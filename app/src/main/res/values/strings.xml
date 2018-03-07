@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">monero</string>
+    <string name="my_activities">My Activities</string>
+    <string name="account_book">Account Book</string>
+    <string name="notifications">Notifications</string>
+    <string name="my_profile">Profile</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
