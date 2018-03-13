@@ -1,8 +1,8 @@
-package com.monero.main.fragments
+package com.monero.main.fragments.Activities
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,11 +17,11 @@ import com.monero.models.Activities
  * Created by tom.saju on 3/6/2018.
  */
 class ActivityFragment: Fragment() {
-    var mActivityFragmentListener:ActivityFragmentListener?=null
+    var mActivityFragmentListener: ActivityFragmentListener?=null
     var activitiesList:ListView?=null
     var adapter:ActivityListAdapter?=null
     companion object {
-        fun newInstance():ActivityFragment{
+        fun newInstance(): ActivityFragment {
             var activityFragment = ActivityFragment()
             var args = Bundle()
             activityFragment.arguments = args;
@@ -42,8 +42,11 @@ class ActivityFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rootView = inflater?.inflate(R.layout.activitylist_fragment,container,false)
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
-
-
+        val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
+        addActivityButton.setOnClickListener { _:View->
+           val mActivity:Activities = Activities(System.currentTimeMillis(),"Title","desc "+System.currentTimeMillis())
+            mActivityFragmentListener?.addNewActivity(mActivity)
+        }
         return rootView
     }
 
@@ -57,6 +60,8 @@ class ActivityFragment: Fragment() {
         super.onAttach(context)
         if(context is ActivityFragmentListener){
             mActivityFragmentListener =  context
+        }else{
+
         }
 
 
@@ -64,6 +69,7 @@ class ActivityFragment: Fragment() {
 
    public interface ActivityFragmentListener{
        fun getAllActivitiesList()
+       fun addNewActivity(activity:Activities)
 
     }
 }

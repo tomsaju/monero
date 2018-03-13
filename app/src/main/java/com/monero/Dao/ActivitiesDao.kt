@@ -2,6 +2,7 @@ package com.monero.Dao
 
 import android.arch.persistence.room.*
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
+import android.database.Observable
 import com.monero.models.Activities
 
 /**
