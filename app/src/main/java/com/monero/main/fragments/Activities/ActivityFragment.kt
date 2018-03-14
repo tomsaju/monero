@@ -11,6 +11,7 @@ import android.widget.ListView
 import com.monero.R
 import com.monero.main.adapter.ActivityListAdapter
 import com.monero.models.Activities
+import com.monero.models.Tag
 
 
 /**
@@ -44,7 +45,8 @@ class ActivityFragment: Fragment() {
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
         val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
         addActivityButton.setOnClickListener { _:View->
-           val mActivity:Activities = Activities(System.currentTimeMillis(),"Title","desc "+System.currentTimeMillis())
+            var taglist:MutableList<Tag> = mutableListOf<Tag>()
+           val mActivity:Activities = Activities(System.currentTimeMillis(),"Title","desc "+System.currentTimeMillis(),taglist)
             mActivityFragmentListener?.addNewActivity(mActivity)
         }
         return rootView

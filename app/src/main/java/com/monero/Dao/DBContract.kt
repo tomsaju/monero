@@ -15,5 +15,13 @@ class DBContract {
         }
 
     }
+    public class TAG_TABLE {
+
+        companion object {
+            const val TABLE_NAME = "Tag_Table"
+            const val TAG_ID = "Tag_Id"
+            const val TAG_NAME = "Tag_Name"
+        }
+    }
 
 }
