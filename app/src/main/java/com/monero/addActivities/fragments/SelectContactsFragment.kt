@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.HorizontalScrollView
+import android.widget.LinearLayout
 import android.widget.ListView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -13,13 +16,22 @@ import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
 import com.monero.models.Contact
 import com.monero.models.Tag
+import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
+import android.widget.TextView
+import com.monero.Views.ContactsView
+import me.gujun.android.taggroup.TagGroup
+
+
+
+
 
 /**
  * Created by tom.saju on 3/13/2018.
  */
 class SelectContactsFragment : DialogFragment() {
     var contactsListView:ListView?=null
-    lateinit var contacts:List<Contact> 
+    lateinit var contacts:List<Contact>
+    lateinit var horizontalList:LinearLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val listString:String? = arguments?.getString("list")
@@ -35,15 +47,35 @@ class SelectContactsFragment : DialogFragment() {
         val rootView = inflater?.inflate(R.layout.select_contact_fragment_layout, container,
                 false)
         contactsListView = rootView?.findViewById<ListView>(R.id.all_contacts_list) as ListView
+        horizontalList = rootView?.findViewById<LinearLayout>(R.id.horizontal_list) as LinearLayout
         loadContacts(contacts)
         dialog?.setTitle("Select participants")
         // Do something else
         return rootView
     }
 
+    override fun onResume() {
+        super.onResume()
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+        dialog.window!!.setLayout(width, height)
+    }
+
 
     public fun loadContacts(contactsList:List<Contact>){
-        val contactsAdapter:ContactListAdapter = ContactListAdapter(activity,contactsList)
+        val contactsAdapter:ContactListAdapter = ContactListAdapter(activity,contactsList,this)
         contactsListView?.adapter = contactsAdapter
     }
+
+     fun onContactSelected(contact:Contact) {
+
+         val contactView = ContactsView(activity,contact.name,true)
+
+
+         /*val textView = TextView(activity)
+         textView.text = contact.name
+         textView.setPadding(10,10,10,10)*/
+         horizontalList.addView(contactView)
+
+     }
 }
