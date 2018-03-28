@@ -25,43 +25,37 @@ class AddActivityPresenter :IAddActivityPresenter {
     }
 
     private fun getContacts(): MutableList<Contact> {
-        val contactsList:MutableList<Contact> = mutableListOf()
+        val PROJECTION = arrayOf(ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+        val contactsList: MutableList<Contact> = mutableListOf()
         val builder = StringBuilder()
-        val resolver: ContentResolver = context?.contentResolver;
-        val cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null,
-                null)
+        val resolver: ContentResolver = context?.contentResolver
 
-        if (cursor.count > 0) {
-            while (cursor.moveToNext()) {
 
-                val id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
-                val name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                val phoneNumber = (cursor.getString(
-                        cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))).toInt()
+        val cursor = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION, null, null, null);
+        if (cursor != null) {
+            try {
+                val nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
 
-                if (phoneNumber > 0) {
-                    val cursorPhone = context?.contentResolver.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", arrayOf(id), null)
+                var name: String
+                var number: String
+                while (cursor.moveToNext()) {
+                    name = cursor.getString(nameIndex)
+                    number = cursor.getString(numberIndex)
 
-                    if(cursorPhone.count > 0) {
-                        while (cursorPhone.moveToNext()) {
-                            val phoneNumValue = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                            builder.append("Contact: ").append(name).append(", Phone Number: ").append(
-                                    phoneNumValue).append("\n\n")
-                            Log.e("Name ===>",phoneNumValue)
-                            var newCOntact:Contact = Contact(name,phoneNumValue)
-                            contactsList.add(newCOntact)
-                        }
-
-                    }
-                    cursorPhone.close()
+                    var newCOntact: Contact = Contact(name, number)
+                    contactsList.add(newCOntact)
                 }
+            } finally {
+                cursor.close();
             }
-        } else {
-            //   toast("No contacts available!")
+
         }
-        cursor.close()
-        return contactsList
-    }
+            return contactsList
+        }
+
+
 }

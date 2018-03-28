@@ -4,6 +4,7 @@ import android.app.Application
 import com.monero.helper.AppDatabase
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
+import android.support.multidex.MultiDex
 import com.facebook.stetho.Stetho
 
 
@@ -18,6 +19,7 @@ class ApplicationController:Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MultiDex.install(this)
         db=Room.databaseBuilder(this, AppDatabase::class.java, "fair-db").build()
         Stetho.initializeWithDefaults(this)
     }

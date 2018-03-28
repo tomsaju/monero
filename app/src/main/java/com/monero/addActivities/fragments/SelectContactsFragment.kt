@@ -1,7 +1,9 @@
 package com.monero.addActivities.fragments
 
+import android.app.Activity
 import android.app.Dialog
 import android.app.DialogFragment
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +21,7 @@ import com.monero.models.Tag
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import android.widget.TextView
 import com.monero.Views.ContactsView
+import com.pchmn.materialchips.ChipView
 import me.gujun.android.taggroup.TagGroup
 
 
@@ -30,8 +33,13 @@ import me.gujun.android.taggroup.TagGroup
  */
 class SelectContactsFragment : DialogFragment() {
     var contactsListView:ListView?=null
+    var doneButton:Button?=null
+    var cancelButton:Button?=null
     lateinit var contacts:List<Contact>
     lateinit var horizontalList:LinearLayout
+    var mListener:OnCotactSelectedListener?=null
+    var selectedContactList:MutableList<Contact>?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val listString:String? = arguments?.getString("list")
@@ -39,6 +47,7 @@ class SelectContactsFragment : DialogFragment() {
         val type = object : TypeToken<List<Contact>>() {
         }.type
         contacts= gson.fromJson(listString, type)
+        selectedContactList = mutableListOf<Contact>()
 
     }
 
@@ -48,9 +57,18 @@ class SelectContactsFragment : DialogFragment() {
                 false)
         contactsListView = rootView?.findViewById<ListView>(R.id.all_contacts_list) as ListView
         horizontalList = rootView?.findViewById<LinearLayout>(R.id.horizontal_list) as LinearLayout
+        doneButton = rootView?.findViewById<Button>(R.id.done_action_select_contacts) as Button
+        cancelButton = rootView?.findViewById<Button>(R.id.cancel_action_select_contacts) as Button
+
         loadContacts(contacts)
         dialog?.setTitle("Select participants")
         // Do something else
+
+        doneButton?.setOnClickListener(View.OnClickListener {
+            mListener?.onContactSelected(selectedContactList)
+            dialog?.dismiss()
+        })
+
         return rootView
     }
 
@@ -69,13 +87,40 @@ class SelectContactsFragment : DialogFragment() {
 
      fun onContactSelected(contact:Contact) {
 
-         val contactView = ContactsView(activity,contact.name,true)
+        // val contactView = ContactsView(activity,contact.name,true)
+         val chip = ChipView(activity)
+         chip.label = contact.name
+         chip.setDeletable(true)
+         chip.setAvatarIcon(activity.resources.getDrawable(R.drawable.avatar))
+         chip.setPadding(5,0,5,0)
+         chip.setChipBackgroundColor(resources.getColor(android.R.color.holo_blue_light))
 
 
-         /*val textView = TextView(activity)
-         textView.text = contact.name
-         textView.setPadding(10,10,10,10)*/
-         horizontalList.addView(contactView)
+
+         selectedContactList?.add(contact)
+         horizontalList.addView(chip)
+
+         horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
+
 
      }
+
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if(context is OnCotactSelectedListener){
+          mListener = context
+        }
+    }
+
+    override fun onAttach(activity: Activity?) {
+        super.onAttach(activity)
+        if(activity is OnCotactSelectedListener){
+            mListener = activity
+        }
+    }
+    interface OnCotactSelectedListener {
+        fun onContactSelected(contactList:MutableList<Contact>?)
+    }
+
 }

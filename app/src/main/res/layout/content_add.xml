@@ -140,6 +140,20 @@
             android:text="Members"
             android:paddingLeft="8dp"
             android:textStyle="bold"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/contact_section_parent">
+
+            <LinearLayout
+                android:id="@+id/contacts_linearlayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="8dp">
+
+            </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -147,7 +161,7 @@
             android:text="Add members"
             android:drawableLeft="@android:drawable/ic_input_add"
             android:gravity="center_vertical"/>
-
+        </FrameLayout>
         <android.support.v4.widget.Space
             android:layout_width="match_parent"
             android:layout_height="10dp" />

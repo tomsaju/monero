@@ -9,10 +9,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.monero.Application.ApplicationController
@@ -21,6 +18,7 @@ import com.monero.addActivities.fragments.SelectContactsFragment
 import com.monero.models.Activities
 import com.monero.models.Contact
 import com.monero.models.Tag
+import com.pchmn.materialchips.ChipView
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -28,7 +26,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_add.*
 import me.gujun.android.taggroup.TagGroup
 
-class AddActivity : AppCompatActivity(),IAddActivityView {
+class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.OnCotactSelectedListener {
     var toolbar:Toolbar?=null
     var title:EditText?=null
     var description:EditText?=null
@@ -40,6 +38,7 @@ class AddActivity : AppCompatActivity(),IAddActivityView {
     var addMembers:TextView?=null
     var mAddActivityPresenter:IAddActivityPresenter?=null
     lateinit var selectContactsFragment: SelectContactsFragment
+   // var contactsSection:FlowLayout?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +51,8 @@ class AddActivity : AppCompatActivity(),IAddActivityView {
         tagSectionParent = findViewById<FrameLayout>(R.id.tag_section_parent) as FrameLayout
         addTagLabel = findViewById<TextView>(R.id.add_tag_text) as TextView
         addMembers = findViewById<TextView>(R.id.add_members_text) as TextView
-
-       addMembers?.setOnClickListener{_:View->
+      //  contactsSection = findViewById<FlowLayout>(R.id.contacts_linearlayout) as FlowLayout
+        addMembers?.setOnClickListener{_:View->
 
            mAddActivityPresenter?.getAllContactsList()
        }
@@ -125,6 +124,26 @@ class AddActivity : AppCompatActivity(),IAddActivityView {
         selectContactsFragment= SelectContactsFragment()
         selectContactsFragment.arguments = bundle
         selectContactsFragment.show(fragmentManager,"selectContacts")
+
+    }
+
+    override fun onContactSelected(contactList: MutableList<Contact>?) {
+        Log.d("contact","sele")
+
+
+        contactList?.let {
+            for(contact in contactList){
+                val chip = ChipView(this)
+                chip.label = contact.name
+                chip.setDeletable(true)
+                chip.setAvatarIcon(resources.getDrawable(R.drawable.avatar))
+                chip.setPadding(5, 0, 5, 0)
+                chip.setChipBackgroundColor(resources.getColor(android.R.color.holo_blue_light))
+
+              //  contactsSection?.addView(chip)
+                addMembers?.visibility = View.INVISIBLE
+            }
+        }
 
     }
 }

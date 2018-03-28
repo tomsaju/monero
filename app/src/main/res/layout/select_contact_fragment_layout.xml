@@ -21,6 +21,7 @@
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/horizontal_scrollview"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
         android:layout_marginLeft="10dp"
@@ -45,8 +46,28 @@
     <ListView
         android:id="@+id/all_contacts_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="350dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:minHeight="50dp"></ListView>
+        android:minHeight="40dp"></ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/cancel_action_select_contacts"
+            android:text="Cancel"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/done_action_select_contacts"
+            android:text="Done"/>
+
+    </LinearLayout>
 </LinearLayout>
