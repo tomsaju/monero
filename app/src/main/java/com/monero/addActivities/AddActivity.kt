@@ -38,7 +38,9 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
     var addMembers:TextView?=null
     var mAddActivityPresenter:IAddActivityPresenter?=null
     lateinit var selectContactsFragment: SelectContactsFragment
-   // var contactsSection:FlowLayout?=null
+    var contactsSection: LinearLayout?=null
+    var cancel:Button?=null
+    var save:Button?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +53,14 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
         tagSectionParent = findViewById<FrameLayout>(R.id.tag_section_parent) as FrameLayout
         addTagLabel = findViewById<TextView>(R.id.add_tag_text) as TextView
         addMembers = findViewById<TextView>(R.id.add_members_text) as TextView
-      //  contactsSection = findViewById<FlowLayout>(R.id.contacts_linearlayout) as FlowLayout
+        contactsSection = findViewById<LinearLayout>(R.id.contacts_linearlayout) as LinearLayout
+        save = findViewById<Button>(R.id.saveAddPage) as Button
+        cancel = findViewById<Button>(R.id.cancelAddPage) as Button
+
+        save?.setOnClickListener { _: View ->
+
+            saveActivity();
+        }
         addMembers?.setOnClickListener{_:View->
 
            mAddActivityPresenter?.getAllContactsList()
@@ -140,7 +149,7 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
                 chip.setPadding(5, 0, 5, 0)
                 chip.setChipBackgroundColor(resources.getColor(android.R.color.holo_blue_light))
 
-              //  contactsSection?.addView(chip)
+                contactsSection?.addView(chip)
                 addMembers?.visibility = View.INVISIBLE
             }
         }

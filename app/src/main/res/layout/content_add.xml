@@ -151,9 +151,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
                 android:paddingLeft="8dp">
 
             </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -166,7 +168,58 @@
             android:layout_width="match_parent"
             android:layout_height="10dp" />
 
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Currency"
+        android:paddingLeft="8dp"
+        android:textStyle="bold"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Currency: "/>
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add members"
+                android:entries="@array/modes_list"
+                android:drawableLeft="@android:drawable/ic_input_add"
+                android:gravity="center_vertical"/>
+        </LinearLayout>
+
+        <android.support.v4.widget.Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:gravity="bottom|end"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:id="@+id/cancelAddPage"
+                android:text="Cancel" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:id="@+id/saveAddPage"
+                android:text="Save" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

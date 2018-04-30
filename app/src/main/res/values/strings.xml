@@ -14,4 +14,10 @@
         <item>Single Mode</item>
         <item>Group Mode</item>
     </string-array>
+
+    <string-array name="currency_list">
+        <item>INR</item>
+        <item>USD</item>
+        <item>YEN</item>
+    </string-array>
 </resources>

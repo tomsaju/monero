@@ -1,12 +1,15 @@
 package com.monero.main.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.monero.R
+import com.monero.activitydetail.DetailActivity
 import com.monero.models.Activities
 
 /**
@@ -26,8 +29,16 @@ class ActivityListAdapter : BaseAdapter {
         var view:View?
         var inflater:LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         view = inflater.inflate(R.layout.activities_list_item,parent,false)
+
         var title:TextView = view.findViewById(R.id.activites_title)
         var description:TextView = view.findViewById(R.id.activities_description)
+        var parent:RelativeLayout = view.findViewById(R.id.mainListItemParent)
+
+        parent.setOnClickListener{_:View->
+            var intent:Intent = Intent(context,DetailActivity::class.java)
+            context.startActivity(intent)
+
+        }
 
         title.text=activitiesList[position].title
         description.text = activitiesList[position].description
