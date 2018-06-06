@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="18dp"
+    android:minHeight="80dp">
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/leftImages">
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp">
+    </View>
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="25dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/messaging"/>
+
+</RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/title_text"
+        android:layout_toRightOf="@id/leftImages"
+        android:layout_marginTop="30dp"
+        android:textSize="16sp"
+        android:text="Tony added a comment"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/timeDateText"
+        android:layout_toRightOf="@id/leftImages"
+        android:text=" 28 minutes ago"
+        android:textSize="12sp"
+        android:layout_below="@+id/title_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textSample"
+        android:layout_toRightOf="@id/leftImages"
+        android:layout_below="@+id/timeDateText"
+        android:layout_marginTop="18dp"
+        android:textSize="14sp"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."/>
+</RelativeLayout>
