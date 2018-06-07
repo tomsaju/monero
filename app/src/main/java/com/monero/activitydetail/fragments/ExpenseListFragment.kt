@@ -44,6 +44,7 @@ class ExpenseListFragment : Fragment() {
         fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
         fab?.setOnClickListener { _:View ->
             //Show the add expense fragment
+            onButtonPressed(Uri.EMPTY)
         }
         return view
     }
@@ -57,11 +58,11 @@ class ExpenseListFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        /*if (context is OnFragmentInteractionListener) {
+        if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
             throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
-        }*/
+        }
     }
 
     override fun onDetach() {

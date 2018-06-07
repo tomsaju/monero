@@ -24,4 +24,16 @@ class DBContract {
         }
     }
 
+    public class EXPENSE_TABLE {
+
+        companion object {
+            const val TABLE_NAME = "Expense_Table"
+            const val EXPENSE_ID = "expense_id"
+            const val EXPENSE_TITLE = "title"
+            const val EXPENSE_COMMENTS = "comments"
+            const val EXPENSE_PAYMENTS = "payments"
+        }
+
+    }
+
 }

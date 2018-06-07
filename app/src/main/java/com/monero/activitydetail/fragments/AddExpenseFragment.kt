@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 
 import com.monero.R
 
@@ -19,6 +21,11 @@ import com.monero.R
 class AddExpenseFragment : Fragment() {
 
     private var mListener: OnFragmentInteractionListener? = null
+    var title:EditText?=null
+    var comments:EditText?=null
+    var saveButton: Button?=null
+    var discardButton: Button?=null
+    var amount:EditText?=null
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,

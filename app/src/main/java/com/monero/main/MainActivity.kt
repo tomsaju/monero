@@ -126,11 +126,6 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
     override fun addNewActivity(activity: Activities) {
 
-      /*  Single.fromCallable {
-            ApplicationController.db?.activitesDao().insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
-        }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe()*/
-
         val intent = Intent(this,AddActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)

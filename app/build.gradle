@@ -51,6 +51,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.github.pchmn:MaterialChipsInput:1.0.8'
     compile "com.android.support:design:$supportLibraryVersion"
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
 
 
 }
