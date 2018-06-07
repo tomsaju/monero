@@ -8,10 +8,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/leftImages">
+
         <View
             android:layout_width="2dp"
             android:layout_height="match_parent"
-            android:background="@android:color/darker_gray"
+            android:background="@android:color/black"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="30dp">
         </View>
@@ -23,7 +24,7 @@
             android:layout_marginTop="30dp"
             android:layout_marginLeft="25dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/cam"/>
+            android:src="@drawable/cam" />
 
     </RelativeLayout>
 
@@ -47,11 +48,11 @@
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="centerInside"
-        android:maxHeight="40dp"
-        android:maxWidth="40dp"
+        android:layout_height="250dp"
+        android:maxHeight="250dp"
         android:layout_toRightOf="@id/leftImages"
         android:layout_below="@+id/timeDateText"
-        android:src="@drawable/ic_person_white_24dp"/>
+        android:src="@drawable/placeholder"
+        android:layout_marginRight="18dp"
+        android:id ="@+id/imageContent"/>
     </RelativeLayout>

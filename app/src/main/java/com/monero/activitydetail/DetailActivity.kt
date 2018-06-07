@@ -1,14 +1,18 @@
 package com.monero.activitydetail
 
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import com.monero.R
+import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
 
-class DetailActivity : AppCompatActivity()  {
+class DetailActivity : AppCompatActivity()   {
+
+
     var toolbar:Toolbar?=null
     var tabLayout:TabLayout?=null
 
@@ -37,4 +41,5 @@ class DetailActivity : AppCompatActivity()  {
         tabLayout?.setupWithViewPager(mViewPager)
 
     }
+
 }

@@ -61,4 +61,13 @@ class AddExpenseFragment : Fragment() {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
     }
+
+    companion object {
+
+        fun newInstance(): AddExpenseFragment {
+            val fragment = AddExpenseFragment()
+            return fragment
+        }
+    }
+
 }// Required empty public constructor

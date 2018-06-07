@@ -4,7 +4,9 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
+import com.monero.activitydetail.fragments.HistoryFragment
 
 /**
  * Created by Dreamz on 01-05-2018.
@@ -16,7 +18,7 @@ class DetailViewPagerAdapter(fm: FragmentManager?,private val context: Context) 
 
 
     override fun getItem(position: Int): Fragment {
-        return ExpenseListFragment.newInstance()
+        return HistoryFragment.newInstance()
           }
 
     override fun getCount(): Int {

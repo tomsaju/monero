@@ -11,7 +11,7 @@
     <View
         android:layout_width="2dp"
         android:layout_height="match_parent"
-        android:background="@android:color/darker_gray"
+        android:background="@android:color/black"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="30dp">
     </View>
@@ -48,10 +48,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textSample"
+        android:id="@+id/textComment"
         android:layout_toRightOf="@id/leftImages"
         android:layout_below="@+id/timeDateText"
         android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
         android:textSize="14sp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."/>
 </RelativeLayout>
