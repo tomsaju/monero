@@ -16,7 +16,7 @@ import com.monero.activitydetail.fragments.ExpenseListFragment
 class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInteractionListener,AddExpenseFragment.OnFragmentInteractionListener  {
     var toolbar:Toolbar?=null
     var tabLayout:TabLayout?=null
-    var fragmentContainer:FrameLayout?=null
+  //  var fragmentContainer:FrameLayout?=null
     private var mViewPager: ViewPager? = null
     private var mSectionsPagerAdapter:DetailViewPagerAdapter?=null
 
@@ -27,7 +27,7 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInterac
         toolbar = findViewById<Toolbar>(R.id.my_toolbar) as Toolbar
         tabLayout = findViewById<TabLayout>(R.id.detailPageTab) as TabLayout
         mViewPager = findViewById<ViewPager?>(R.id.container)
-        fragmentContainer = findViewById<FrameLayout>(R.id.container_fragment) as FrameLayout
+       // fragmentContainer = findViewById<FrameLayout>(R.id.container_fragment) as FrameLayout
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
 
         setSupportActionBar(toolbar)
@@ -52,7 +52,7 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInterac
 
     fun showAddExpenseFragment(){
         supportFragmentManager.inTransaction {
-            add(R.id.container_fragment,AddExpenseFragment())
+            add(android.R.id.content,AddExpenseFragment())
         }
     }
 

@@ -18,8 +18,20 @@ class DetailViewPagerAdapter(fm: FragmentManager?,private val context: Context) 
 
 
     override fun getItem(position: Int): Fragment {
-        return HistoryFragment.newInstance()
-          }
+        var returnFragment:Fragment = ExpenseListFragment.newInstance()
+        when(position){
+            0 ->{
+               returnFragment = ExpenseListFragment.newInstance()
+            }
+            1->{
+               returnFragment = HistoryFragment.newInstance()
+            }
+            2->{
+                returnFragment = ExpenseListFragment.newInstance()
+            }
+        }
+        return returnFragment
+    }
 
     override fun getCount(): Int {
         return mFragmentList.size

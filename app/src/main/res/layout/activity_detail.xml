@@ -18,9 +18,11 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/my_toolbar"
             style="@style/HeaderBar"
+            android:elevation="4dp"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll|enterAlways"/>
+
         <RelativeLayout
                 android:id="@+id/costSectionParent"
                 android:layout_width="match_parent"
@@ -36,11 +38,7 @@
                     android:text="$330"
                     android:textSize="30sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="#000000"></View>
+
 
             </RelativeLayout>
 
