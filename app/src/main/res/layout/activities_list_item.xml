@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="70dp"
     android:paddingLeft="10dp"
+    android:background="#ffffff"
     android:id="@+id/mainListItemParent">
 <RelativeLayout
     android:layout_width="wrap_content"
@@ -12,8 +13,8 @@
     <de.hdodenhof.circleimageview.CircleImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/profile_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:src="@drawable/ic_person_outline_white_24dp"
         app:civ_border_width="2dp"
         android:layout_alignParentLeft="true"
@@ -26,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/profile_image"
         android:layout_alignParentTop="true"
-        android:textSize="19sp"
+        android:textSize="17sp"
         android:textColor="#CC000000"
         android:text="Trip to nevada" />
 
@@ -34,7 +35,7 @@
         android:id="@+id/activities_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:layout_toRightOf="@id/profile_image"
         android:layout_alignStart="@+id/activites_title"
         android:layout_below="@+id/activites_title"
