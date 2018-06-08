@@ -15,41 +15,43 @@
         android:background="?attr/colorPrimary"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/my_toolbar"
-            style="@style/HeaderBar"
-            android:elevation="4dp"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways"/>
+       <include layout="@layout/toolbar"></include>
 
         <RelativeLayout
                 android:id="@+id/costSectionParent"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
                 app:layout_scrollFlags="scroll|enterAlways"
                 android:layout_height="100dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="$330"
-                    android:textSize="30sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total"
+                android:layout_centerHorizontal="true"
+                android:textSize="21sp"
+                android:textColor="#575d66"
+                android:id="@+id/totalText"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$330"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/totalText"
+                android:id="@+id/totalCost"
+                android:textColor="#202326"
+                android:textSize="30sp" />
+
+
 
 
 
             </RelativeLayout>
 
-           <!-- <ImageView
-                android:id="@+id/htab_header"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/placeholder"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                app:layout_collapseMode="parallax"/>-->
+
 
 
 

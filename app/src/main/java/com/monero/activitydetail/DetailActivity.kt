@@ -24,13 +24,14 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInterac
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        toolbar = findViewById<Toolbar>(R.id.my_toolbar) as Toolbar
+        toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         tabLayout = findViewById<TabLayout>(R.id.detailPageTab) as TabLayout
         mViewPager = findViewById<ViewPager?>(R.id.container)
-       // fragmentContainer = findViewById<FrameLayout>(R.id.container_fragment) as FrameLayout
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
 
         setSupportActionBar(toolbar)
+
+
         setupViewPager()
     }
 

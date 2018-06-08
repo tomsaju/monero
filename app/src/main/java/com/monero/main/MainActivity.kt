@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
+import android.support.v7.widget.Toolbar
 import android.widget.FrameLayout
 import android.widget.Toast
 import com.monero.Application.ApplicationController
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
     val TIME_INTERVAL:Long =2000
     var mBackPressed:Long=0
     lateinit var context:Context
+    var toolbar:Toolbar?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +41,8 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         context = baseContext
         content = findViewById<FrameLayout>(R.id.container) as FrameLayout
         val bottomNavigationMenu = findViewById<BottomNavigationMenuView>(R.id.bottomNavigation) as BottomNavigationView
+        toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
+        setSupportActionBar(toolbar)
 
         MainPresenter = MainPresenter(baseContext,this)
 
