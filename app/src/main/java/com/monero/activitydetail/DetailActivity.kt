@@ -37,7 +37,7 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInterac
 
     private fun setupViewPager() {
         mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "Expenses")
-        mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "Statistics")
+        mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "My Status")
         mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "History")
         mViewPager!!.adapter = mSectionsPagerAdapter
         tabLayout?.setupWithViewPager(mViewPager)

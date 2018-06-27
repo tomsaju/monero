@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.addActivities.AddActivity
+import com.monero.addActivities.AddActivityFragment
 import com.monero.main.fragments.AccountBookFragment
 import com.monero.main.fragments.Activities.ActivityFragment
 import com.monero.main.fragments.NotificationFragment
@@ -130,9 +131,17 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
     override fun addNewActivity(activity: Activities) {
 
-        val intent = Intent(this,AddActivity::class.java)
+        var ft = supportFragmentManager.beginTransaction()
+
+        //Basic "newInstance" constructor to avoid omitting necessary variables
+        var frag =  AddActivityFragment()
+
+        //Here is where error occurs
+        ft.add(android.R.id.content, frag).commit()
+
+      /*  val intent = Intent(this,AddActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)
+        context.startActivity(intent)*/
     }
 
     //var intent: Intent = Intent(context,AddActivity.class)
