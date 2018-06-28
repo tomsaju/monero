@@ -22,7 +22,7 @@
         android:layout_height="wrap_content">
 
         <AutoCompleteTextView
-            android:id="@+id/title_activity_edittext"
+            android:id="@+id/title_activity_autotextview"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content">
 
             <AutoCompleteTextView
-                android:id="@+id/description_activity_edittext"
+                android:id="@+id/description_activity_autotextview"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="Description"
@@ -57,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                android:textSize="15sp"
                 android:text="Mode: "/>
             <Spinner
                 android:layout_width="wrap_content"
@@ -71,22 +72,34 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/helper_text"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp"
     android:paddingLeft="8dp"
     android:textSize="12sp"
     android:textColor="@android:color/holo_green_dark"
     android:text="Each user adds there own expenses"/>
 
-
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tags"
+            android:textSize="15sp"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
             android:paddingLeft="8dp"
             android:textStyle="bold"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_input_add"
+            android:id="@+id/add_tag_button"
+            android:background="@android:color/transparent"/>
+</RelativeLayout>
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -112,23 +125,39 @@
 
         </FrameLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Members"
+            android:textSize="15sp"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
             android:paddingLeft="8dp"
             android:textStyle="bold"/>
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@android:drawable/ic_menu_edit"
+                android:id="@+id/add_members_button"
+                android:background="@android:color/transparent"/>
+
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/members_layout">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add Members."
                 android:paddingLeft="8dp"
+                android:id="@+id/add_mebers_banner"
                 android:layout_gravity="center_vertical|center_horizontal" />
 
         </LinearLayout>
