@@ -1,5 +1,6 @@
 package com.monero.main.presenter
 
+import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.support.annotation.WorkerThread
 import android.util.Log
@@ -36,14 +37,32 @@ class MainPresenter:IMainPresenter {
     }
 
 
+
     override fun getAllActivitiesList() {
 
-        Observable.create(ObservableOnSubscribe<List<Activities>>
+
+        var allActivities = ApplicationController.db.activitesDao().getAllActivities();
+
+        view.onActivitiesFetched(allActivities);
+
+
+       /* Observable.create(ObservableOnSubscribe<List<Activities>>
         { emitter -> emitter.onNext(ApplicationController.db.activitesDao().getAllActivities()) })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { result -> view.onActivitiesFetched(result) }
+                .subscribe { result -> view.onActivitiesFetched(result) }*/
 
     }
 
+    override fun saveActivity(activity: Activities) {
+        Single.fromCallable {
+            ApplicationController.db?.activitesDao().insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
+            for(tag in activity.tags){
+                ApplicationController.db?.tagDao().insertIntoTagTable(tag)
+            }
+
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe()
+
+    }
 }

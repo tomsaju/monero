@@ -40,23 +40,32 @@ class ActivityFragment: Fragment() {
         super.onResume()
         mActivityFragmentListener?.getAllActivitiesList()
     }
+
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rootView = inflater?.inflate(R.layout.activitylist_fragment,container,false)
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
         val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
         addActivityButton.setOnClickListener { _:View->
             var taglist:MutableList<Tag> = mutableListOf<Tag>()
-           val mActivity:Activities = Activities(System.currentTimeMillis(),"Title","desc "+System.currentTimeMillis(),taglist)
+            val mActivity:Activities = Activities(System.currentTimeMillis(),"Title","desc "+System.currentTimeMillis(),taglist)
             mActivityFragmentListener?.addNewActivity(mActivity)
         }
         return rootView
     }
 
-    fun onAllActivitiesFetched(activites: List<Activities>) {
+    fun onAllActivitiesFetched(activities: List<Activities>?) {
         //pass result to fragment
-        adapter = ActivityListAdapter(context,activites)
-        activitiesList?.adapter=adapter
+        if(activities!=null) {
+            adapter = ActivityListAdapter(context, activities)
+            activitiesList?.adapter = adapter
+        }
     }
+
+    public fun refreshList(){
+        adapter?.notifyDataSetChanged();
+    }
+
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

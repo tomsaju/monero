@@ -12,7 +12,7 @@ import com.monero.models.Tag
  * Created by tom.saju on 3/8/2018.
  */
 @TypeConverters(Converter::class)
-@Database(entities = arrayOf(Activities::class, Tag::class),version = 2,exportSchema = false)
+@Database(entities = arrayOf(Activities::class, Tag::class),version = 3,exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun activitesDao():ActivitiesDao

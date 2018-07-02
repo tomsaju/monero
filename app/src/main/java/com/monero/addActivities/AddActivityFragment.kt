@@ -1,6 +1,8 @@
 package com.monero.addActivities
 
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.*
 
 import com.monero.R
+import com.monero.models.Activities
 import com.monero.models.Tag
 import com.monero.models.User
 import kotlinx.android.synthetic.main.new_activity_fragment.*
@@ -33,6 +36,8 @@ public class AddActivityFragment : Fragment() {
     lateinit var cancelButton:TextView
     lateinit var selectedList:ArrayList<User>
     lateinit var selectedTagList:ArrayList<Tag>
+    lateinit var mListener:IAddActivityFragmentListener
+
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -42,22 +47,24 @@ public class AddActivityFragment : Fragment() {
         modeSelector = view.findViewById(R.id.mode_spinner_activity)
         addTagButton = view.findViewById(R.id.add_tag_button)
         addMembersButton = view.findViewById(R.id.add_members_button)
-        /*tagContainer = view.findViewById(R.id.container)
-        memberListParent = members_layout
-        addTagText = add_tag_text
-        addMemberBanner = add_mebers_banner
-        doneButton = done_button_new_activity
-        cancelButton = cancel_button_new_activity*/
+        tagContainer = view.findViewById(R.id.tag_group)
+        memberListParent =view.findViewById(R.id.members_layout)
+        addTagText = view.findViewById(R.id.add_tag_text) //add_tag_text
+        addMemberBanner = view.findViewById(R.id.add_mebers_banner) // add_mebers_banner
+        doneButton = view.findViewById(R.id.done_button_new_activity) // done_button_new_activity
+        cancelButton = view.findViewById(R.id.cancel_button_new_activity)  // cancel_button_new_activity
         selectedList = ArrayList(emptyList<User>())
+        selectedTagList = ArrayList(emptyList<Tag>())
 
-       /* doneButton.setOnClickListener {
+        doneButton.setOnClickListener {
             v: View? ->
-            {
-                if(checkifInputValid()){
 
+                if(checkifInputValid()){
+                    val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(),selectedTagList )
+                    mListener.saveActivity(activity)
                 }
             }
-        }*/
+
 
         return view;
     }
@@ -70,15 +77,28 @@ public class AddActivityFragment : Fragment() {
         }else if(description.text.isEmpty()){
             Toast.makeText(context,"Enter a description",Toast.LENGTH_SHORT)
             valid=false
-        }
-
-        if(selectedList.isEmpty()){
+        }/*else if(selectedList.isEmpty()){
             Toast.makeText(context,"Please add members",Toast.LENGTH_SHORT)
             valid=false
-        }
+        }*/
 
         return  valid
 
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if(context is IAddActivityFragmentListener){
+           mListener = context as IAddActivityFragmentListener
+        }else{
+            throw Exception("Activity must implement IAddActivityFragmentlistener")
+        }
+    }
+
+
+    interface IAddActivityFragmentListener{
+      fun  saveActivity(activity: Activities)
+      fun getActivity(id:String):Activities
     }
 
 }// Required empty public constructor

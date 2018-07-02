@@ -8,5 +8,6 @@ import com.monero.models.Activities
 interface IMainPresenter {
 
     fun getAllActivitiesList()
+    fun saveActivity(activity:Activities)
 
 }

@@ -1,7 +1,10 @@
 package com.monero.main
 
+import android.arch.core.util.Function
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.Transformations
 import android.content.Context
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationMenuView
@@ -10,10 +13,10 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
 import android.widget.FrameLayout
 import android.widget.Toast
-import com.monero.Application.ApplicationController
+import com.monero.Dao.ActivitiesDao
 import com.monero.R
-import com.monero.addActivities.AddActivity
 import com.monero.addActivities.AddActivityFragment
+import com.monero.helper.AppDatabase
 import com.monero.main.fragments.AccountBookFragment
 import com.monero.main.fragments.Activities.ActivityFragment
 import com.monero.main.fragments.NotificationFragment
@@ -23,13 +26,10 @@ import com.monero.main.presenter.IMainPresenter
 import com.monero.main.presenter.IMainView
 import com.monero.main.presenter.MainPresenter
 import com.monero.models.Activities
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
-class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFragmentListener {
+class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener {
     private var content:FrameLayout? = null
-    lateinit var  MainPresenter:IMainPresenter
+    lateinit var mMainPresenter:IMainPresenter
     val TIME_INTERVAL:Long =2000
     var mBackPressed:Long=0
     lateinit var context:Context
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-        MainPresenter = MainPresenter(baseContext,this)
+        mMainPresenter = MainPresenter(baseContext,this)
 
         BottomNavigationViewHelper.removeShiftMode(bottomNavigationMenu)
         bottomNavigationMenu.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -59,10 +59,23 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
     override fun getAllActivitiesList() {
         //call from fragment
-        MainPresenter.getAllActivitiesList()
+        mMainPresenter.getAllActivitiesList()
     }
 
 
+    override fun saveActivity(activity: Activities) {
+        mMainPresenter.saveActivity(activity)
+        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("activity_add_fragment")).commit()
+
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        if(currentFragment is ActivityFragment){
+            currentFragment.refreshList()
+        }
+    }
+
+    override fun getActivity(id: String): Activities {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     private fun addFragment(fragment:Fragment){
 
@@ -74,11 +87,24 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
     }
 
-    override fun onActivitiesFetched(activityList: List<Activities>) {
+    override fun onActivitiesFetched(activityList: LiveData<List<Activities>>) {
         var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
-        if(currentFragment is ActivityFragment){
-            currentFragment.onAllActivitiesFetched(activityList)
-        }
+
+                activityList.observe(this, object : Observer<List<Activities>> {
+                    override fun onChanged(allList: List<Activities>?) {
+
+                        if(currentFragment is ActivityFragment){
+                            currentFragment.onAllActivitiesFetched(allList)
+                        }
+
+                    }
+
+                });
+
+
+
+
+
     }
 
 
@@ -137,11 +163,9 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         var frag =  AddActivityFragment()
 
         //Here is where error occurs
-        ft.add(android.R.id.content, frag).commit()
 
-      /*  val intent = Intent(this,AddActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(intent)*/
+        ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
+
     }
 
     //var intent: Intent = Intent(context,AddActivity.class)
