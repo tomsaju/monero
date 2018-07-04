@@ -141,14 +141,26 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
     override fun onBackPressed() {
 
-        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-            super.onBackPressed()
-            finish()
-        } else {
-            "Press back button again to exit".shortToast(context)
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")
+        if(currentFragment is AddActivityFragment&&currentFragment.isVisible){
+            supportFragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+                    .detach(currentFragment)
+                    .addToBackStack(currentFragment.javaClass.simpleName)
+                    .commit()
+        }else {
+
+            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+                super.onBackPressed()
+                finish()
+            } else {
+                "Press back button again to exit".shortToast(context)
+                mBackPressed = System.currentTimeMillis()
+            }
+
         }
 
-        mBackPressed = System.currentTimeMillis()
+
     }
 
     fun Any.shortToast(context: Context) {

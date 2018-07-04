@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken
 import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
+import com.monero.helper.AppDatabase
 import com.monero.models.Activities
 import com.monero.models.Contact
 import com.monero.models.Tag
@@ -109,9 +110,9 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
         if(title?.text.toString().isNotEmpty()) {
             val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(),taglist )
             Single.fromCallable {
-                ApplicationController.db?.activitesDao().insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
+                AppDatabase.db?.activitesDao().insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
                 for(tag in taglist){
-                    ApplicationController.db?.tagDao().insertIntoTagTable(tag)
+                    AppDatabase.db?.tagDao().insertIntoTagTable(tag)
                 }
 
             }.subscribeOn(Schedulers.io())

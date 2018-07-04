@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/MyAppTheme">
-        <activity android:name=".main.MainActivity"
+        <activity
+            android:name=".main.MainActivity"
             android:theme="@style/MyAppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +26,10 @@
             android:name=".addActivities.AddActivity"
             android:label="@string/title_activity_add"
             android:theme="@style/MyAppTheme.NoActionBar" />
-        <activity android:name=".activitydetail.DetailActivity"
+        <activity
+            android:name=".activitydetail.DetailActivity"
+            android:theme="@style/MyAppTheme.NoActionBar" />
+        <activity android:name=".tags.TagActivity"
             android:theme="@style/MyAppTheme.NoActionBar"></activity>
     </application>
 

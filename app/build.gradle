@@ -55,7 +55,6 @@ dependencies {
     compile "com.android.support:design:$supportLibraryVersion"
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
-
     // Lifecycle components
     implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$archLifecycleVersion"

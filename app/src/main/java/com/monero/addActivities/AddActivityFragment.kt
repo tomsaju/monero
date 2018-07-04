@@ -3,6 +3,7 @@ package com.monero.addActivities
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import com.monero.R
 import com.monero.models.Activities
 import com.monero.models.Tag
 import com.monero.models.User
+import com.monero.tags.TagActivity
 import kotlinx.android.synthetic.main.new_activity_fragment.*
 import me.gujun.android.taggroup.TagGroup
 
@@ -64,6 +66,13 @@ public class AddActivityFragment : Fragment() {
                     mListener.saveActivity(activity)
                 }
             }
+
+        addTagText.setOnClickListener {
+            v: View? ->
+
+                var intent:Intent = Intent(context,TagActivity::class.java)
+                startActivity(intent)
+        }
 
 
         return view;

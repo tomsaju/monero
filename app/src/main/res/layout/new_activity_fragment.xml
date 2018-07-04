@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff"
     android:fillViewport="true"
 
@@ -18,6 +19,8 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/to_text_input_layout"
         android:layout_marginTop="8dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="35"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -25,14 +28,17 @@
             android:id="@+id/title_activity_autotextview"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:hint="Title"
-            android:layout_marginTop="45dp"
+            android:maxLength="35"
             />
     </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/to_text_input_layout_desc"
             android:layout_marginTop="8dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="100"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -40,8 +46,9 @@
                 android:id="@+id/description_activity_autotextview"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="3"
                 android:hint="Description"
-                android:layout_marginTop="45dp"
+                android:maxLength="100"
                 />
         </android.support.design.widget.TextInputLayout>
 
@@ -98,6 +105,7 @@
             android:layout_alignParentRight="true"
             android:src="@android:drawable/ic_input_add"
             android:id="@+id/add_tag_button"
+            android:visibility="invisible"
             android:background="@android:color/transparent"/>
 </RelativeLayout>
 
