@@ -24,21 +24,21 @@ import me.gujun.android.taggroup.TagGroup
  * A simple [Fragment] subclass.
  */
 public class AddActivityFragment : Fragment() {
-
-    lateinit var title:AutoCompleteTextView;
-    lateinit var description:AutoCompleteTextView;
-    lateinit var modeSelector:Spinner
-    lateinit var addTagButton:ImageButton
-    lateinit var addMembersButton:ImageButton
-    lateinit var tagContainer:TagGroup
-    lateinit var memberListParent:LinearLayout
-    lateinit var addTagText:TextView
-    lateinit var addMemberBanner:TextView
-    lateinit var doneButton:TextView
-    lateinit var cancelButton:TextView
-    lateinit var selectedList:ArrayList<User>
-    lateinit var selectedTagList:ArrayList<Tag>
-    lateinit var mListener:IAddActivityFragmentListener
+    var REQUEST_CODE_TAG_SELECTION = 1
+    lateinit var title: AutoCompleteTextView;
+    lateinit var description: AutoCompleteTextView;
+    lateinit var modeSelector: Spinner
+    lateinit var addTagButton: ImageButton
+    lateinit var addMembersButton: ImageButton
+    lateinit var tagContainer: TagGroup
+    lateinit var memberListParent: LinearLayout
+    lateinit var addTagText: TextView
+    lateinit var addMemberBanner: TextView
+    lateinit var doneButton: TextView
+    lateinit var cancelButton: TextView
+    lateinit var selectedList: ArrayList<User>
+    lateinit var selectedTagList: ArrayList<Tag>
+    lateinit var mListener: IAddActivityFragmentListener
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -50,7 +50,7 @@ public class AddActivityFragment : Fragment() {
         addTagButton = view.findViewById(R.id.add_tag_button)
         addMembersButton = view.findViewById(R.id.add_members_button)
         tagContainer = view.findViewById(R.id.tag_group)
-        memberListParent =view.findViewById(R.id.members_layout)
+        memberListParent = view.findViewById(R.id.members_layout)
         addTagText = view.findViewById(R.id.add_tag_text) //add_tag_text
         addMemberBanner = view.findViewById(R.id.add_mebers_banner) // add_mebers_banner
         doneButton = view.findViewById(R.id.done_button_new_activity) // done_button_new_activity
@@ -58,20 +58,18 @@ public class AddActivityFragment : Fragment() {
         selectedList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
 
-        doneButton.setOnClickListener {
-            v: View? ->
+        doneButton.setOnClickListener { v: View? ->
 
-                if(checkifInputValid()){
-                    val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(),selectedTagList )
-                    mListener.saveActivity(activity)
-                }
+            if (checkifInputValid()) {
+                val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(), selectedTagList)
+                mListener.saveActivity(activity)
             }
+        }
 
-        addTagText.setOnClickListener {
-            v: View? ->
+        addTagText.setOnClickListener { v: View? ->
 
-                var intent:Intent = Intent(context,TagActivity::class.java)
-                startActivity(intent)
+            var intent: Intent = Intent(context, TagActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE_TAG_SELECTION)
         }
 
 
@@ -79,35 +77,54 @@ public class AddActivityFragment : Fragment() {
     }
 
     private fun checkifInputValid(): Boolean {
-        var valid:Boolean = true
-        if(title.text.isEmpty()){
-            Toast.makeText(context,"Enter a valid title",Toast.LENGTH_SHORT)
-            valid=false
-        }else if(description.text.isEmpty()){
-            Toast.makeText(context,"Enter a description",Toast.LENGTH_SHORT)
-            valid=false
+        var valid: Boolean = true
+        if (title.text.isEmpty()) {
+            Toast.makeText(context, "Enter a valid title", Toast.LENGTH_SHORT)
+            valid = false
+        } else if (description.text.isEmpty()) {
+            Toast.makeText(context, "Enter a description", Toast.LENGTH_SHORT)
+            valid = false
         }/*else if(selectedList.isEmpty()){
             Toast.makeText(context,"Please add members",Toast.LENGTH_SHORT)
             valid=false
         }*/
 
-        return  valid
+        return valid
 
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if(context is IAddActivityFragmentListener){
-           mListener = context as IAddActivityFragmentListener
-        }else{
+        if (context is IAddActivityFragmentListener) {
+            mListener = context as IAddActivityFragmentListener
+        } else {
             throw Exception("Activity must implement IAddActivityFragmentlistener")
         }
     }
 
 
-    interface IAddActivityFragmentListener{
-      fun  saveActivity(activity: Activities)
-      fun getActivity(id:String):Activities
+    interface IAddActivityFragmentListener {
+        fun saveActivity(activity: Activities)
+        fun getActivity(id: String): Activities
     }
 
-}// Required empty public constructor
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_TAG_SELECTION && data != null) {
+            var selectedList: ArrayList<Tag> = data.getParcelableArrayListExtra("Tag")
+            if (!selectedList.isEmpty()) {
+                addTagText.visibility = View.INVISIBLE
+                var tagArray = ArrayList<String>()
+
+                for (i in 0 until selectedList.size) {
+                    tagArray.add(selectedList[i].title)
+                }
+
+                tagContainer.setTags(tagArray)
+            }
+        }
+    }
+
+
+
+}

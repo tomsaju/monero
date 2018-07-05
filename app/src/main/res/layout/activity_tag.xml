@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.monero.tags.TagActivity">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/topPortion"
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -37,11 +41,48 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="5"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_close"
+        android:layout_weight="1"
+        android:paddingTop="14dp"
+        android:id="@+id/close_button_add_tag"
+        android:layout_gravity="center_horizontal"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tooltipText="add new tag"
+        android:hint="+ Add new tag"
+        android:id="@+id/add_tag_edittext"
+        android:layout_weight="3"
+        android:maxLines="1"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_done"
+            android:layout_weight="1"
+            android:paddingTop="14dp"
+            android:id="@+id/done_button_add_tag"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="18dp"
         tools:listitem="@layout/tag_list_item_layout"
         android:id="@+id/tagList"></ListView>
-
 </LinearLayout>
+
+
+</RelativeLayout>

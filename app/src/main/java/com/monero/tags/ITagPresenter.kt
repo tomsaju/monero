@@ -7,7 +7,7 @@ import com.monero.models.Tag
  * Created by tom.saju on 7/4/2018.
  */
 interface ITagPresenter {
-    fun getAllTags():LiveData<List<Tag>>
+    fun getAllTags()
     fun saveTag(tag:Tag)
 
 }

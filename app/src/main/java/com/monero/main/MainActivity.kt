@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.Transformations
 import android.content.Context
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationMenuView
@@ -87,10 +88,10 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
     }
 
-    override fun onActivitiesFetched(activityList: LiveData<List<Activities>>) {
+    override fun onActivitiesFetched(activityList: LiveData<List<Activities>>?) {
         var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
 
-                activityList.observe(this, object : Observer<List<Activities>> {
+                activityList?.observe(this, object : Observer<List<Activities>> {
                     override fun onChanged(allList: List<Activities>?) {
 
                         if(currentFragment is ActivityFragment){
@@ -170,17 +171,14 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
     override fun addNewActivity(activity: Activities) {
 
         var ft = supportFragmentManager.beginTransaction()
-
-        //Basic "newInstance" constructor to avoid omitting necessary variables
         var frag =  AddActivityFragment()
-
-        //Here is where error occurs
-
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
 
     }
 
-    //var intent: Intent = Intent(context,AddActivity.class)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
 
 
 }

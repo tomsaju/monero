@@ -18,16 +18,18 @@ import android.content.Context
 @Database(entities = arrayOf(Activities::class, Tag::class),version = 3,exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
     companion object {
-        lateinit var db:AppDatabase
-    }
+         var db:AppDatabase? = null
 
-
-    public fun getAppDatabase(context: Context): AppDatabase {
-        if (db == null) {
-            db=Room.databaseBuilder(context, AppDatabase::class.java, "fair-db").build()
+         fun getAppDatabase(context: Context): AppDatabase? {
+            if (db == null) {
+                db=Room.databaseBuilder(context, AppDatabase::class.java, "fair-db").build()
+            }
+            return db
         }
-        return db
+
     }
+
+
 
 
 

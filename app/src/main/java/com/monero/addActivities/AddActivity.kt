@@ -110,9 +110,9 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
         if(title?.text.toString().isNotEmpty()) {
             val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(),taglist )
             Single.fromCallable {
-                AppDatabase.db?.activitesDao().insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
+                AppDatabase.db?.activitesDao()?.insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
                 for(tag in taglist){
-                    AppDatabase.db?.tagDao().insertIntoTagTable(tag)
+                    AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
                 }
 
             }.subscribeOn(Schedulers.io())

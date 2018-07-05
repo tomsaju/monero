@@ -25,6 +25,10 @@ android {
         }
     }
 }
+androidExtensions {
+    experimental = true
+}
+
 ext {
     supportLibraryVersion = '26.1.0'
     roomVersion = '1.0.0'

@@ -7,6 +7,7 @@ import android.util.Log
 import com.monero.Application.ApplicationController
 import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.db
+import com.monero.helper.AppDatabase.Companion.getAppDatabase
 import com.monero.models.Activities
 import com.monero.models.User
 import io.reactivex.Observable
@@ -43,11 +44,11 @@ class MainPresenter:IMainPresenter {
     override fun getAllActivitiesList() {
 
 
-        var appDatabase:AppDatabase = AppDatabase.db
-        db= appDatabase.getAppDatabase(context)
-        var allActivities = db.activitesDao().getAllActivities();
 
-        view.onActivitiesFetched(allActivities);
+        db= getAppDatabase(context)
+        var allActivities = db?.activitesDao()?.getAllActivities();
+
+        view.onActivitiesFetched(allActivities)
 
 
        /* Observable.create(ObservableOnSubscribe<List<Activities>>
@@ -60,11 +61,11 @@ class MainPresenter:IMainPresenter {
 
     override fun saveActivity(activity: Activities) {
         Single.fromCallable {
-            var appDatabase:AppDatabase = AppDatabase.db
-            db= appDatabase.getAppDatabase(context)
-           db?.activitesDao().insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
+
+            db= getAppDatabase(context)
+           db?.activitesDao()?.insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
             for(tag in activity.tags){
-                AppDatabase.db?.tagDao().insertIntoTagTable(tag)
+                AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
             }
 
         }.subscribeOn(Schedulers.io())
