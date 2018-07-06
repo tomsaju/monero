@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#ffffff"
-    android:fillViewport="true"
 
     android:orientation="vertical">
     <RelativeLayout
@@ -160,14 +160,35 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/members_layout">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_members_parent"
+                android:orientation="vertical"  >
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:alpha=".4"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/multiple_users"
+                android:src="@drawable/multiple_users_silhouette"/>
+
             <TextView
+                android:id="@+id/add_mebers_banner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add Members."
+                android:layout_below="@+id/topSection"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_vertical|center_horizontal"
                 android:paddingLeft="8dp"
-                android:id="@+id/add_mebers_banner"
-                android:layout_gravity="center_vertical|center_horizontal" />
-
+                android:text="Add Members." />
+        </LinearLayout>
+        </FrameLayout>
         </LinearLayout>
 
 
@@ -176,8 +197,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_gravity="bottom|end"
+            android:layout_below="@id/topSection"
             android:layout_alignParentBottom="true"
             android:orientation="horizontal"
             android:gravity="bottom|end"
@@ -208,6 +230,8 @@
                 android:textAlignment="textEnd"
                 android:textColor="#ffffff" />
         </LinearLayout>
+
+
     </RelativeLayout>
 
 </ScrollView>

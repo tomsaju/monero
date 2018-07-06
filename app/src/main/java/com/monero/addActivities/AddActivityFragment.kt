@@ -1,29 +1,32 @@
 package com.monero.addActivities
 
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 import com.monero.R
 import com.monero.models.Activities
+import com.monero.models.Contact
 import com.monero.models.Tag
 import com.monero.models.User
 import com.monero.tags.TagActivity
-import kotlinx.android.synthetic.main.new_activity_fragment.*
 import me.gujun.android.taggroup.TagGroup
+import java.util.jar.Manifest
 
 
 /**
  * A simple [Fragment] subclass.
  */
-public class AddActivityFragment : Fragment() {
+public class AddActivityFragment : Fragment(),IAddActivityView {
     var REQUEST_CODE_TAG_SELECTION = 1
     lateinit var title: AutoCompleteTextView;
     lateinit var description: AutoCompleteTextView;
@@ -36,10 +39,12 @@ public class AddActivityFragment : Fragment() {
     lateinit var addMemberBanner: TextView
     lateinit var doneButton: TextView
     lateinit var cancelButton: TextView
-    lateinit var selectedList: ArrayList<User>
     lateinit var selectedTagList: ArrayList<Tag>
     lateinit var mListener: IAddActivityFragmentListener
-
+    lateinit var addMembersParent: LinearLayout
+    lateinit var addActivityPresenter:IAddActivityPresenter
+    lateinit var contactsList:List<Contact>
+    var selectedUserList: ArrayList<User> = ArrayList()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -55,25 +60,45 @@ public class AddActivityFragment : Fragment() {
         addMemberBanner = view.findViewById(R.id.add_mebers_banner) // add_mebers_banner
         doneButton = view.findViewById(R.id.done_button_new_activity) // done_button_new_activity
         cancelButton = view.findViewById(R.id.cancel_button_new_activity)  // cancel_button_new_activity
-        selectedList = ArrayList(emptyList<User>())
+        addMembersParent = view.findViewById(R.id.add_members_parent)
+
+
+
+        addActivityPresenter = AddActivityPresenter(context,this)
+
+        selectedUserList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
 
         doneButton.setOnClickListener { v: View? ->
 
             if (checkifInputValid()) {
-                val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(), selectedTagList)
+                val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(), selectedTagList,1, selectedUserList)
                 mListener.saveActivity(activity)
             }
         }
 
         addTagText.setOnClickListener { v: View? ->
 
-            var intent: Intent = Intent(context, TagActivity::class.java)
+            var intent = Intent(context, TagActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_TAG_SELECTION)
+        }
+
+        addMembersParent.setOnClickListener{  v:View? ->
+
+            mListener.setupPermissions()
+
+
+
         }
 
 
         return view;
+    }
+
+
+
+    public fun onContactPermissionGranted(){
+        addActivityPresenter.getAllContactsList()
     }
 
     private fun checkifInputValid(): Boolean {
@@ -84,7 +109,7 @@ public class AddActivityFragment : Fragment() {
         } else if (description.text.isEmpty()) {
             Toast.makeText(context, "Enter a description", Toast.LENGTH_SHORT)
             valid = false
-        }/*else if(selectedList.isEmpty()){
+        }/*else if(selectedUserList.isEmpty()){
             Toast.makeText(context,"Please add members",Toast.LENGTH_SHORT)
             valid=false
         }*/
@@ -103,21 +128,33 @@ public class AddActivityFragment : Fragment() {
     }
 
 
+    override fun onResume() {
+        super.onResume()
+        if(selectedUserList.isEmpty()){
+            addMembersParent.visibility = View.VISIBLE
+        }else{
+            addMembersParent.visibility = View.GONE
+        }
+    }
+
     interface IAddActivityFragmentListener {
         fun saveActivity(activity: Activities)
         fun getActivity(id: String): Activities
+        fun showAddContactsPage(bundle: Bundle)
+        fun hideAddContactsPage()
+        fun setupPermissions()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_TAG_SELECTION && data != null) {
-            var selectedList: ArrayList<Tag> = data.getParcelableArrayListExtra("Tag")
-            if (!selectedList.isEmpty()) {
+             selectedTagList= data.getParcelableArrayListExtra("Tag")
+            if (!selectedTagList.isEmpty()) {
                 addTagText.visibility = View.INVISIBLE
                 var tagArray = ArrayList<String>()
 
-                for (i in 0 until selectedList.size) {
-                    tagArray.add(selectedList[i].title)
+                for (i in 0 until selectedTagList.size) {
+                    tagArray.add(selectedTagList[i].title)
                 }
 
                 tagContainer.setTags(tagArray)
@@ -126,5 +163,45 @@ public class AddActivityFragment : Fragment() {
     }
 
 
+    override fun onContactsfetched(contactList: List<Contact>) {
+        this.contactsList = contactList
+        Log.d("contacts fetched","now")
+        val bundle = Bundle()
+        val gson = Gson()
+        val type = object : TypeToken<List<Contact>>() {}.type
+        val listString = gson.toJson(contactsList, type)
+        bundle.putString("list",listString)
+        mListener.showAddContactsPage(bundle)
+    }
+
+    fun setSelectedContacts(contactList: List<Contact>){
+
+        if(!contactList.isEmpty()){
+
+            memberListParent.removeAllViews()
+            selectedUserList.clear()
+            for(contact in contactList){
+                selectedUserList.add(User(0,contact.name,contact.phoneNumber,"sample@yopmail.com"))
+                memberListParent.addView(getContactView(contact))
+
+            }
+            addMembersParent.visibility = View.GONE
+
+        }
+
+
+    }
+
+
+    fun getContactView(contact: Contact):View{
+        var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        var view:View = inflater?.inflate(R.layout.contact_list_item_layout,null,false)
+        var name:TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
+        var number:TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
+
+        name.text = contact.name
+        number.text = contact.phoneNumber
+        return  view
+    }
 
 }

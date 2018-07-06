@@ -9,13 +9,14 @@ import com.monero.models.Activities
 import com.monero.models.Tag
 import android.arch.persistence.room.Room
 import android.content.Context
+import com.monero.helper.converters.TagConverter
 
 
 /**
  * Created by tom.saju on 3/8/2018.
  */
-@TypeConverters(Converter::class)
-@Database(entities = arrayOf(Activities::class, Tag::class),version = 3,exportSchema = false)
+@TypeConverters(TagConverter::class)
+@Database(entities = arrayOf(Activities::class, Tag::class),version = 4,exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
     companion object {
          var db:AppDatabase? = null

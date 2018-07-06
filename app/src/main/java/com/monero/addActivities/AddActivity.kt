@@ -107,7 +107,7 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
     }
 
     private fun saveActivity() {
-        if(title?.text.toString().isNotEmpty()) {
+        /*if(title?.text.toString().isNotEmpty()) {
             val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(),taglist )
             Single.fromCallable {
                 AppDatabase.db?.activitesDao()?.insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
@@ -120,7 +120,7 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
             finish()
         }else{
             Toast.makeText(baseContext,"Please enter title",Toast.LENGTH_SHORT)
-        }
+        }*/
     }
 
     override fun onContactsfetched(contactsList:List<Contact>){

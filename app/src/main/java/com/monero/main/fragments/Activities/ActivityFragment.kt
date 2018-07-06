@@ -48,8 +48,8 @@ class ActivityFragment: Fragment() {
         val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
         addActivityButton.setOnClickListener { _:View->
             var taglist:MutableList<Tag> = mutableListOf<Tag>()
-            val mActivity:Activities = Activities(System.currentTimeMillis(),"Title","desc "+System.currentTimeMillis(),taglist)
-            mActivityFragmentListener?.addNewActivity(mActivity)
+
+            mActivityFragmentListener?.addNewActivity()
         }
         return rootView
     }
@@ -80,7 +80,7 @@ class ActivityFragment: Fragment() {
 
    public interface ActivityFragmentListener{
        fun getAllActivitiesList()
-       fun addNewActivity(activity:Activities)
+       fun addNewActivity()
 
     }
 }

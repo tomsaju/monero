@@ -29,8 +29,8 @@ class HistoryFragment:Fragment() {
 
         var listView =view?.findViewById<ListView>(R.id.history_list)
 
-        val user: User = User(234,"Steve")
-        val user2:User= User(45,"Tony")
+        val user: User = User(234,"Steve","3242342","23423423424")
+        val user2:User= User(45,"Tony","3242342","23423423424")
 
         val history1 = History("676","comment",4555432,user2,"www.ghfhgf.jpg","lorem ipsum dolor sit adiyl let the sky fall, when it crumbles, we will stand tall")
         val history2 = History("616","image",4555432,user,"www.ghfhgf.jpg","sample descptn")
