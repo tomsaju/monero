@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="80"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="INR"
+        android:layout_weight="20"
+        android:id="@+id/currency_symbol_textview_add_expense"
+        android:textSize="18sp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="amount"
+        android:maxWidth="90dp"
+        android:id="@+id/amount_edittext_add_expense"
+        android:inputType="number"
+        android:layout_weight="20"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="paid by"
+        android:layout_weight="20"
+        android:textSize="18sp"/>
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="payee"
+        android:id="@+id/autocomplete_tv_add_expense_payee"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:layout_weight="20"/>
+
+
+</LinearLayout>

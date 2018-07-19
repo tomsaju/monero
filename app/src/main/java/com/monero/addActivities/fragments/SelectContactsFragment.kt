@@ -20,6 +20,7 @@ import com.monero.models.Contact
 import com.monero.models.Tag
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import android.widget.TextView
+import com.monero.Views.CircularProfileImage
 import com.monero.Views.ContactsView
 import com.pchmn.materialchips.ChipView
 import me.gujun.android.taggroup.TagGroup
@@ -31,7 +32,9 @@ import me.gujun.android.taggroup.TagGroup
 /**
  * Created by tom.saju on 3/13/2018.
  */
-class SelectContactsFragment : DialogFragment() {
+class SelectContactsFragment : DialogFragment(),CircularProfileImage.ICircularProfileImageListener {
+
+
     var contactsListView:ListView?=null
     var doneButton:Button?=null
     var cancelButton:Button?=null
@@ -87,18 +90,15 @@ class SelectContactsFragment : DialogFragment() {
 
      fun onContactSelected(contact:Contact) {
 
-        // val contactView = ContactsView(activity,contact.name,true)
-         val chip = ChipView(activity)
-         chip.label = contact.name
-         chip.setDeletable(true)
-         chip.setAvatarIcon(activity.resources.getDrawable(R.drawable.avatar))
-         chip.setPadding(5,0,5,0)
-         chip.setChipBackgroundColor(resources.getColor(android.R.color.holo_blue_light))
+
+
+
+         var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), contact.name, true, contact.phoneNumber + " id ")
 
 
 
          selectedContactList?.add(contact)
-         horizontalList.addView(chip)
+         horizontalList.addView(profileImage)
 
          horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
 
@@ -121,6 +121,9 @@ class SelectContactsFragment : DialogFragment() {
     }
     interface OnCotactSelectedListener {
         fun onContactSelected(contactList:MutableList<Contact>?)
+    }
+    override fun onProfileClosed(name: String?) {
+
     }
 
 }

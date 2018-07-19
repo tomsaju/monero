@@ -32,6 +32,39 @@ class DBContract {
             const val EXPENSE_TITLE = "title"
             const val EXPENSE_COMMENTS = "comments"
             const val EXPENSE_PAYMENTS = "payments"
+            const val EXPENSE_CREDITS = "credits"
+            const val EXPENSE_DEBIT = "debits"
+            const val EXPENSE_ACTIVITY_ID = "activity_id"
+
+        }
+
+    }
+
+    public class CREDIT_TABLE {
+
+        companion object {
+            const val TABLE_NAME = "Credit_Table"
+            const val CREDIT_ID = "credit_id"
+            const val ACTIVITY_ID = "activity_id"
+            const val USER_ID = "user_id"
+            const val USER_NAME = "user_name"
+            const val EXPENSE_ID = "expense_id"
+            const val AMOUNT = "amount"
+        }
+
+    }
+
+    public class DEBIT_TABLE {
+
+        companion object {
+            const val TABLE_NAME = "Debit_Table"
+            const val DEBIT_ID = "debit_id"
+            const val ACTIVITY_ID = "activity_id"
+            const val USER_ID = "user_id"
+            const val USER_NAME = "user_name"
+            const val EXPENSE_ID = "expense_id"
+             const val AMOUNT = "amount"
+
         }
 
     }

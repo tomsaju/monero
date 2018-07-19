@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/pete"
+        android:id="@+id/imageview"/>
+
+    <Button
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignEnd="@+id/imageview"
+        android:layout_alignTop="@+id/imageview"
+        android:background="@drawable/closebtn"
+        app:layout_constraintCircle="@+id/imageview"
+        app:layout_constraintCircleAngle="45"
+        android:alpha="0.7"
+        android:id="@+id/close_button"
+        app:layout_constraintCircleRadius="40dp"/>
+
+    <TextView xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@+id/imageview"
+        app:layout_constraintLeft_toLeftOf="@+id/imageview"
+        app:layout_constraintRight_toRightOf="@+id/imageview"
+        android:id="@+id/name_text"
+        tools:text="Adam" />
+</android.support.constraint.ConstraintLayout>
+</merge>

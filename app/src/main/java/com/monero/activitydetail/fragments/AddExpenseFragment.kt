@@ -7,10 +7,20 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 
 import com.monero.R
+import com.monero.activitydetail.presenter.expense.ExpenseFragmentPresenter
+import com.monero.activitydetail.presenter.expense.IExpenseFragmentPresenter
+import com.monero.activitydetail.presenter.expense.IExpenseFragmentView
+import com.monero.models.Credit
+import com.monero.models.Debit
+import com.monero.models.Expense
+import com.monero.models.User
+import java.util.*
 
 /**
  * A simple [Fragment] subclass.
@@ -18,20 +28,82 @@ import com.monero.R
  * [AddExpenseFragment.OnFragmentInteractionListener] interface
  * to handle interaction events.
  */
-class AddExpenseFragment : Fragment() {
+class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
     private var mListener: OnFragmentInteractionListener? = null
-    var title:EditText?=null
-    var comments:EditText?=null
-    var saveButton: Button?=null
-    var discardButton: Button?=null
-    var amount:EditText?=null
+
+    lateinit var title:AutoCompleteTextView
+    lateinit var currencySymbolTV: TextView
+    lateinit var amountEditText:EditText
+    lateinit var paidByTV:AutoCompleteTextView
+    lateinit var splitTypeTv:AutoCompleteTextView
+    lateinit var discardButton:Button
+    lateinit var saveButton:Button
+    var amount:Double?=0.0
+    lateinit var paidUsersList:HashMap<User,Double> //<each user,amount paid>
+    lateinit var splitPaymentList:HashMap<User,Double>//<each user,amount owed>
+    lateinit var debitList:ArrayList<Debit>
+    lateinit var creditList:ArrayList<Credit>
+    lateinit var mExpenseFragmentPresenter : IExpenseFragmentPresenter
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_add_expense, container, false)
+             // Inflate the layout for this fragment
+         var view:View = inflater!!.inflate(R.layout.add_expense_layout, container, false)
+         title = view.findViewById(R.id.title_expense_autotextview)
+         currencySymbolTV = view.findViewById(R.id.currency_symbol_textview_add_expense)
+         amountEditText = view.findViewById(R.id.amount_edittext_add_expense)
+         paidByTV = view.findViewById(R.id.autocomplete_tv_add_expense_payee)
+         splitTypeTv = view.findViewById(R.id.autocomplete_tv_split_members_add_expense)
+         saveButton = view.findViewById(R.id.save_btn_add_expense)
+         discardButton = view.findViewById(R.id.discard_btn_add_expense)
+         mExpenseFragmentPresenter = ExpenseFragmentPresenter(activity,this)
+
+
+         saveButton.setOnClickListener { v: View? ->
+           if(checkInputValid()){
+               var tempDebitList = ArrayList<Debit>()
+               var tempCreditList = ArrayList<Credit>()
+
+
+               //add value to paiduserlist & splitpaymentList
+               //ex. if paid by me for all, then paid user list is <me,amount> and splitpayment list is
+               //<userN, amount/no of users> for N times
+
+               for(entry in paidUsersList){
+                    var debit = Debit(System.currentTimeMillis()*(0 until 10).random(),
+                                        455434,
+                                        234333,
+                                         entry.key.id.toLong(),
+                                         entry.key.name,
+                                         entry.value)
+
+                   tempDebitList.add(debit)
+               }
+
+               for(entry in splitPaymentList){
+                   var credit = Credit(System.currentTimeMillis()*(0 until 10).random(),
+                                455432,
+                                23423423,
+                                entry.key.id.toLong(),
+                                entry.key.name,
+                                entry.value)
+
+                   tempCreditList.add(credit)
+               }
+
+
+               var expense: Expense = Expense(System.currentTimeMillis(),title.text.toString(),"",tempCreditList,tempDebitList)
+               mExpenseFragmentPresenter.saveExpense(expense)
+           }
+         }
+
+         discardButton.setOnClickListener { v: View? ->
+
+         }
+
+        return view
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -40,6 +112,9 @@ class AddExpenseFragment : Fragment() {
             mListener!!.onFragmentInteraction(uri)
         }
     }
+
+    fun ClosedRange<Int>.random() =
+            Random().nextInt((endInclusive + 1) - start) +  start
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -55,15 +130,29 @@ class AddExpenseFragment : Fragment() {
         mListener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
-     */
+
+    fun checkInputValid():Boolean{
+
+        if(title!=null&&title.text.isEmpty()){
+           return false
+        }else if(amountEditText.text.isEmpty()){
+            return false;
+
+        }else if(paidByTV.text.isEmpty()){
+            return false
+        }else if(splitTypeTv.text.isEmpty()){
+            return false
+        }
+
+        return true
+    }
+
+    fun saveExpense(){
+        if(checkInputValid()){
+
+        }
+    }
+
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)

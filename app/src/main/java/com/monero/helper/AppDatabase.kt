@@ -3,20 +3,24 @@ package com.monero.helper
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.TypeConverters
-import com.monero.Dao.ActivitiesDao
-import com.monero.Dao.TagDao
-import com.monero.models.Activities
-import com.monero.models.Tag
 import android.arch.persistence.room.Room
 import android.content.Context
+import com.monero.Dao.*
 import com.monero.helper.converters.TagConverter
+import com.monero.models.*
 
 
 /**
  * Created by tom.saju on 3/8/2018.
  */
 @TypeConverters(TagConverter::class)
-@Database(entities = arrayOf(Activities::class, Tag::class),version = 4,exportSchema = false)
+@Database(entities = arrayOf(Activities::class,
+                                Tag::class,
+                                Expense::class,
+                                Credit::class,
+                                Debit::class),version = 4,exportSchema = false)
+
+
 abstract class AppDatabase: RoomDatabase() {
     companion object {
          var db:AppDatabase? = null
@@ -36,4 +40,7 @@ abstract class AppDatabase: RoomDatabase() {
 
     abstract fun activitesDao():ActivitiesDao
     abstract fun tagDao():TagDao
+    abstract fun expenseDao():ExpenseDAO
+    abstract fun creditDao():CreditDAO
+    abstract fun debitDao():DebitDAO
 }
