@@ -1,5 +1,6 @@
 package com.monero.activitydetail
 
+import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -14,6 +15,8 @@ import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
 
 class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInteractionListener,AddExpenseFragment.OnFragmentInteractionListener  {
+
+    var REQUEST_CODE_PAYER_SELECTION = 3
     var toolbar:Toolbar?=null
     var tabLayout:TabLayout?=null
   //  var fragmentContainer:FrameLayout?=null
@@ -59,5 +62,10 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnFragmentInterac
 
     override fun onFragmentInteraction(uri: Uri) {
         showAddExpenseFragment()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
     }
 }

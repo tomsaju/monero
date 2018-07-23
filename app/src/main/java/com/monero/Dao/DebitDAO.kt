@@ -10,13 +10,13 @@ import com.monero.models.Debit
  */
 @Dao interface DebitDAO {
 
-    @Query("SELECT * FROM "+DBContract.CREDIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.EXPENSE_ID+" = :id")
+    @Query("SELECT * FROM "+DBContract.DEBIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.EXPENSE_ID+" = :id")
     fun getAllDebitForExpense(id:Long): LiveData<List<Debit>>
 
-    @Query("SELECT * FROM "+DBContract.CREDIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.DEBIT_ID+" = :id")
+    @Query("SELECT * FROM "+DBContract.DEBIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.DEBIT_ID+" = :id")
     fun getDebitForId(id:Long): Debit
 
-    @Query("SELECT * FROM "+DBContract.CREDIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.USER_ID+" = :id")
+    @Query("SELECT * FROM "+DBContract.DEBIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.USER_ID+" = :id")
     fun getDebitsForUser(id:Long): List<Debit>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -1,6 +1,9 @@
 package com.monero.activitydetail.fragments
 
 import android.content.Context
+import android.content.Intent
+import android.content.Intent.getIntent
+import android.content.Intent.parseIntent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -20,7 +23,9 @@ import com.monero.models.Credit
 import com.monero.models.Debit
 import com.monero.models.Expense
 import com.monero.models.User
+import com.monero.payeeSelector.PayerSelectorActivity
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * A simple [Fragment] subclass.
@@ -29,7 +34,7 @@ import java.util.*
  * to handle interaction events.
  */
 class AddExpenseFragment : Fragment(),IExpenseFragmentView {
-
+    var REQUEST_CODE_PAYER_SELECTION = 3
     private var mListener: OnFragmentInteractionListener? = null
 
     lateinit var title:AutoCompleteTextView
@@ -60,6 +65,17 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          discardButton = view.findViewById(R.id.discard_btn_add_expense)
          mExpenseFragmentPresenter = ExpenseFragmentPresenter(activity,this)
 
+         paidUsersList = HashMap()
+
+
+
+         //
+
+        paidByTV.setOnClickListener { v: View? ->
+
+            startActivityForResult(Intent(context,PayerSelectorActivity::class.java),REQUEST_CODE_PAYER_SELECTION)
+
+        }
 
          saveButton.setOnClickListener { v: View? ->
            if(checkInputValid()){
@@ -75,7 +91,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                     var debit = Debit(System.currentTimeMillis()*(0 until 10).random(),
                                         455434,
                                         234333,
-                                         entry.key.id.toLong(),
+                                         entry.key.user_id.toLong(),
                                          entry.key.name,
                                          entry.value)
 
@@ -86,7 +102,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                    var credit = Credit(System.currentTimeMillis()*(0 until 10).random(),
                                 455432,
                                 23423423,
-                                entry.key.id.toLong(),
+                                entry.key.user_id.toLong(),
                                 entry.key.name,
                                 entry.value)
 
@@ -94,7 +110,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                }
 
 
-               var expense: Expense = Expense(System.currentTimeMillis(),title.text.toString(),"",tempCreditList,tempDebitList)
+               var expense: Expense = Expense(System.currentTimeMillis(),title.text.toString(),"",234234,tempCreditList,tempDebitList)
                mExpenseFragmentPresenter.saveExpense(expense)
            }
          }
@@ -163,6 +179,16 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
         fun newInstance(): AddExpenseFragment {
             val fragment = AddExpenseFragment()
             return fragment
+        }
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PAYER_SELECTION && data != null) {
+            splitPaymentList = data.getSerializableExtra("PayeeList") as HashMap<User, Double>
+            //do something with payerlist
+           paidByTV.setText("${splitPaymentList.size} people")
         }
     }
 

@@ -12,5 +12,6 @@ import com.monero.Dao.DBContract
 data class Expense(@ColumnInfo(name = "expense_id") @PrimaryKey(autoGenerate = true) val id:Long,
                    val title:String,
                    val comments:String,
+                   val activity_id:Long,
                    val creditList:List<Credit>,
                    val debitList:List<Debit>)
