@@ -69,4 +69,15 @@ class DBContract {
 
     }
 
+
+
+     public class USER_TABLE {
+
+         companion object {
+             const val TABLE_NAME = "User_Table"
+             const val USER_ID = "user_id"
+
+         }
+     }
+
 }

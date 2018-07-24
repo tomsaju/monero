@@ -2,11 +2,10 @@ package com.monero.activitydetail.fragments
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.getIntent
-import android.content.Intent.parseIntent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,12 +18,11 @@ import com.monero.R
 import com.monero.activitydetail.presenter.expense.ExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentView
-import com.monero.models.Credit
-import com.monero.models.Debit
-import com.monero.models.Expense
-import com.monero.models.User
+import com.monero.models.*
 import com.monero.payeeSelector.PayerSelectorActivity
+import kotlinx.android.synthetic.main.add_expense_payment_line.*
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 /**
@@ -34,9 +32,13 @@ import kotlin.collections.HashMap
  * to handle interaction events.
  */
 class AddExpenseFragment : Fragment(),IExpenseFragmentView {
+    val TAG = "AddExpenseFragment"
+    val SPLIT_EQUALLY_AMONG_ALL =0
+    val SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME =1
+    val SPLIT_AMONG_CUSTOM =2
     var REQUEST_CODE_PAYER_SELECTION = 3
-    private var mListener: OnFragmentInteractionListener? = null
 
+    private var mListener: OnFragmentInteractionListener? = null
     lateinit var title:AutoCompleteTextView
     lateinit var currencySymbolTV: TextView
     lateinit var amountEditText:EditText
@@ -50,6 +52,11 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var debitList:ArrayList<Debit>
     lateinit var creditList:ArrayList<Credit>
     lateinit var mExpenseFragmentPresenter : IExpenseFragmentPresenter
+    var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
+    var amountSpend:Double =0.0
+    lateinit var totalParticipantList:ArrayList<User>
+    var activityId:Long = 0
+    var currentlyWorkingActivity :Activities?=null
 
 
      override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -64,9 +71,19 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          saveButton = view.findViewById(R.id.save_btn_add_expense)
          discardButton = view.findViewById(R.id.discard_btn_add_expense)
          mExpenseFragmentPresenter = ExpenseFragmentPresenter(activity,this)
+         currentlyWorkingActivity = mListener?.getcurrentWorkingActivity()
+         Log.d(TAG,"currentlyworkingact "+currentlyWorkingActivity?.title)
+         if(currentlyWorkingActivity?.members!=null) {
+             totalParticipantList = ArrayList(currentlyWorkingActivity?.members)
+         }
+
+         val currentAct = currentlyWorkingActivity
+         if(currentAct!=null) {
+             activityId = currentAct.id
+         }
 
          paidUsersList = HashMap()
-
+         splitPaymentList = HashMap()
 
 
          //
@@ -79,6 +96,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
          saveButton.setOnClickListener { v: View? ->
            if(checkInputValid()){
+
+               amountSpend = amount_edittext_add_expense.text.toString().toDouble()
+
                var tempDebitList = ArrayList<Debit>()
                var tempCreditList = ArrayList<Credit>()
 
@@ -89,7 +109,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
                for(entry in paidUsersList){
                     var debit = Debit(System.currentTimeMillis()*(0 until 10).random(),
-                                        455434,
+                                        activityId,
                                         234333,
                                          entry.key.user_id.toLong(),
                                          entry.key.name,
@@ -98,9 +118,11 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                    tempDebitList.add(debit)
                }
 
+               splitCredits(splitType)
+
                for(entry in splitPaymentList){
                    var credit = Credit(System.currentTimeMillis()*(0 until 10).random(),
-                                455432,
+                                activityId,
                                 23423423,
                                 entry.key.user_id.toLong(),
                                 entry.key.name,
@@ -110,16 +132,39 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                }
 
 
-               var expense: Expense = Expense(System.currentTimeMillis(),title.text.toString(),"",234234,tempCreditList,tempDebitList)
+
+               var expense = Expense(System.currentTimeMillis(),title.text.toString(),"Some comments",activityId,amountEditText.text.toString().toDouble(),tempCreditList,tempDebitList)
                mExpenseFragmentPresenter.saveExpense(expense)
+               mListener?.closeFragment()
            }
          }
 
          discardButton.setOnClickListener { v: View? ->
-
+           mListener?.closeFragment()
          }
 
         return view
+    }
+
+    private fun splitCredits(splitType: Int) {
+
+        if(splitType===SPLIT_EQUALLY_AMONG_ALL){
+           var amountOwed =  amountSpend/totalParticipantList.size
+
+            for(user in totalParticipantList){
+                splitPaymentList.put(user,amountOwed)
+            }
+        }else if(splitType===SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME){
+            var amountOwed =  amountSpend/totalParticipantList.size-1
+
+            for(user in totalParticipantList){
+                if(!user.name.contains("Tony Stark")) {
+                    splitPaymentList.put(user, amountOwed)
+                }
+            }
+        }
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -137,7 +182,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context!!.toString() + " must implement OnExpenseListFragmentInteractionListener")
         }
     }
 
@@ -163,15 +208,13 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
         return true
     }
 
-    fun saveExpense(){
-        if(checkInputValid()){
 
-        }
-    }
 
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
+        fun getcurrentWorkingActivity():Activities?
+        fun closeFragment()
     }
 
     companion object {
@@ -186,9 +229,8 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_PAYER_SELECTION && data != null) {
-            splitPaymentList = data.getSerializableExtra("PayeeList") as HashMap<User, Double>
-            //do something with payerlist
-           paidByTV.setText("${splitPaymentList.size} people")
+            paidUsersList = data.getSerializableExtra("PayeeList") as HashMap<User, Double>
+           paidByTV.setText("${paidUsersList.size} people")
         }
     }
 

@@ -1,6 +1,8 @@
 package com.monero.models
 
+import android.arch.persistence.room.Entity
 import android.os.Parcelable
+import com.monero.Dao.DBContract
 import kotlinx.android.parcel.Parcelize
 
 /**

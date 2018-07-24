@@ -1,8 +1,10 @@
 package com.monero.activitydetail.presenter.expense
 
 import android.content.Context
+import com.google.gson.Gson
 import com.monero.helper.AppDatabase
 import com.monero.models.Expense
+import com.monero.models.User
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -40,4 +42,19 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe()
     }
 
+    override fun getAllParticipantsForthisActivity(id: Long): ArrayList<User> {
+       var allUserList:ArrayList<User> = ArrayList()
+
+        Single.fromCallable {
+            var gson = Gson()
+            AppDatabase.db = AppDatabase.getAppDatabase(context)
+            var users = AppDatabase.db?.activitesDao()?.getAllUsersForActivity(id)
+            var list :List<User> =gson.fromJson(users , Array<User>::class.java).toList()
+            allUserList = ArrayList(list)
+
+
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe()
+        return allUserList
+    }
 }

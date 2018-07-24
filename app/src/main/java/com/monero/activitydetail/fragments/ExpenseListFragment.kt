@@ -10,12 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.monero.R
+import com.monero.models.Expense
 
 
 class ExpenseListFragment : Fragment() {
 
     private var fab:FloatingActionButton? = null
-    private var mListener: OnFragmentInteractionListener? = null
+    private var mListenerExpenseList: OnExpenseListFragmentInteractionListener? = null
+    lateinit private var expenseList:ArrayList<Expense>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,27 +44,27 @@ class ExpenseListFragment : Fragment() {
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
     }
     fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
+        if (mListenerExpenseList != null) {
+            mListenerExpenseList!!.onFragmentInteraction(uri)
         }
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
+        if (context is OnExpenseListFragmentInteractionListener) {
+            mListenerExpenseList = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context!!.toString() + " must implement OnExpenseListFragmentInteractionListener")
         }
     }
 
     override fun onDetach() {
         super.onDetach()
-        mListener = null
+        mListenerExpenseList = null
     }
 
 
-    interface OnFragmentInteractionListener {
+    interface OnExpenseListFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
     }
@@ -73,4 +76,10 @@ class ExpenseListFragment : Fragment() {
             return fragment
         }
     }
+
+
+    fun setExpenseList(expenseList:ArrayList<Expense>){
+        this.expenseList = expenseList
+    }
+
 }// Required empty public constructor

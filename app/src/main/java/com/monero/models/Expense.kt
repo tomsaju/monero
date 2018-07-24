@@ -13,5 +13,6 @@ data class Expense(@ColumnInfo(name = "expense_id") @PrimaryKey(autoGenerate = t
                    val title:String,
                    val comments:String,
                    val activity_id:Long,
+                   val amount:Double,
                    val creditList:List<Credit>,
                    val debitList:List<Debit>)

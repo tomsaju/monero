@@ -46,7 +46,7 @@ class MainPresenter:IMainPresenter {
 
 
         db= getAppDatabase(context)
-        var allActivities = db?.activitesDao()?.getAllActivities();
+        var allActivities = db?.activitesDao()?.getAllActivities()
 
         view.onActivitiesFetched(allActivities)
 
