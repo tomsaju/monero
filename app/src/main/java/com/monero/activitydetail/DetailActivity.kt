@@ -1,5 +1,7 @@
 package com.monero.activitydetail
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -14,19 +16,21 @@ import android.util.Log
 import com.monero.R
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
+import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
 import com.monero.activitydetail.presenter.detail.DetailPresenter
 import com.monero.activitydetail.presenter.detail.IDetailPresenter
 import com.monero.activitydetail.presenter.detail.IDetailView
 import com.monero.models.Activities
+import com.monero.models.Expense
 
-class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnExpenseListFragmentInteractionListener,AddExpenseFragment.OnFragmentInteractionListener,IDetailView  {
+class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteractionListener,IDetailView ,ExpenseListFragment.OnExpenseListFragmentInteractionListener {
 
     var REQUEST_CODE_PAYER_SELECTION = 3
     var toolbar:Toolbar?=null
     var tabLayout:TabLayout?=null
     private var mViewPager: ViewPager? = null
     private var mSectionsPagerAdapter:DetailViewPagerAdapter?=null
-    private var activityId:Long =0
+    var activityId:Long =0
     private var currentlyWorkingActivity:Activities?=null
     lateinit var mDetailPresenter:IDetailPresenter
 
@@ -44,15 +48,10 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnExpenseListFrag
         Log.d("activityId",activityId.toString())
         mDetailPresenter.getActivityForId(activityId)
         setupViewPager()
-        populateViewPagerData()
+
 
     }
 
-    private fun populateViewPagerData() {
-
-     //   (mSectionsPagerAdapter?.getItem(0) as ExpenseListFragment).setExpenseList() //expenses
-
-    }
 
     private fun setupViewPager() {
         mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "Expenses")
@@ -97,6 +96,8 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnExpenseListFrag
 
     }
 
+
+
     override fun closeFragment() {
         var currentFragment: Fragment =  supportFragmentManager.findFragmentById(android.R.id.content)
         if(currentFragment is AddExpenseFragment &&currentFragment.isVisible){
@@ -107,4 +108,6 @@ class DetailActivity : AppCompatActivity(),ExpenseListFragment.OnExpenseListFrag
                     .commit()
         }
     }
+
+
 }

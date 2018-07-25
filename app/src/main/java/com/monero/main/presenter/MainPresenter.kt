@@ -55,7 +55,7 @@ class MainPresenter:IMainPresenter {
         { emitter -> emitter.onNext(ApplicationController.db.activitesDao().getAllActivities()) })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { result -> view.onActivitiesFetched(result) }*/
+                .subscribe { allExpenses -> view.onActivitiesFetched(allExpenses) }*/
 
     }
 

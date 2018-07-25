@@ -30,6 +30,8 @@ class ExpenseListAdapter(var expenseList:ArrayList<Expense>,var context: Context
         paidBy.text = "paid by "+expenseList[position].debitList.size+" people"
         amountTv.text = expenseList[position].amount.toString()
 
+        return returnView
+
     }
 
     override fun getItem(position: Int): Any {

@@ -1,5 +1,7 @@
 package com.monero.activitydetail.fragments
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -8,17 +10,27 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListView
 
 import com.monero.R
+import com.monero.activitydetail.DetailActivity
+import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
+import com.monero.activitydetail.presenter.detail.IDetailPresenter
+import com.monero.activitydetail.presenter.expenselist.ExpenseListPresenter
+import com.monero.activitydetail.presenter.expenselist.IExpenseListPresenter
+import com.monero.activitydetail.presenter.expenselist.IExpenseListView
 import com.monero.models.Expense
 
 
-class ExpenseListFragment : Fragment() {
+class ExpenseListFragment : Fragment(),IExpenseListView {
+
 
     private var fab:FloatingActionButton? = null
     private var mListenerExpenseList: OnExpenseListFragmentInteractionListener? = null
     lateinit private var expenseList:ArrayList<Expense>
-
+    private lateinit var expenseAdapter: ExpenseListAdapter
+    private lateinit var listView: ListView
+    private lateinit var mPresenter:IExpenseListPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +43,8 @@ class ExpenseListFragment : Fragment() {
 
          var view:View = inflater!!.inflate(R.layout.fragment_expense_list, container, false)
         fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
+        listView = view.findViewById(R.id.expense_list)
+        mPresenter=ExpenseListPresenter(activity,this)
         fab?.setOnClickListener { _:View ->
             //Show the add expense fragment
            addNewExpense()
@@ -43,11 +57,7 @@ class ExpenseListFragment : Fragment() {
         var frag =  AddExpenseFragment()
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
     }
-    fun onButtonPressed(uri: Uri) {
-        if (mListenerExpenseList != null) {
-            mListenerExpenseList!!.onFragmentInteraction(uri)
-        }
-    }
+
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -65,8 +75,7 @@ class ExpenseListFragment : Fragment() {
 
 
     interface OnExpenseListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+
     }
 
     companion object {
@@ -80,6 +89,29 @@ class ExpenseListFragment : Fragment() {
 
     fun setExpenseList(expenseList:ArrayList<Expense>){
         this.expenseList = expenseList
+        expenseAdapter = ExpenseListAdapter(expenseList,activity)
+        if(listView!=null){
+            listView.adapter = expenseAdapter
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(mPresenter!=null){
+            mPresenter?.getAllExpensesForActivity((activity as DetailActivity).activityId)
+        }
+
+    }
+
+    override fun onExpensesFetched(expenses: LiveData<List<Expense>>) {
+        expenses.observe(this,object: Observer<List<Expense>> {
+            override fun onChanged(expenseList: List<Expense>?) {
+                if(expenseList!=null) {
+                    setExpenseList(ArrayList(expenseList)) //expenses
+                }
+            }
+
+        })
     }
 
 }// Required empty public constructor
