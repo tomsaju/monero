@@ -57,7 +57,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var totalParticipantList:ArrayList<User>
     var activityId:Long = 0
     var currentlyWorkingActivity :Activities?=null
-
+    val expenseId:Long = 76453627
 
      override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -90,7 +90,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
         paidByTV.setOnClickListener { v: View? ->
 
-            startActivityForResult(Intent(context,PayerSelectorActivity::class.java),REQUEST_CODE_PAYER_SELECTION)
+            var intent = Intent(context,PayerSelectorActivity::class.java)
+            intent.putExtra("activity_id",activityId)
+            startActivityForResult(intent,REQUEST_CODE_PAYER_SELECTION)
 
         }
 
@@ -110,9 +112,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                for(entry in paidUsersList){
                     var debit = Debit(System.currentTimeMillis()*(0 until 10).random(),
                                         activityId,
-                                        234333,
+                                         expenseId,
                                          entry.key.user_id.toLong(),
-                                         entry.key.name,
+                                         entry.key.user_name,
                                          entry.value)
 
                    tempDebitList.add(debit)
@@ -123,9 +125,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                for(entry in splitPaymentList){
                    var credit = Credit(System.currentTimeMillis()*(0 until 10).random(),
                                 activityId,
-                                23423423,
-                                entry.key.user_id.toLong(),
-                                entry.key.name,
+                                expenseId,
+                                entry.key.user_id,
+                                entry.key.user_name,
                                 entry.value)
 
                    tempCreditList.add(credit)
@@ -133,7 +135,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
 
-               var expense = Expense(System.currentTimeMillis(),title.text.toString(),"Some comments",activityId,amountEditText.text.toString().toDouble(),tempCreditList,tempDebitList)
+               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,amountEditText.text.toString().toDouble(),tempCreditList,tempDebitList)
                mExpenseFragmentPresenter.saveExpense(expense)
                mListener?.closeFragment()
            }
@@ -158,7 +160,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             var amountOwed =  amountSpend/totalParticipantList.size-1
 
             for(user in totalParticipantList){
-                if(!user.name.contains("Tony Stark")) {
+                if(!user.user_name.contains("Tony Stark")) {
                     splitPaymentList.put(user, amountOwed)
                 }
             }
@@ -211,7 +213,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
+        // TODO: Update argument type and user_name
         fun onFragmentInteraction(uri: Uri)
         fun getcurrentWorkingActivity():Activities?
         fun closeFragment()

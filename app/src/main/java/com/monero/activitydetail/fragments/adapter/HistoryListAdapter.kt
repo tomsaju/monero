@@ -1,11 +1,9 @@
 package com.monero.activitydetail.fragments.adapter
 
 import android.content.Context
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -30,7 +28,7 @@ class HistoryListAdapter(var historyList:ArrayList<History>,var context:Context)
             var dateText:TextView = returnView.findViewById<TextView>(R.id.timeDateText) as TextView
             var commentText:TextView = returnView.findViewById<TextView>(R.id.textComment) as TextView
 
-            titleText.text = historyList[position].user.name+" added a comment"
+            titleText.text = historyList[position].user.user_name +" added a comment"
             dateText.text = historyList[position].time.toString()
             commentText.text = historyList[position].description
 
@@ -42,7 +40,7 @@ class HistoryListAdapter(var historyList:ArrayList<History>,var context:Context)
             var dateText:TextView = returnView.findViewById<TextView>(R.id.timeDateText) as TextView
             var imageContent:ImageView = returnView.findViewById<ImageView>(R.id.imageContent) as ImageView
 
-            titleText.text = historyList[position].user.name+" added an image"
+            titleText.text = historyList[position].user.user_name +" added an image"
             dateText.text = historyList[position].time.toString()
            // imageContent.setIma = historyList[position].description
 

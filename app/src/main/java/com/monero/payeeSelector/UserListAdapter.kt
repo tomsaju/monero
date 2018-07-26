@@ -8,7 +8,6 @@ import android.widget.BaseAdapter
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.monero.R
-import com.monero.addActivities.fragments.SelectContactsFragment
 import com.monero.models.User
 import com.monero.payeeSelector.fragment.SelectPayerFragment
 
@@ -34,8 +33,8 @@ class UserListAdapter : BaseAdapter {
         var name: TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
         var number: TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
 
-        name.text = userList.get(position)?.name
-        number.text = userList.get(position)?.phone
+        name.text = userList.get(position)?.user_name
+        number.text = userList.get(position)?.user_phone
 
         layoutParent.setOnClickListener { view: View ->
             mListener?.onUserSelected(userList[position])

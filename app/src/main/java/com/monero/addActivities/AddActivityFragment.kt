@@ -20,7 +20,7 @@ import com.monero.models.Tag
 import com.monero.models.User
 import com.monero.tags.TagActivity
 import me.gujun.android.taggroup.TagGroup
-import java.util.jar.Manifest
+import java.util.*
 
 
 /**
@@ -181,7 +181,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
             memberListParent.removeAllViews()
             selectedUserList.clear()
             for(contact in contactList){
-                selectedUserList.add(User(0,contact.name,contact.phoneNumber,"sample@yopmail.com"))
+                selectedUserList.add(User(System.currentTimeMillis()*(0 until 10).random(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
                 memberListParent.addView(getContactView(contact))
 
             }
@@ -203,5 +203,8 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         number.text = contact.phoneNumber
         return  view
     }
+
+    fun ClosedRange<Int>.random() =
+            Random().nextInt((endInclusive + 1) - start) +  start
 
 }

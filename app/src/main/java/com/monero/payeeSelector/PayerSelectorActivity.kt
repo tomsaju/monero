@@ -10,12 +10,13 @@ import android.view.View
 import android.widget.*
 
 import com.monero.R
-import com.monero.models.Contact
 import com.monero.models.User
 import com.monero.payeeSelector.fragment.SelectPayerFragment
-import kotlinx.android.synthetic.main.activity_payee_selector.*
+import com.monero.payeeSelector.presenter.IPayerSelectorPresenter
+import com.monero.payeeSelector.presenter.IPayerSelectorView
+import com.monero.payeeSelector.presenter.PayerSelectorPresenter
 
-class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPayerFragmentInteractionListener {
+class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPayerFragmentInteractionListener,IPayerSelectorView {
 
     var REQUEST_CODE_PAYER_SELECTION = 3
     lateinit var toolbar:Toolbar
@@ -24,6 +25,9 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
     lateinit var selectPayerFragment:SelectPayerFragment
     lateinit var doneButton:Button
     var payerList:HashMap<User,Double> = HashMap()
+    lateinit var mPayerSelectorPresenter:IPayerSelectorPresenter
+    lateinit var allUserList:ArrayList<User>
+    var activityId:Long =0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +36,13 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         listParent = findViewById<LinearLayout>(R.id.userList_linear) as LinearLayout
         addPayerBanner = findViewById(R.id.banner_parent)
         doneButton = findViewById(R.id.done_button_payer_select)
+        mPayerSelectorPresenter = PayerSelectorPresenter(this,this)
+
+        if(intent!=null&&intent.data!=null){
+            activityId = intent.getLongExtra("activity_id",0)
+        }
+
+        allUserList = mPayerSelectorPresenter?.getAllUsersForActivity(activityId)
 
         addPayerBanner.setOnClickListener{v:View ->
            selectPayerFragment = SelectPayerFragment()
@@ -61,7 +72,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
                 var userId:TextView = child.findViewById<TextView>(R.id.userId) as TextView
 
                 for (user in payerList){
-                    if(user.key.user_id==Integer.parseInt(userId.text.toString())){
+                    if(user.key.user_id==userId.text.toString().toLong()){
                         user.setValue(amountEdittext.text.toString().toDouble())
                     }
                 }
@@ -85,12 +96,16 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         var amountEdittext: EditText = view.findViewById<EditText>(R.id.edittext_paid_amount) as EditText
         var userId:TextView = view.findViewById<TextView>(R.id.userId) as TextView
 
-        nameAutoCompleteText.text = user.name
+        nameAutoCompleteText.text = user.user_name
         userId.text = user.user_id.toString()
         return  view
     }
 
     override fun onUserSelected(user: User) {
         addUserToPayerList(user)
+    }
+
+    override fun getAllusers(): ArrayList<User> {
+        return allUserList
     }
 }

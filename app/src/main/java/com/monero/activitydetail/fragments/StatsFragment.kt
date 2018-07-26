@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.monero.R
+import com.monero.activitydetail.DetailActivity
 import com.monero.activitydetail.presenter.stats.IStatsPresenter
 import com.monero.activitydetail.presenter.stats.IStatsView
 import com.monero.activitydetail.presenter.stats.StatsPresenter
@@ -51,5 +52,20 @@ class StatsFragment : Fragment(),IStatsView {
 
     interface StatsFragmentListener {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(mStatsPresenter!=null){
+            mStatsPresenter?.getAllPendingTransactions((activity as DetailActivity).activityId)
+        }
+    }
+
+    companion object {
+
+        fun newInstance(): StatsFragment {
+            val fragment = StatsFragment()
+            return fragment
+        }
     }
 }// Required empty public constructor

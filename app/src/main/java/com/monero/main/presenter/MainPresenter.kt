@@ -68,6 +68,7 @@ class MainPresenter:IMainPresenter {
                 AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
             }
 
+
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe()
 

@@ -76,7 +76,9 @@ class DBContract {
          companion object {
              const val TABLE_NAME = "User_Table"
              const val USER_ID = "user_id"
-
+             const val USER_NAME = "user_name"
+             const val USER_PHONE ="user_phone"
+             const val USER_EMAIL ="user_email"
          }
      }
 

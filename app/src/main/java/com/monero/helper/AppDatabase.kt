@@ -18,7 +18,8 @@ import com.monero.models.*
                                 Tag::class,
                                 Expense::class,
                                 Credit::class,
-                                Debit::class),version = 4,exportSchema = false)
+                                Debit::class,
+                                User::class),version = 4,exportSchema = false)
 
 
 abstract class AppDatabase: RoomDatabase() {
@@ -43,4 +44,5 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun expenseDao():ExpenseDAO
     abstract fun creditDao():CreditDAO
     abstract fun debitDao():DebitDAO
+    abstract fun userDao():UserDao
 }

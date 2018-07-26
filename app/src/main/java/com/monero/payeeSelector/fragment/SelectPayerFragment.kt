@@ -1,10 +1,8 @@
 package com.monero.payeeSelector.fragment
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,15 +29,6 @@ class SelectPayerFragment : DialogFragment() {
         // Inflate the layout for this fragment
         var  view:View= inflater!!.inflate(R.layout.fragment_select_payer, container, false)
         userList = view.findViewById(R.id.userList)
-        //fake data
-        var tony = User(123,"Tony Stark","787287382","tg@fty.com")
-        var thor = User(78,"Thor","76747374623","ashgdakjahsd@hkfshd.com")
-        var steve = User(79,"Steve Rogers","767473742343","ashgdakjahsd@hkfshd.com")
-        var Bruce = User(71,"Bruce Banners","7674003742343","ashgdakjahsd@hkfshd.com")
-        userArrayList.add(tony)
-        userArrayList.add(thor)
-        userArrayList.add(steve)
-        userArrayList.add(Bruce)
 
         var userListAdapter:UserListAdapter = UserListAdapter(context,userArrayList,mListener)
 
@@ -66,7 +55,7 @@ class SelectPayerFragment : DialogFragment() {
 
 
     interface SelectPayerFragmentInteractionListener {
-
+        fun getAllusers():ArrayList<User>
        fun onUserSelected(user:User)
     }
 

@@ -16,6 +16,7 @@ import android.util.Log
 import com.monero.R
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
+import com.monero.activitydetail.fragments.StatsFragment
 import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
 import com.monero.activitydetail.presenter.detail.DetailPresenter
 import com.monero.activitydetail.presenter.detail.IDetailPresenter
@@ -23,7 +24,7 @@ import com.monero.activitydetail.presenter.detail.IDetailView
 import com.monero.models.Activities
 import com.monero.models.Expense
 
-class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteractionListener,IDetailView ,ExpenseListFragment.OnExpenseListFragmentInteractionListener {
+class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteractionListener,IDetailView ,ExpenseListFragment.OnExpenseListFragmentInteractionListener,StatsFragment.StatsFragmentListener {
 
     var REQUEST_CODE_PAYER_SELECTION = 3
     var toolbar:Toolbar?=null
