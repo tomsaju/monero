@@ -38,11 +38,11 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         doneButton = findViewById(R.id.done_button_payer_select)
         mPayerSelectorPresenter = PayerSelectorPresenter(this,this)
 
-        if(intent!=null&&intent.data!=null){
+        if(intent!=null&&intent.extras!=null){
             activityId = intent.getLongExtra("activity_id",0)
         }
 
-        allUserList = mPayerSelectorPresenter?.getAllUsersForActivity(activityId)
+         mPayerSelectorPresenter?.getAllUsersForActivity(activityId)
 
         addPayerBanner.setOnClickListener{v:View ->
            selectPayerFragment = SelectPayerFragment()
@@ -107,5 +107,9 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
 
     override fun getAllusers(): ArrayList<User> {
         return allUserList
+    }
+
+    override fun onUsersFetched(userList: ArrayList<User>) {
+        allUserList = userList
     }
 }

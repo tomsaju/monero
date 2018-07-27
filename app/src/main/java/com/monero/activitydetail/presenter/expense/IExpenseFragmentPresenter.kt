@@ -9,5 +9,5 @@ import com.monero.models.User
 interface IExpenseFragmentPresenter {
 
     fun saveExpense(expense: Expense)
-    fun getAllParticipantsForthisActivity(id:Long) :ArrayList<User>
+
 }

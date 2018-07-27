@@ -63,4 +63,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$archLifecycleVersion"
 
+    //use rx java objects as result for queries
+    compile "android.arch.persistence.room:rxjava2:$roomVersion"
+
 }

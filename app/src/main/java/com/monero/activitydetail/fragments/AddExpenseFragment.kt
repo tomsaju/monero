@@ -110,7 +110,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                //<userN, amount/no of users> for N times
 
                for(entry in paidUsersList){
-                    var debit = Debit(System.currentTimeMillis()*(0 until 10).random(),
+                    var debit = Debit(System.currentTimeMillis()*(1 until 10).random(),
                                         activityId,
                                          expenseId,
                                          entry.key.user_id.toLong(),
@@ -123,7 +123,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                splitCredits(splitType)
 
                for(entry in splitPaymentList){
-                   var credit = Credit(System.currentTimeMillis()*(0 until 10).random(),
+                   var credit = Credit(System.currentTimeMillis()*(1 until 10).random(),
                                 activityId,
                                 expenseId,
                                 entry.key.user_id,
@@ -160,9 +160,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             var amountOwed =  amountSpend/totalParticipantList.size-1
 
             for(user in totalParticipantList){
-                if(!user.user_name.contains("Tony Stark")) {
-                    splitPaymentList.put(user, amountOwed)
-                }
+                splitPaymentList.put(user, amountOwed)
             }
         }
 

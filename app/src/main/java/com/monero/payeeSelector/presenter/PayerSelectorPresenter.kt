@@ -1,10 +1,12 @@
 package com.monero.payeeSelector.presenter
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
 import com.monero.helper.AppDatabase
 import com.monero.models.User
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -23,7 +25,7 @@ class PayerSelectorPresenter:IPayerSelectorPresenter {
         this.view = view
     }
 
-    override fun getAllUsersForActivity(activity_id: Long): ArrayList<User> {
+    /*override fun getAllUsersForActivity(activity_id: Long): ArrayList<User> {
         var allUserList:ArrayList<User> = ArrayList()
         var gson = Gson()
         var users:String? = ""
@@ -41,7 +43,43 @@ class PayerSelectorPresenter:IPayerSelectorPresenter {
 
         })
         return allUserList
+    }*/
+
+
+    override fun getAllUsersForActivity(activity_id: Long) {
+
+        AppDatabase.db = AppDatabase.getAppDatabase(context)
+        AppDatabase.db?.activitesDao()?.getAllUsersForActivity(activity_id)
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe(
+                        { allusersJson ->
+                            var gson = Gson()
+                            var list :List<User> =gson.fromJson(allusersJson , Array<User>::class.java).toList()
+                            var allUserList = ArrayList(list)
+                            view.onUsersFetched(allUserList)
+                        },
+                        { error ->
+                            Log.d("Payerselector", error.message)
+                        })
+
+
+       /* var allUserList:ArrayList<User> = ArrayList()
+        var gson = Gson()
+        var users:String? = ""
+        Single.fromCallable {
+
+            AppDatabase.db = AppDatabase.getAppDatabase(context)
+            users = AppDatabase.db?.activitesDao()?.getAllUsersForActivity(activity_id)
+
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(Consumer {
+
+            var list :List<User> =gson.fromJson(users , Array<User>::class.java).toList()
+            allUserList = ArrayList(list)
+            view.onUsersFetched(allUserList)
+
+        })*/
+
     }
-
-
 }

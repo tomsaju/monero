@@ -16,7 +16,7 @@ class SelectPayerFragment : DialogFragment() {
 
     private var mListener: SelectPayerFragmentInteractionListener? = null
     lateinit var userList: ListView
-    var userArrayList = ArrayList<User>()
+     var userArrayList:ArrayList<User>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
@@ -30,9 +30,7 @@ class SelectPayerFragment : DialogFragment() {
         var  view:View= inflater!!.inflate(R.layout.fragment_select_payer, container, false)
         userList = view.findViewById(R.id.userList)
 
-        var userListAdapter:UserListAdapter = UserListAdapter(context,userArrayList,mListener)
 
-        userList.adapter = userListAdapter
         return view
     }
 
@@ -69,5 +67,18 @@ class SelectPayerFragment : DialogFragment() {
             fragment.arguments = args
             return fragment
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        userArrayList= mListener?.getAllusers()
+        if(userArrayList!=null){
+            val list = userArrayList
+            if(list!=null) {
+                var userListAdapter = UserListAdapter(context, list, mListener)
+                userList.adapter = userListAdapter
+            }
+        }
+
     }
 }// Required empty public constructor

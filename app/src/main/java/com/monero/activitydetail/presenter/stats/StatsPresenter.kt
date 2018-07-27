@@ -4,15 +4,20 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.support.v4.app.Fragment
+import android.util.Log
 import com.google.gson.Gson
 import com.monero.helper.AppDatabase
 import com.monero.models.Expense
 import com.monero.models.PendingTransaction
 import com.monero.models.User
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.single
+import java.util.Map
+
 
 /**
  * Created by tom.saju on 7/25/2018.
@@ -60,7 +65,7 @@ class StatsPresenter:IStatsPresenter {
         expenses.observe(view as Fragment,object: Observer<List<Expense>> {
             override fun onChanged(expenseList: List<Expense>?) {
                 if(expenseList!=null) {
-                    groupCreditsAndDebits(expenseList)
+                    startGrouping(expenseList)
                 }
             }
 
@@ -68,36 +73,56 @@ class StatsPresenter:IStatsPresenter {
 
     }
 
+
+    private fun startGrouping(expenseList: List<Expense>){
+        if(expenseList!=null&&!expenseList.isEmpty()) {
+            AppDatabase.db = AppDatabase.getAppDatabase(context)
+            AppDatabase.db?.activitesDao()?.getAllUsersForActivity(expenseList[0].activity_id)
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe(
+                            { allusersJson ->
+                                var gson = Gson()
+                                var list :List<User> =gson.fromJson(allusersJson , Array<User>::class.java).toList()
+                                allUsers = ArrayList(list)
+                                groupCreditsAndDebits(expenseList)
+
+                            },
+                            { error ->
+                                Log.d("Payerselector", error.message)
+                            })
+        }
+    }
+
+
     private fun groupCreditsAndDebits(expenseList: List<Expense>) {
 
-        if(expenseList!=null&&!expenseList.isEmpty()) {
-            allUsers = getAllParticipantsForthisActivity(expenseList[0].activity_id)
-        }
+
         var totalPaidList:HashMap<Long,Double> = HashMap() //<User id,amount> ,p(n)
         var totalOwedList:HashMap<Long,Double> = HashMap() //                     o(n)
 
         for (expense in expenseList){
             var creditList = expense.creditList
             for(credit in creditList){
-                if(totalPaidList.containsKey(credit.user_id)){
-                    val currentamount =totalPaidList.get(credit.user_id)
+                if(totalOwedList.containsKey(credit.user_id)){
+                    val currentamount =totalOwedList.get(credit.user_id)
                     if(currentamount!=null) {
-                        totalPaidList.put(credit.user_id, currentamount + credit.amount)
+                        totalOwedList.put(credit.user_id, currentamount + credit.amount)
                     }
                 }else{
-                    totalPaidList.put(credit.user_id,credit.amount)
+                    totalOwedList.put(credit.user_id,credit.amount)
                 }
             }
 
             var debitList =expense.debitList
             for(debit in debitList) {
-                if(totalOwedList.containsKey(debit.user_id)){
-                    val currentamount =totalOwedList.get(debit.user_id)
+                if(totalPaidList.containsKey(debit.user_id)){
+                    val currentamount =totalPaidList.get(debit.user_id)
                     if(currentamount!=null) {
-                        totalOwedList.put(debit.user_id, currentamount + debit.amount)
+                        totalPaidList.put(debit.user_id, currentamount + debit.amount)
                     }
                 }else{
-                    totalOwedList.put(debit.user_id,debit.amount)
+                    totalPaidList.put(debit.user_id,debit.amount)
                 }
             }
 
@@ -124,8 +149,53 @@ class StatsPresenter:IStatsPresenter {
         //2)make a pending transaction for users of those p and o respectively
         //3)update values for that p and o after the pending transaction n step 2
         //repeat
+        while(pendingtransactionsExist(totalPaidList,totalOwedList)){
+          var nextLargestPayment = getNextLargestPayment(totalPaidList)
+          var nextLargestReceipt = getNextLargestReceipt(totalOwedList)
+
+            val payerId = nextLargestPayment?.key
+            val recepientId = nextLargestReceipt?.key
+
+            val paidAmount = nextLargestPayment?.value
+            val recievedAmount = nextLargestReceipt?.value
+
+            if(paidAmount!=null&&recievedAmount!=null&&payerId!=null&&recepientId!=null) {
+                val amountToBePaid =  recievedAmount
+                createPendingTransaction(expenseList.get(0).activity_id,payerId,recepientId,amountToBePaid)
+                totalPaidList.put(payerId,paidAmount-recievedAmount)
+                totalOwedList.put(recepientId,0.0)
+            }
 
 
+
+        }
+
+    }
+
+    private fun getNextLargestReceipt(totalOwedList: HashMap<Long, Double>): kotlin.collections.Map.Entry<Long, Double>? {
+        var maxVal = totalOwedList.maxBy { it.value }
+        return maxVal
+    }
+
+    private fun getNextLargestPayment(totalPaidList: HashMap<Long, Double>): kotlin.collections.Map.Entry<Long, Double>? {
+        var maxVal = totalPaidList.maxBy { it.value }
+        return maxVal
+    }
+
+    private fun pendingtransactionsExist(totalPaidList: HashMap<Long, Double>, totalOwedList: HashMap<Long, Double>): Boolean {
+        for(payment in totalPaidList){
+            if(payment.value>0){
+                return true
+            }
+        }
+
+        for(receipts in totalOwedList){
+            if(receipts.value>0){
+                return true
+            }
+        }
+
+        return false
     }
 
 
@@ -137,24 +207,13 @@ class StatsPresenter:IStatsPresenter {
         if(payer!=null&&recepient!=null){
             var pendingTransaction  = PendingTransaction(System.currentTimeMillis(),payer,recepient,amount)
             allPendingTransaction.add(pendingTransaction)
+            Log.d("pending payment :",payer.user_name+" should pay "+amount+" to "+recepient.user_name)
         }
 
     }
 
 
-    fun getAllParticipantsForthisActivity(id: Long): ArrayList<User> {
-        var allUserList:ArrayList<User> = ArrayList()
 
-        Single.fromCallable {
-            var gson = Gson()
-            AppDatabase.db = AppDatabase.getAppDatabase(context)
-            var users = AppDatabase.db?.activitesDao()?.getAllUsersForActivity(id)
-            var list :List<User> =gson.fromJson(users , Array<User>::class.java).toList()
-            allUserList = ArrayList(list)
-        }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe()
-        return allUserList
-    }
 
     fun getUserForId(user_id:Long,allUserList:ArrayList<User>):User?{
         for(user in allUserList){

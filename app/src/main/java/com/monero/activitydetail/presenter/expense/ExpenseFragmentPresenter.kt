@@ -42,7 +42,7 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe()
     }
 
-    override fun getAllParticipantsForthisActivity(id: Long): ArrayList<User> {
+    /*override fun getAllParticipantsForthisActivity(id: Long): ArrayList<User> {
        var allUserList:ArrayList<User> = ArrayList()
 
         Single.fromCallable {
@@ -56,5 +56,5 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe()
         return allUserList
-    }
+    }*/
 }
