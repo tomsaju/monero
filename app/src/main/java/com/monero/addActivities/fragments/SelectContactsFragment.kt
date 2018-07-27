@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import android.widget.TextView
 import com.monero.Views.ContactsView
 import com.pchmn.materialchips.ChipView
+import de.hdodenhof.circleimageview.CircleImageView
 import me.gujun.android.taggroup.TagGroup
 
 
