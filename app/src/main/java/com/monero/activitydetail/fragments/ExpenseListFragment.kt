@@ -1,5 +1,7 @@
 package com.monero.activitydetail.fragments
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -8,32 +10,31 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListView
 
 import com.monero.R
+import com.monero.activitydetail.DetailActivity
+import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
+import com.monero.activitydetail.presenter.detail.IDetailPresenter
+import com.monero.activitydetail.presenter.expenselist.ExpenseListPresenter
+import com.monero.activitydetail.presenter.expenselist.IExpenseListPresenter
+import com.monero.activitydetail.presenter.expenselist.IExpenseListView
+import com.monero.models.Expense
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [ExpenseListFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [ExpenseListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ExpenseListFragment : Fragment() {
 
-    // TODO: Rename and change types of parameters
+class ExpenseListFragment : Fragment(),IExpenseListView {
 
-    private var mParam1: String? = null
-    private var mParam2: String? = null
+
     private var fab:FloatingActionButton? = null
-    private var mListener: OnFragmentInteractionListener? = null
+    private var mListenerExpenseList: OnExpenseListFragmentInteractionListener? = null
+    lateinit private var expenseList:ArrayList<Expense>
+    private lateinit var expenseAdapter: ExpenseListAdapter
+    private lateinit var listView: ListView
+    private lateinit var mPresenter:IExpenseListPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (arguments != null) {
-            mParam1 = arguments.getString(ARG_PARAM1)
-            mParam2 = arguments.getString(ARG_PARAM2)
-        }
+
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -42,66 +43,75 @@ class ExpenseListFragment : Fragment() {
 
          var view:View = inflater!!.inflate(R.layout.fragment_expense_list, container, false)
         fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
+        listView = view.findViewById(R.id.expense_list)
+        mPresenter=ExpenseListPresenter(activity,this)
         fab?.setOnClickListener { _:View ->
             //Show the add expense fragment
-            onButtonPressed(Uri.EMPTY)
+           addNewExpense()
         }
         return view
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
-        }
+    fun addNewExpense(){
+        var ft = activity.supportFragmentManager.beginTransaction()
+        var frag =  AddExpenseFragment()
+        ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
     }
+
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
+        if (context is OnExpenseListFragmentInteractionListener) {
+            mListenerExpenseList = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context!!.toString() + " must implement OnExpenseListFragmentInteractionListener")
         }
     }
 
     override fun onDetach() {
         super.onDetach()
-        mListener = null
+        mListenerExpenseList = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+
+    interface OnExpenseListFragmentInteractionListener {
+
     }
 
     companion object {
-        // TODO: Rename parameter arguments, choose names that match
-        // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-        private val ARG_PARAM1 = "param1"
-        private val ARG_PARAM2 = "param2"
 
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ExpenseListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         fun newInstance(): ExpenseListFragment {
             val fragment = ExpenseListFragment()
             return fragment
         }
     }
+
+
+    fun setExpenseList(expenseList:ArrayList<Expense>){
+        this.expenseList = expenseList
+        expenseAdapter = ExpenseListAdapter(expenseList,activity)
+        if(listView!=null){
+            listView.adapter = expenseAdapter
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(mPresenter!=null){
+            mPresenter?.getAllExpensesForActivity((activity as DetailActivity).activityId)
+        }
+
+    }
+
+    override fun onExpensesFetched(expenses: LiveData<List<Expense>>) {
+        expenses.observe(this,object: Observer<List<Expense>> {
+            override fun onChanged(expenseList: List<Expense>?) {
+                if(expenseList!=null) {
+                    setExpenseList(ArrayList(expenseList)) //expenses
+                }
+            }
+
+        })
+    }
+
 }// Required empty public constructor

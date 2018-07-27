@@ -36,6 +36,7 @@ class ActivityListAdapter : BaseAdapter {
 
         parent.setOnClickListener{_:View->
             var intent:Intent = Intent(context,DetailActivity::class.java)
+            intent.putExtra("activityId",activitiesList[position].id)
             context.startActivity(intent)
 
         }

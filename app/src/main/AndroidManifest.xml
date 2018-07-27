@@ -29,8 +29,10 @@
         <activity
             android:name=".activitydetail.DetailActivity"
             android:theme="@style/MyAppTheme.NoActionBar" />
-        <activity android:name=".tags.TagActivity"
-            android:theme="@style/MyAppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".tags.TagActivity"
+            android:theme="@style/MyAppTheme.NoActionBar" />
+        <activity android:name=".payeeSelector.PayerSelectorActivity"></activity>
     </application>
 
 </manifest>

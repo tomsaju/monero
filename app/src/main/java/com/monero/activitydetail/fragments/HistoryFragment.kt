@@ -10,7 +10,6 @@ import com.monero.R
 import com.monero.activitydetail.fragments.adapter.HistoryListAdapter
 import com.monero.models.History
 import com.monero.models.User
-import kotlinx.android.synthetic.main.history_fragment.*
 
 /**
  * Created by tom.saju on 6/6/2018.

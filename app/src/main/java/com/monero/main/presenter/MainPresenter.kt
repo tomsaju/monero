@@ -46,7 +46,7 @@ class MainPresenter:IMainPresenter {
 
 
         db= getAppDatabase(context)
-        var allActivities = db?.activitesDao()?.getAllActivities();
+        var allActivities = db?.activitesDao()?.getAllActivities()
 
         view.onActivitiesFetched(allActivities)
 
@@ -55,7 +55,7 @@ class MainPresenter:IMainPresenter {
         { emitter -> emitter.onNext(ApplicationController.db.activitesDao().getAllActivities()) })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { result -> view.onActivitiesFetched(result) }*/
+                .subscribe { allExpenses -> view.onActivitiesFetched(allExpenses) }*/
 
     }
 
@@ -67,6 +67,7 @@ class MainPresenter:IMainPresenter {
             for(tag in activity.tags){
                 AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
             }
+
 
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe()

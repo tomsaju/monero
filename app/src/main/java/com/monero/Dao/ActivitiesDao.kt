@@ -5,6 +5,8 @@ import android.arch.persistence.room.*
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
 import android.database.Observable
 import com.monero.models.Activities
+import com.monero.models.User
+import io.reactivex.Single
 
 /**
  * Created by tom.saju on 3/8/2018.
@@ -16,6 +18,10 @@ import com.monero.models.Activities
 
     @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :id")
     fun getActivityForId(id:Long):Activities
+
+    @Query("SELECT members FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :id")
+    fun getAllUsersForActivity(id:Long):Single<String>
+
 
     @Insert(onConflict = REPLACE)
     fun insertIntoActivitiesTable(activity:Activities)

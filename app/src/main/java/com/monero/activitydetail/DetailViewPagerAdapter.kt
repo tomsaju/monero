@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
 import com.monero.activitydetail.fragments.HistoryFragment
+import com.monero.activitydetail.fragments.StatsFragment
 
 /**
  * Created by Dreamz on 01-05-2018.
@@ -24,10 +25,10 @@ class DetailViewPagerAdapter(fm: FragmentManager?,private val context: Context) 
                returnFragment = ExpenseListFragment.newInstance()
             }
             1->{
-               returnFragment = HistoryFragment.newInstance()
+               returnFragment = StatsFragment.newInstance()
             }
             2->{
-                returnFragment = ExpenseListFragment.newInstance()
+                returnFragment =  HistoryFragment.newInstance()
             }
         }
         return returnFragment
