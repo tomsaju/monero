@@ -8,7 +8,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 /**
  * Created by Dreamz on 09-07-2018.
  */
-class ClosableImage() : CircleImageView( context:Context) {
-    abstract val context: Context?
+class ClosableImage() {
+
 
 }

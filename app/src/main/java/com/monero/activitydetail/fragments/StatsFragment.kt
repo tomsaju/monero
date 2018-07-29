@@ -7,18 +7,23 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListView
 
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
+import com.monero.activitydetail.fragments.adapter.PendingTransactionListAdapter
 import com.monero.activitydetail.presenter.stats.IStatsPresenter
 import com.monero.activitydetail.presenter.stats.IStatsView
 import com.monero.activitydetail.presenter.stats.StatsPresenter
+import com.monero.models.PendingTransaction
 
 
 class StatsFragment : Fragment(),IStatsView {
 
     private var mListener: StatsFragmentListener? = null
     private lateinit var mStatsPresenter:IStatsPresenter
+    private lateinit var transactionsListVIew:ListView
+    private lateinit var adapter:PendingTransactionListAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +34,9 @@ class StatsFragment : Fragment(),IStatsView {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_stats, container, false)
+       var view=inflater!!.inflate(R.layout.fragment_stats, container, false)
+        transactionsListVIew = view.findViewById(R.id.transactionList)
+        return view
     }
 
 
@@ -67,5 +73,10 @@ class StatsFragment : Fragment(),IStatsView {
             val fragment = StatsFragment()
             return fragment
         }
+    }
+
+    override fun onPendingTransactionsObtained(pendingTransaction: ArrayList<PendingTransaction>) {
+        adapter = PendingTransactionListAdapter(pendingTransaction,context)
+        transactionsListVIew.adapter = adapter
     }
 }// Required empty public constructor

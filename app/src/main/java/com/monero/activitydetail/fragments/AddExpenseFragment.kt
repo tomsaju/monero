@@ -57,7 +57,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var totalParticipantList:ArrayList<User>
     var activityId:Long = 0
     var currentlyWorkingActivity :Activities?=null
-    val expenseId:Long = 76453627
+    var expenseId:Long = 0
 
      override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -75,6 +75,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          Log.d(TAG,"currentlyworkingact "+currentlyWorkingActivity?.title)
          if(currentlyWorkingActivity?.members!=null) {
              totalParticipantList = ArrayList(currentlyWorkingActivity?.members)
+         }
+
+         if(expenseId<1){
+             expenseId = System.currentTimeMillis()
          }
 
          val currentAct = currentlyWorkingActivity

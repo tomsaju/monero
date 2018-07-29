@@ -181,7 +181,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
             memberListParent.removeAllViews()
             selectedUserList.clear()
             for(contact in contactList){
-                selectedUserList.add(User(System.currentTimeMillis()*(0 until 10).random(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
+                selectedUserList.add(User(System.currentTimeMillis()*(1 until 10).random(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
                 memberListParent.addView(getContactView(contact))
 
             }
