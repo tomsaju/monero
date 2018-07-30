@@ -21,6 +21,8 @@ import com.monero.activitydetail.presenter.expense.IExpenseFragmentView
 import com.monero.models.*
 import com.monero.payeeSelector.PayerSelectorActivity
 import kotlinx.android.synthetic.main.add_expense_payment_line.*
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -46,14 +48,14 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var splitTypeTv:AutoCompleteTextView
     lateinit var discardButton:Button
     lateinit var saveButton:Button
-    var amount:Double?=0.0
+    var amount:BigDecimal?=BigDecimal.ZERO
     lateinit var paidUsersList:HashMap<User,Double> //<each user,amount paid>
     lateinit var splitPaymentList:HashMap<User,Double>//<each user,amount owed>
     lateinit var debitList:ArrayList<Debit>
     lateinit var creditList:ArrayList<Credit>
     lateinit var mExpenseFragmentPresenter : IExpenseFragmentPresenter
     var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
-    var amountSpend:Double =0.0
+    var amountSpend:BigDecimal = BigDecimal.ZERO
     lateinit var totalParticipantList:ArrayList<User>
     var activityId:Long = 0
     var currentlyWorkingActivity :Activities?=null
@@ -103,7 +105,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          saveButton.setOnClickListener { v: View? ->
            if(checkInputValid()){
 
-               amountSpend = amount_edittext_add_expense.text.toString().toDouble()
+               amountSpend = BigDecimal(amount_edittext_add_expense.text.toString()).setScale(2,RoundingMode.HALF_UP)
 
                var tempDebitList = ArrayList<Debit>()
                var tempCreditList = ArrayList<Credit>()
@@ -155,16 +157,16 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     private fun splitCredits(splitType: Int) {
 
         if(splitType===SPLIT_EQUALLY_AMONG_ALL){
-           var amountOwed =  amountSpend/totalParticipantList.size
+           var amountOwed =  amountSpend/BigDecimal(totalParticipantList.size).setScale(2,RoundingMode.HALF_UP)
 
             for(user in totalParticipantList){
-                splitPaymentList.put(user,amountOwed)
+                splitPaymentList.put(user,amountOwed.toDouble())
             }
         }else if(splitType===SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME){
-            var amountOwed =  amountSpend/totalParticipantList.size-1
+            var amountOwed =  amountSpend/BigDecimal(totalParticipantList.size-1)
 
             for(user in totalParticipantList){
-                splitPaymentList.put(user, amountOwed)
+                splitPaymentList.put(user, amountOwed.toDouble())
             }
         }
 

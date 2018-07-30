@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
+        android:textSize="18sp"
         tools:text="Tony Stark must pay $50 to Bruce Banner"
         android:layout_centerVertical="true"
         android:layout_margin="18dp"

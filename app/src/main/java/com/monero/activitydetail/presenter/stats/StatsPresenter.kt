@@ -147,10 +147,10 @@ class StatsPresenter:IStatsPresenter {
         allPendingTransaction = ArrayList()
 
 
-       if(getsumof(totalPaidList) !=getsumof(totalOwedList)){
+      /* if(getsumof(totalPaidList) !=getsumof(totalOwedList)){
            Log.d(logTag,"Error. Payments doesnt match")
            return
-       }
+       }*/
 
         if(true){
             var map = HashMap<Long,Double>()
@@ -289,11 +289,11 @@ class StatsPresenter:IStatsPresenter {
     }
 
     private fun getsumof(totalPaidList: HashMap<Long, Double>): Double {
-        var sum=0.0
+        var sum=BigDecimal(0).setScale(2,RoundingMode.HALF_UP)
         for(items in totalPaidList){
-            sum+=items.value
+            sum+=BigDecimal(items.value).setScale(2,RoundingMode.HALF_UP)
         }
-        return sum
+        return sum.toDouble()
     }
 
     private fun getNextLargestReceipt(totalOwedList: HashMap<Long, Double>): kotlin.collections.Map.Entry<Long, Double>? {
@@ -366,12 +366,12 @@ internal var parm: HashMap<String, Double> = HashMap()
 
         val Max_Value = Collections.max(poolList.values) as Double
         val Min_Value = Collections.min(poolList.values) as Double
-        if (Max_Value !== Min_Value) {
+        if (Max_Value !== Min_Value&&Max_Value-Min_Value>0.01) {
             val Max_Key:Long = getKeyFromValue(poolList, Max_Value)
             val Min_Key:Long = getKeyFromValue(poolList, Min_Value)
             var result: Double? = Max_Value + Min_Value
-            result = round(result!!, 1)
-            if (result >= 0.0) {
+            result = round(result!!, 2)
+            if (result >= 0.02) {
                 //printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2));
                    println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2))
                 var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,round(Math.abs(Min_Value), 2))
