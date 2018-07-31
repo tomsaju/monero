@@ -75,7 +75,7 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
 
     interface OnExpenseListFragmentInteractionListener {
-
+        fun onTotal(total:Double)
     }
 
     companion object {
@@ -88,11 +88,20 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
 
     fun setExpenseList(expenseList:ArrayList<Expense>){
+        setExpenseTotal(expenseList)
         this.expenseList = expenseList
         expenseAdapter = ExpenseListAdapter(expenseList,activity)
         if(listView!=null){
             listView.adapter = expenseAdapter
         }
+    }
+
+    private fun setExpenseTotal(expenseList: ArrayList<Expense>) {
+        var sum:Double =0.0
+        for(expense in expenseList){
+            sum+=expense.amount
+        }
+        mListenerExpenseList?.onTotal(sum)
     }
 
     override fun onResume() {

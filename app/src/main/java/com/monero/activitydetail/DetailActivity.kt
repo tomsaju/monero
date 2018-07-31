@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.widget.TextView
 import com.monero.R
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
@@ -34,6 +35,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     var activityId:Long =0
     private var currentlyWorkingActivity:Activities?=null
     lateinit var mDetailPresenter:IDetailPresenter
+    lateinit var totalCost:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         tabLayout = findViewById<TabLayout>(R.id.detailPageTab) as TabLayout
         mViewPager = findViewById<ViewPager?>(R.id.container)
+        totalCost = findViewById(R.id.totalCost)
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
         mDetailPresenter = DetailPresenter(this,this)
         setSupportActionBar(toolbar)
@@ -110,5 +113,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         }
     }
 
-
+    override fun onTotal(total: Double) {
+        totalCost.setText("$"+total)
+    }
 }

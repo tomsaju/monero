@@ -366,12 +366,12 @@ internal var parm: HashMap<String, Double> = HashMap()
 
         val Max_Value = Collections.max(poolList.values) as Double
         val Min_Value = Collections.min(poolList.values) as Double
-        if (Max_Value !== Min_Value&&Max_Value-Min_Value>0.01) {
+        if (Max_Value !== Min_Value&&Max_Value-Min_Value>0.09) {
             val Max_Key:Long = getKeyFromValue(poolList, Max_Value)
             val Min_Key:Long = getKeyFromValue(poolList, Min_Value)
             var result: Double? = Max_Value + Min_Value
             result = round(result!!, 2)
-            if (result >= 0.02) {
+            if (result >= 0.09) {
                 //printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2));
                    println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2))
                 var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,round(Math.abs(Min_Value), 2))

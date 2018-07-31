@@ -2,6 +2,7 @@ package com.monero.activitydetail.fragments
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -44,8 +45,8 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var title:AutoCompleteTextView
     lateinit var currencySymbolTV: TextView
     lateinit var amountEditText:EditText
-    lateinit var paidByTV:AutoCompleteTextView
-    lateinit var splitTypeTv:AutoCompleteTextView
+    lateinit var paidByTV:TextView
+    lateinit var splitTypeTv:TextView
     lateinit var discardButton:Button
     lateinit var saveButton:Button
     var amount:BigDecimal?=BigDecimal.ZERO
@@ -93,11 +94,16 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
          //
-
+         paidByTV.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         paidByTV.setOnClickListener { v: View? ->
 
             var intent = Intent(context,PayerSelectorActivity::class.java)
             intent.putExtra("activity_id",activityId)
+            if(amountEditText.text.isEmpty()){
+                intent.putExtra("entered_total", 0.0)
+            }else {
+                intent.putExtra("entered_total", amountEditText.text.toString().toDouble())
+            }
             startActivityForResult(intent,REQUEST_CODE_PAYER_SELECTION)
 
         }
@@ -157,7 +163,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     private fun splitCredits(splitType: Int) {
 
         if(splitType===SPLIT_EQUALLY_AMONG_ALL){
-           var amountOwed =  amountSpend/BigDecimal(totalParticipantList.size).setScale(2,RoundingMode.HALF_UP)
+           var amountOwed =  (amountSpend.divide(BigDecimal(totalParticipantList.size),2,RoundingMode.DOWN).setScale(2,RoundingMode.HALF_DOWN))
 
             for(user in totalParticipantList){
                 splitPaymentList.put(user,amountOwed.toDouble())
@@ -236,6 +242,11 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_PAYER_SELECTION && data != null) {
             paidUsersList = data.getSerializableExtra("PayeeList") as HashMap<User, Double>
+            var addedUptotal:Double = data.getDoubleExtra("total",0.0)
+            if(addedUptotal!=0.0){
+                amountEditText?.setText(addedUptotal.toString())
+            }
+
            paidByTV.setText("${paidUsersList.size} people")
         }
     }

@@ -27,13 +27,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="paid by"
+        android:gravity="center_horizontal"
         android:layout_weight="20"
         android:textSize="18sp"/>
 
-    <AutoCompleteTextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="payee"
+        android:text="me"
         android:id="@+id/autocomplete_tv_add_expense_payee"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
