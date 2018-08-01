@@ -181,6 +181,7 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
 
         var ft = supportFragmentManager.beginTransaction()
         var frag =  AddActivityFragment()
+        ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
 
     }

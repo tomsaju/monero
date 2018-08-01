@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="10dp"
+    android:background="#ffffff"
     android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
@@ -30,24 +31,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        tools:text="Payments"/>
+        android:textColor="#4f5c72"
+        android:textSize="18sp"
+        tools:text="Payments:"/>
 
     </RelativeLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"></View>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        android:background="@android:color/darker_gray"></View>
+
        <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:orientation="vertical"
-           android:layout_marginTop="30dp"
+           android:layout_marginTop="10dp"
            android:id="@+id/payment_section_expenses">
 
            <include layout="@layout/add_expense_payment_line"></include>
@@ -64,42 +58,38 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Split"
+            android:text="Split:"
             android:id="@+id/currency_symbol_textview_add_expense"
             android:textSize="18sp"/>
 
-        <AutoCompleteTextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" equally "
+            android:text="Equally among all participants"
+            android:paddingLeft="20dp"
+            android:textSize="18sp"
+            android:textColor="#000000"
             android:id="@+id/split_type_edittext_add_expense"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="among"
-            android:textSize="18sp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All"
-            android:id="@+id/autocomplete_tv_split_members_add_expense"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"/>
+
 
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:weightSum="2"
         android:gravity="bottom"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textColor="#ffffff"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/darker_gray"
             android:id="@+id/discard_btn_add_expense"
             android:text="Discard"/>
 
@@ -107,6 +97,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:textColor="#ffffff"
+            android:layout_marginLeft="8dp"
             android:id="@+id/save_btn_add_expense"
             android:text="Save"/>
 

@@ -25,7 +25,7 @@ import com.monero.models.Expense
 class ExpenseListFragment : Fragment(),IExpenseListView {
 
 
-    private var fab:FloatingActionButton? = null
+
     private var mListenerExpenseList: OnExpenseListFragmentInteractionListener? = null
     lateinit private var expenseList:ArrayList<Expense>
     private lateinit var expenseAdapter: ExpenseListAdapter
@@ -42,19 +42,17 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
         // Inflate the layout for this fragment
 
          var view:View = inflater!!.inflate(R.layout.fragment_expense_list, container, false)
-        fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
+        //fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
         listView = view.findViewById(R.id.expense_list)
         mPresenter=ExpenseListPresenter(activity,this)
-        fab?.setOnClickListener { _:View ->
-            //Show the add expense fragment
-           addNewExpense()
-        }
+
         return view
     }
 
     fun addNewExpense(){
         var ft = activity.supportFragmentManager.beginTransaction()
         var frag =  AddExpenseFragment()
+        ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
     }
 

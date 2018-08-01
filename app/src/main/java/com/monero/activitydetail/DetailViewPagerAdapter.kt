@@ -22,13 +22,13 @@ class DetailViewPagerAdapter(fm: FragmentManager?,private val context: Context) 
         var returnFragment:Fragment = ExpenseListFragment.newInstance()
         when(position){
             0 ->{
-               returnFragment = ExpenseListFragment.newInstance()
+               returnFragment = mFragmentList[position]
             }
             1->{
-               returnFragment = StatsFragment.newInstance()
+               returnFragment = mFragmentList[position]
             }
             2->{
-                returnFragment =  HistoryFragment.newInstance()
+                returnFragment =  mFragmentList[position]
             }
         }
         return returnFragment

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -13,10 +14,12 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import com.monero.R
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
+import com.monero.activitydetail.fragments.HistoryFragment
 import com.monero.activitydetail.fragments.StatsFragment
 import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
 import com.monero.activitydetail.presenter.detail.DetailPresenter
@@ -36,6 +39,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     private var currentlyWorkingActivity:Activities?=null
     lateinit var mDetailPresenter:IDetailPresenter
     lateinit var totalCost:TextView
+    lateinit var addExpenseFab:FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +49,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         tabLayout = findViewById<TabLayout>(R.id.detailPageTab) as TabLayout
         mViewPager = findViewById<ViewPager?>(R.id.container)
         totalCost = findViewById(R.id.totalCost)
+        addExpenseFab = findViewById(R.id.addexpenseButton)
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
         mDetailPresenter = DetailPresenter(this,this)
         setSupportActionBar(toolbar)
@@ -59,10 +64,33 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
 
     private fun setupViewPager() {
         mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "Expenses")
-        mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "Status")
-        mSectionsPagerAdapter?.addFragment(ExpenseListFragment(), "History")
+        mSectionsPagerAdapter?.addFragment(StatsFragment(), "Status")
+        mSectionsPagerAdapter?.addFragment(HistoryFragment(), "History")
         mViewPager!!.adapter = mSectionsPagerAdapter
         tabLayout?.setupWithViewPager(mViewPager)
+        mViewPager?.addOnPageChangeListener(object:ViewPager.OnPageChangeListener{
+            override fun onPageScrollStateChanged(state: Int) {
+
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+            }
+
+            override fun onPageSelected(position: Int) {
+               if(position==0){
+                   addExpenseFab.show()
+               }else{
+                   addExpenseFab.hide()
+               }
+            }
+        })
+
+        addExpenseFab?.setOnClickListener { _:View ->
+            //Show the add expense fragment
+
+            (mSectionsPagerAdapter?.getItem(0) as ExpenseListFragment).addNewExpense()
+        }
 
     }
 

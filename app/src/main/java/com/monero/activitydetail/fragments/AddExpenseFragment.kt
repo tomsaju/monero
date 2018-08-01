@@ -70,7 +70,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          currencySymbolTV = view.findViewById(R.id.currency_symbol_textview_add_expense)
          amountEditText = view.findViewById(R.id.amount_edittext_add_expense)
          paidByTV = view.findViewById(R.id.autocomplete_tv_add_expense_payee)
-         splitTypeTv = view.findViewById(R.id.autocomplete_tv_split_members_add_expense)
+         splitTypeTv = view.findViewById(R.id.split_type_edittext_add_expense)
          saveButton = view.findViewById(R.id.save_btn_add_expense)
          discardButton = view.findViewById(R.id.discard_btn_add_expense)
          mExpenseFragmentPresenter = ExpenseFragmentPresenter(activity,this)
@@ -217,6 +217,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             return false
         }
 
+        if(paidByTV.text.equals("me")){
+            return false
+        }
+
         return true
     }
 
@@ -249,6 +253,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
            paidByTV.setText("${paidUsersList.size} people")
         }
+    }
+
+    fun showListDialog( listItem:ArrayList<String>){
+
     }
 
 }// Required empty public constructor
