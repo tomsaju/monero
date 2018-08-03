@@ -14,11 +14,14 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
 import com.monero.R
 import com.monero.addActivities.AddActivityFragment
 import com.monero.addActivities.fragments.SelectContactsFragment
+import com.monero.auth.SignInActivity
 import com.monero.main.fragments.AccountBookFragment
 import com.monero.main.fragments.Activities.ActivityFragment
 import com.monero.main.fragments.NotificationFragment
@@ -29,6 +32,10 @@ import com.monero.main.presenter.IMainView
 import com.monero.main.presenter.MainPresenter
 import com.monero.models.Activities
 import com.monero.models.Contact
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+
+
 
 class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
     private var content:FrameLayout? = null
@@ -46,6 +53,8 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 //        Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
+        val user = FirebaseAuth.getInstance().currentUser
+
         context = baseContext
         content = findViewById<FrameLayout>(R.id.container) as FrameLayout
         val bottomNavigationMenu = findViewById<BottomNavigationMenuView>(R.id.bottomNavigation) as BottomNavigationView
@@ -93,6 +102,25 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
                 .commit()
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main_activity_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.action_sign_in -> {
+                var intent = Intent(this,SignInActivity::class.java)
+                startActivity(intent)
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onActivitiesFetched(activityList: LiveData<List<Activities>>?) {
         var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")

@@ -32,7 +32,8 @@
         <activity
             android:name=".tags.TagActivity"
             android:theme="@style/MyAppTheme.NoActionBar" />
-        <activity android:name=".payeeSelector.PayerSelectorActivity"></activity>
+        <activity android:name=".payeeSelector.PayerSelectorActivity" />
+        <activity android:name=".auth.SignInActivity"></activity>
     </application>
 
 </manifest>

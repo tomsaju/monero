@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
 kapt {
     generateStubs = true
 }
@@ -56,7 +57,6 @@ dependencies {
     compile 'me.gujun.android.taggroup:library:1.4@aar'
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.github.pchmn:MaterialChipsInput:1.0.8'
-    compile "com.android.support:design:$supportLibraryVersion"
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
     // Lifecycle components
@@ -65,5 +65,9 @@ dependencies {
 
     //use rx java objects as result for queries
     compile "android.arch.persistence.room:rxjava2:$roomVersion"
+
+    // FirebaseUI for Firebase Auth
+    implementation 'com.firebaseui:firebase-ui-auth:3.1.0'
+
 
 }
