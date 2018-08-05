@@ -1,10 +1,14 @@
 package com.monero.auth
 
+import android.app.ActionBar
 import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
@@ -18,13 +22,35 @@ class SignInActivity : AppCompatActivity() {
     private val RC_SIGN_IN = 154 //the request code could be any Integer
     val auth = FirebaseAuth.getInstance()!!
 
+    lateinit var skipNowText:TextView
+    lateinit var loginButton:Button
+    lateinit var registerButton:Button
+
+
     fun showSnackbar(id : Int){
         Snackbar.make(findViewById(R.id.sign_in_container), resources.getString(id), Snackbar.LENGTH_LONG).show()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
-        if(auth.currentUser != null){ //If user is signed in
+        skipNowText = findViewById(R.id.skipBtn)
+        loginButton =findViewById(R.id.loginBtn)
+        registerButton = findViewById(R.id.registerBtn)
+
+        skipNowText.setOnClickListener { v: View ->
+            nextActivity()
+        }
+
+        loginButton.setOnClickListener { v:View ->
+            login()
+        }
+
+        registerButton.setOnClickListener { v:View ->
+            register()
+
+        }
+
+       /* if(auth.currentUser != null){ //If user is signed in
 //                startActivity(Next Activity)
         }
         else {
@@ -39,7 +65,22 @@ class SignInActivity : AppCompatActivity() {
                             .setPrivacyPolicyUrl("link to app privacy policy")
                             .build(),
                     RC_SIGN_IN)
-        }
+        }*/
+    }
+
+    fun login(){
+        var mainIntent = Intent(this,FireBaseAuthActivity::class.java)
+        startActivity(mainIntent)
+    }
+
+    fun register(){
+        var mainIntent = Intent(this,FireBaseAuthActivity::class.java)
+        startActivity(mainIntent)
+    }
+
+    fun nextActivity(){
+        var mainIntent = Intent(this,MainActivity::class.java)
+        startActivity(mainIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -68,12 +109,12 @@ class SignInActivity : AppCompatActivity() {
                     showSnackbar(R.string.sign_in_cancelled)
                     return
                 }
-                if(response.errorCode == ErrorCodes.NO_NETWORK){
+                if(response.error?.errorCode == ErrorCodes.NO_NETWORK){
                     //If there was a network problem the user's phone
                     showSnackbar(R.string.no_internet_connection)
                     return
                 }
-                if(response.errorCode == ErrorCodes.UNKNOWN_ERROR){
+                if(response.error?.errorCode == ErrorCodes.UNKNOWN_ERROR){
                     //If the error cause was unknown
                     showSnackbar(R.string.unknown_error)
                     return

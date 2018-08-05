@@ -37,23 +37,23 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
 
          var view:View = inflater!!.inflate(R.layout.fragment_expense_list, container, false)
         //fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
         listView = view.findViewById(R.id.expense_list)
-        mPresenter=ExpenseListPresenter(activity,this)
+        mPresenter=ExpenseListPresenter(requireContext(),this)
 
         return view
     }
 
     fun addNewExpense(){
-        var ft = activity.supportFragmentManager.beginTransaction()
+        var ft = activity?.supportFragmentManager?.beginTransaction()
         var frag =  AddExpenseFragment()
-        ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
-        ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
+        ft?.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+        ft?.add(android.R.id.content, frag,"activity_add_fragment")?.commit()
     }
 
 
@@ -88,7 +88,7 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
     fun setExpenseList(expenseList:ArrayList<Expense>){
         setExpenseTotal(expenseList)
         this.expenseList = expenseList
-        expenseAdapter = ExpenseListAdapter(expenseList,activity)
+        expenseAdapter = ExpenseListAdapter(expenseList,requireActivity())
         if(listView!=null){
             listView.adapter = expenseAdapter
         }

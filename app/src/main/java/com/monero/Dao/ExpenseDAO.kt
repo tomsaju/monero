@@ -14,10 +14,10 @@ import com.monero.models.Expense
     fun getAllExpenses(): LiveData<List<Expense>>
 
     @Query("SELECT * FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME+" WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ID +" = :id")
-    fun getExpenseForId(id:Long): LiveData<List<Expense>>
+    fun getExpenseForId(id:String): LiveData<List<Expense>>
 
     @Query("SELECT * FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME+" WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID +" = :id")
-    fun getAllExpensesForActivity(id:Long): LiveData<List<Expense>>
+    fun getAllExpensesForActivity(id:String): LiveData<List<Expense>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoAExpensesTable(expense: Expense)

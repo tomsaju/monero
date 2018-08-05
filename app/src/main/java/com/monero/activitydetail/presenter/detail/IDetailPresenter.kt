@@ -9,5 +9,5 @@ import com.monero.models.Expense
  */
 interface IDetailPresenter {
 
-    fun getActivityForId(id:Long)
+    fun getActivityForId(id:String)
 }

@@ -11,13 +11,13 @@ import com.monero.models.Debit
 @Dao interface DebitDAO {
 
     @Query("SELECT * FROM "+DBContract.DEBIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.EXPENSE_ID+" = :id")
-    fun getAllDebitForExpense(id:Long): LiveData<List<Debit>>
+    fun getAllDebitForExpense(id:String): LiveData<List<Debit>>
 
     @Query("SELECT * FROM "+DBContract.DEBIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.DEBIT_ID+" = :id")
     fun getDebitForId(id:Long): Debit
 
     @Query("SELECT * FROM "+DBContract.DEBIT_TABLE.TABLE_NAME+" WHERE "+DBContract.DEBIT_TABLE.USER_ID+" = :id")
-    fun getDebitsForUser(id:Long): List<Debit>
+    fun getDebitsForUser(id:String): List<Debit>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoDebitTable(debit: Debit)

@@ -23,7 +23,7 @@ class ExpenseListPresenter:IExpenseListPresenter {
         this.view = view
     }
 
-    override fun getAllExpensesForActivity(activity_id: Long){
+    override fun getAllExpensesForActivity(activity_id: String){
 
         Single.fromCallable{
             AppDatabase.db = AppDatabase.getAppDatabase(context)

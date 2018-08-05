@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.NonNull
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.ActivityCompat
@@ -34,7 +35,7 @@ import com.monero.models.Activities
 import com.monero.models.Contact
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-
+import io.reactivex.internal.util.HalfSerializer.onComplete
 
 
 class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
@@ -46,12 +47,13 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
     var toolbar:Toolbar?=null
     lateinit var selectContactsFragment:SelectContactsFragment
     private val READ_CONTACTS_REQUEST_CODE: Int = 3
-
+    val auth = FirebaseAuth.getInstance()!!
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 //        Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
         val user = FirebaseAuth.getInstance().currentUser
 
@@ -116,9 +118,16 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
                 var intent = Intent(this,SignInActivity::class.java)
                 startActivity(intent)
             }
+            R.id.action_sign_out->{
+                signout();
+            }
 
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun signout() {
+        FirebaseAuth.getInstance().signOut();
     }
 
 

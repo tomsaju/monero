@@ -27,7 +27,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
     var payerList:HashMap<User,Double> = HashMap()
     lateinit var mPayerSelectorPresenter:IPayerSelectorPresenter
     lateinit var allUserList:ArrayList<User>
-    var activityId:Long =0
+    var activityId:String =""
     var enteredTotal:Double =0.0
     var addedUpTotal:Double =0.0
 
@@ -41,7 +41,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         mPayerSelectorPresenter = PayerSelectorPresenter(this,this)
 
         if(intent!=null&&intent.extras!=null){
-            activityId = intent.getLongExtra("activity_id",0)
+            activityId = intent.getStringExtra("activity_id")
             enteredTotal = intent.getDoubleExtra("entered_total",0.0)
         }
 
@@ -103,7 +103,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
                 var userId:TextView = child.findViewById<TextView>(R.id.userId) as TextView
 
                 for (user in payerList){
-                    if(user.key.user_id==userId.text.toString().toLong()){
+                    if(user.key.user_id==userId.text.toString()){
                         user.setValue(amountEdittext.text.toString().toDouble())
                     }
                 }

@@ -9,10 +9,10 @@ import com.monero.Dao.DBContract
  * Created by Dreamz on 06-05-2018.
  */
 @Entity(tableName = DBContract.EXPENSE_TABLE.TABLE_NAME)
-data class Expense(@ColumnInfo(name = "expense_id") @PrimaryKey(autoGenerate = true) val id:Long,
+data class Expense(@ColumnInfo(name = "expense_id") @PrimaryKey val id: String,
                    val title:String,
                    val comments:String,
-                   val activity_id:Long,
+                   val activity_id: String,
                    val amount:Double,
                    val creditList:List<Credit>,
                    val debitList:List<Debit>)

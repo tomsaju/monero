@@ -10,8 +10,8 @@ import com.monero.Dao.DBContract
  */
 @Entity(tableName = DBContract.DEBIT_TABLE.TABLE_NAME)
 data class Debit(@ColumnInfo(name = "debit_id") @PrimaryKey val id:Long,
-                  val activity_id:Long,
-                  val expense_id:Long,
-                  val user_id:Long,
-                  val userName:String,
-                  val amount:Double)
+                 val activity_id: String,
+                 val expense_id: String,
+                 val user_id: String,
+                 val userName:String,
+                 val amount:Double)

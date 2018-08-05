@@ -46,7 +46,7 @@ class PayerSelectorPresenter:IPayerSelectorPresenter {
     }*/
 
 
-    override fun getAllUsersForActivity(activity_id: Long) {
+    override fun getAllUsersForActivity(activity_id: String) {
 
         AppDatabase.db = AppDatabase.getAppDatabase(context)
         AppDatabase.db?.activitesDao()?.getAllUsersForActivity(activity_id)

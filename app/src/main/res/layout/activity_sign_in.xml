@@ -7,5 +7,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.monero.auth.SignInActivity">
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scaleType="centerCrop"/>
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:paddingBottom="15dp"
+        android:textColor="#ffffff"
+        android:layout_centerInParent="true"
+        android:id="@+id/sign_in_text"
+        android:text="Sign in to get started"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/sign_in_text"
+        android:id="@+id/buttons_parent"
+        android:weightSum="2">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:background="@android:color/darker_gray"
+            android:textAllCaps="false"
+            android:layout_margin="10dp"
+            android:textColor="#ffffff"
+            android:id="@+id/loginBtn"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Register"
+            android:textAllCaps="false"
+            android:background="@color/colorAccent"
+            android:layout_margin="10dp"
+            android:textColor="#ffffff"
+            android:id="@+id/registerBtn"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Skip for now"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="#80ffffff"
+        android:paddingBottom="8dp"
+        android:textSize="16sp"
+        android:id="@+id/skipBtn"/>
 </RelativeLayout>

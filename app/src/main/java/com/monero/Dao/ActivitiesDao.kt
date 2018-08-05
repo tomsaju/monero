@@ -17,10 +17,10 @@ import io.reactivex.Single
     fun getAllActivities():LiveData<List<Activities>>
 
     @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :id")
-    fun getActivityForId(id:Long):Activities
+    fun getActivityForId(id:String):Activities
 
     @Query("SELECT members FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :id")
-    fun getAllUsersForActivity(id:Long):Single<String>
+    fun getAllUsersForActivity(id:String):Single<String>
 
 
     @Insert(onConflict = REPLACE)

@@ -35,7 +35,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     var tabLayout:TabLayout?=null
     private var mViewPager: ViewPager? = null
     private var mSectionsPagerAdapter:DetailViewPagerAdapter?=null
-    var activityId:Long =0
+    var activityId:String =""
     private var currentlyWorkingActivity:Activities?=null
     lateinit var mDetailPresenter:IDetailPresenter
     lateinit var totalCost:TextView
@@ -53,9 +53,9 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
         mDetailPresenter = DetailPresenter(this,this)
         setSupportActionBar(toolbar)
-        activityId = intent.getLongExtra("activityId",0)
+        activityId = intent.getStringExtra("activityId")
         Log.d("activityId",activityId.toString())
-        mDetailPresenter.getActivityForId(activityId)
+        mDetailPresenter!!.getActivityForId(activityId)
         setupViewPager()
 
 

@@ -10,8 +10,8 @@ import com.monero.Dao.DBContract
  */
 @Entity(tableName = DBContract.CREDIT_TABLE.TABLE_NAME)
 data class Credit(@ColumnInfo(name = "credit_id") @PrimaryKey val id:Long,
-                  val activity_id:Long,
-                  val expense_id:Long,
-                  val user_id:Long,
+                  val activity_id: String,
+                  val expense_id: String,
+                  val user_id: String,
                   val userName:String,
                   val amount:Double)

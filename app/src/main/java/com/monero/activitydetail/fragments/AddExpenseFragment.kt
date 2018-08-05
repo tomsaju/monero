@@ -58,9 +58,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
     var amountSpend:BigDecimal = BigDecimal.ZERO
     lateinit var totalParticipantList:ArrayList<User>
-    var activityId:Long = 0
+    var activityId:String = ""
     var currentlyWorkingActivity :Activities?=null
-    var expenseId:Long = 0
+    var expenseId:String = ""
 
      override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -73,15 +73,15 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          splitTypeTv = view.findViewById(R.id.split_type_edittext_add_expense)
          saveButton = view.findViewById(R.id.save_btn_add_expense)
          discardButton = view.findViewById(R.id.discard_btn_add_expense)
-         mExpenseFragmentPresenter = ExpenseFragmentPresenter(activity,this)
+         mExpenseFragmentPresenter = ExpenseFragmentPresenter(requireContext(),this)
          currentlyWorkingActivity = mListener?.getcurrentWorkingActivity()
          Log.d(TAG,"currentlyworkingact "+currentlyWorkingActivity?.title)
          if(currentlyWorkingActivity?.members!=null) {
              totalParticipantList = ArrayList(currentlyWorkingActivity?.members)
          }
 
-         if(expenseId<1){
-             expenseId = System.currentTimeMillis()
+         if(expenseId.isEmpty()){
+             expenseId = System.currentTimeMillis().toString()
          }
 
          val currentAct = currentlyWorkingActivity
@@ -125,7 +125,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                     var debit = Debit(System.currentTimeMillis()*(1 until 10).random(),
                                         activityId,
                                          expenseId,
-                                         entry.key.user_id.toLong(),
+                                         entry.key.user_id,
                                          entry.key.user_name,
                                          entry.value)
 

@@ -9,7 +9,7 @@ import com.monero.Dao.DBContract
  * Created by tom.saju on 3/7/2018.
   */
 @Entity(tableName = DBContract.ACTIVITY_TABLE.TABLE_NAME)
-data class Activities(@ColumnInfo(name = "activity_id") @PrimaryKey(autoGenerate = true) val id:Long,
+data class Activities(@ColumnInfo(name = "activity_id") @PrimaryKey var id: String,
                       val title:String,
                       val description:String,
                       val tags:List<Tag>,

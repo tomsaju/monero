@@ -28,11 +28,11 @@ class StatsFragment : Fragment(),IStatsView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mStatsPresenter =  StatsPresenter(activity,this)
+        mStatsPresenter =  StatsPresenter(requireContext(),this)
     }
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
        var view=inflater!!.inflate(R.layout.fragment_stats, container, false)
         transactionsListVIew = view.findViewById(R.id.transactionList)
@@ -76,7 +76,7 @@ class StatsFragment : Fragment(),IStatsView {
     }
 
     override fun onPendingTransactionsObtained(pendingTransaction: ArrayList<PendingTransaction>) {
-        adapter = PendingTransactionListAdapter(pendingTransaction,context)
+        adapter = PendingTransactionListAdapter(pendingTransaction,requireContext())
         transactionsListVIew.adapter = adapter
     }
 }// Required empty public constructor

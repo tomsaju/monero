@@ -43,7 +43,7 @@ class StatsPresenter:IStatsPresenter {
         this.view = view
     }
 
-    override fun getAllPendingTransactions(activityId: Long) {
+    override fun getAllPendingTransactions(activityId: String) {
 
         getAllExpensesForActivity(activityId)
 
@@ -51,7 +51,7 @@ class StatsPresenter:IStatsPresenter {
 
     }
 
-    fun getAllExpensesForActivity(activity_id: Long){
+    fun getAllExpensesForActivity(activity_id: String){
         Log.d(logTag,"getALlexpensesForActivity")
         Single.fromCallable{
             AppDatabase.db = AppDatabase.getAppDatabase(context)
@@ -114,8 +114,8 @@ class StatsPresenter:IStatsPresenter {
     private fun groupCreditsAndDebits(expenseList: List<Expense>) {
 
         Log.d(logTag,"froup credits and debits")
-        var totalPaidList:HashMap<Long,Double> = HashMap() //<User id,amount> ,p(n)
-        var totalOwedList:HashMap<Long,Double> = HashMap() //                     o(n)
+        var totalPaidList:HashMap<String,Double> = HashMap() //<User id,amount> ,p(n)
+        var totalOwedList:HashMap<String,Double> = HashMap() //                     o(n)
 
         for (expense in expenseList){
             var creditList = expense.creditList
@@ -153,7 +153,7 @@ class StatsPresenter:IStatsPresenter {
        }*/
 
         if(true){
-            var map = HashMap<Long,Double>()
+            var map = HashMap<String,Double>()
             var sum = getsumof(totalPaidList)
             var amountPaid:Double = 0.0
             for(recepient in totalOwedList){
@@ -288,7 +288,7 @@ class StatsPresenter:IStatsPresenter {
         }
     }
 
-    private fun getsumof(totalPaidList: HashMap<Long, Double>): Double {
+    private fun getsumof(totalPaidList: HashMap<String, Double>): Double {
         var sum=BigDecimal(0).setScale(2,RoundingMode.HALF_UP)
         for(items in totalPaidList){
             sum+=BigDecimal(items.value).setScale(2,RoundingMode.HALF_UP)
@@ -296,17 +296,17 @@ class StatsPresenter:IStatsPresenter {
         return sum.toDouble()
     }
 
-    private fun getNextLargestReceipt(totalOwedList: HashMap<Long, Double>): kotlin.collections.Map.Entry<Long, Double>? {
+    private fun getNextLargestReceipt(totalOwedList: HashMap<String, Double>): kotlin.collections.Map.Entry<String, Double>? {
         var maxVal = totalOwedList.maxBy { it.value }
         return maxVal
     }
 
-    private fun getNextLargestPayment(totalPaidList: HashMap<Long, Double>): kotlin.collections.Map.Entry<Long, Double>? {
+    private fun getNextLargestPayment(totalPaidList: HashMap<String, Double>): kotlin.collections.Map.Entry<String, Double>? {
         var maxVal = totalPaidList.maxBy { it.value }
         return maxVal
     }
 
-    private fun pendingtransactionsExist(totalPaidList: HashMap<Long, Double>, totalOwedList: HashMap<Long, Double>): Boolean {
+    private fun pendingtransactionsExist(totalPaidList: HashMap<String, Double>, totalOwedList: HashMap<String, Double>): Boolean {
         if(testLimit>100){
 
             return false
@@ -328,7 +328,7 @@ class StatsPresenter:IStatsPresenter {
     }
 
 
-    fun createPendingTransaction(activity_id:Long,payer_userId:Long,recepient_userId:Long,amount:Double){
+    fun createPendingTransaction(activity_id:String,payer_userId:String,recepient_userId:String,amount:Double){
         Log.d(logTag,"createPendingTransaction")
         //find user from ID
         var payer = getUserForId(payer_userId,allUsers)
@@ -348,7 +348,7 @@ class StatsPresenter:IStatsPresenter {
 
 
 
-    fun getUserForId(user_id:Long,allUserList:ArrayList<User>):User?{
+    fun getUserForId(user_id:String,allUserList:ArrayList<User>):User?{
         for(user in allUserList){
             if(user.user_id==user_id){
                 return user
@@ -361,14 +361,14 @@ class StatsPresenter:IStatsPresenter {
 internal var parm: HashMap<String, Double> = HashMap()
 
 
-    fun divideTransactions(poolList: HashMap<Long, Double>) {
+    fun divideTransactions(poolList: HashMap<String, Double>) {
 
 
         val Max_Value = Collections.max(poolList.values) as Double
         val Min_Value = Collections.min(poolList.values) as Double
         if (Max_Value !== Min_Value&&Max_Value-Min_Value>0.09) {
-            val Max_Key:Long = getKeyFromValue(poolList, Max_Value)
-            val Min_Key:Long = getKeyFromValue(poolList, Min_Value)
+            val Max_Key:String = getKeyFromValue(poolList, Max_Value)
+            val Min_Key:String = getKeyFromValue(poolList, Min_Value)
             var result: Double? = Max_Value + Min_Value
             result = round(result!!, 2)
             if (result >= 0.09) {
@@ -400,13 +400,13 @@ internal var parm: HashMap<String, Double> = HashMap()
 
     }
 
-    fun getKeyFromValue(hm: HashMap<Long, Double>, value: Double?): Long {
+    fun getKeyFromValue(hm: HashMap<String, Double>, value: Double?): String {
         for (o in hm.keys) {
             if (hm[o] == value) {
                 return o
             }
         }
-        return 0
+        return ""
     }
 
     fun round(value: Double, places: Int): Double {

@@ -28,7 +28,7 @@ class DetailPresenter:IDetailPresenter {
         this.view = view
     }
 
-    override fun getActivityForId(id: Long) {
+    override fun getActivityForId(id: String) {
 
 
          var workingActivity:Activities?=null

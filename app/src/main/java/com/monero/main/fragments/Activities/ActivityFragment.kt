@@ -42,7 +42,7 @@ class ActivityFragment: Fragment() {
     }
 
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rootView = inflater?.inflate(R.layout.activitylist_fragment,container,false)
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
         val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
@@ -57,7 +57,7 @@ class ActivityFragment: Fragment() {
     fun onAllActivitiesFetched(activities: List<Activities>?) {
         //pass result to fragment
         if(activities!=null) {
-            adapter = ActivityListAdapter(context, activities)
+            adapter = ActivityListAdapter(requireContext(), activities)
             activitiesList?.adapter = adapter
         }
     }

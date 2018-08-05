@@ -24,7 +24,7 @@ class SelectPayerFragment : DialogFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         var  view:View= inflater!!.inflate(R.layout.fragment_select_payer, container, false)
@@ -75,7 +75,7 @@ class SelectPayerFragment : DialogFragment() {
         if(userArrayList!=null){
             val list = userArrayList
             if(list!=null) {
-                var userListAdapter = UserListAdapter(context, list, mListener)
+                var userListAdapter = UserListAdapter(requireContext(), list, mListener)
                 userList.adapter = userListAdapter
             }
         }

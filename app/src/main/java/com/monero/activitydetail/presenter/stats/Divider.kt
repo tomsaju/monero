@@ -11,7 +11,7 @@ import kotlin.collections.HashMap
 /**
  * Created by Dreamz on 29-07-2018.
  */
-class Divider {
+class Divider {/*
 
     internal var parm: HashMap<String, Double> = HashMap()
 
@@ -22,8 +22,8 @@ class Divider {
         val Max_Value = Collections.max(poolList.values) as Double
         val Min_Value = Collections.min(poolList.values) as Double
         if (Max_Value !== Min_Value) {
-            val Max_Key:Long = getKeyFromValue(poolList, Max_Value)
-            val Min_Key:Long = getKeyFromValue(poolList, Min_Value)
+            val Max_Key:String = getKeyFromValue(poolList, Max_Value)
+            val Min_Key:String = getKeyFromValue(poolList, Min_Value)
             var result: Double? = Max_Value + Min_Value
             result = round(result!!, 1)
             if (result >= 0.0) {
@@ -49,17 +49,17 @@ class Divider {
             divideTransactions(poolList)
         }
 
-
+*//*
         return rawtransactionList
     }
 
-    fun getKeyFromValue(hm: HashMap<Long, Double>, value: Double?): Long {
+    fun getKeyFromValue(hm: HashMap<String, Double>, value: Double?): String {
         for (o in hm.keys) {
             if (hm[o] == value) {
                 return o
             }
         }
-        return 0
+        return ""
     }
 
     fun round(value: Double, places: Int): Double {
@@ -69,5 +69,5 @@ class Divider {
         var bd = BigDecimal(value)
         bd = bd.setScale(places, RoundingMode.HALF_UP)
         return bd.toDouble()
-    }
+    }*/
 }

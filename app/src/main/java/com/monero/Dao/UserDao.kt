@@ -13,7 +13,7 @@ import com.monero.models.User
     fun getAllUsers(): List<User>
 
     @Query("SELECT * FROM "+DBContract.USER_TABLE.TABLE_NAME+" WHERE "+DBContract.USER_TABLE.USER_ID+" = :id")
-    fun getUserForId(id:Long): User
+    fun getUserForId(id:String): User
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoUserTable(user: User)

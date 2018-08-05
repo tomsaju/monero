@@ -46,7 +46,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var contactsList:List<Contact>
     var selectedUserList: ArrayList<User> = ArrayList()
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         var view = inflater!!.inflate(R.layout.new_activity_fragment, container, false);
         title = view.findViewById(R.id.title_activity_autotextview)
@@ -64,7 +64,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
 
 
-        addActivityPresenter = AddActivityPresenter(context,this)
+        addActivityPresenter = AddActivityPresenter(requireContext(),this)
 
         selectedUserList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
@@ -72,7 +72,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         doneButton.setOnClickListener { v: View? ->
 
             if (checkifInputValid()) {
-                val activity: Activities = Activities(System.currentTimeMillis(), title?.text.toString(), description?.text.toString(), selectedTagList,1, selectedUserList)
+                val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList,1, selectedUserList)
                 mListener.saveActivity(activity)
             }
         }
@@ -181,7 +181,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
             memberListParent.removeAllViews()
             selectedUserList.clear()
             for(contact in contactList){
-                selectedUserList.add(User(System.currentTimeMillis()*(1 until 10).random(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
+                selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
                 memberListParent.addView(getContactView(contact))
 
             }

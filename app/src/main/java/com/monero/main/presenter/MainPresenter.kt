@@ -4,7 +4,10 @@ import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.support.annotation.WorkerThread
 import android.util.Log
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.monero.Application.ApplicationController
+import com.monero.Dao.DBContract
 import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.db
 import com.monero.helper.AppDatabase.Companion.getAppDatabase
@@ -33,7 +36,7 @@ class MainPresenter:IMainPresenter {
 
     var context: Context
     var view: IMainView
-
+    var firestoreDb: FirebaseFirestore? = null
     constructor(context: Context, view: IMainView) {
         this.context = context
         this.view = view
@@ -59,8 +62,47 @@ class MainPresenter:IMainPresenter {
 
     }
 
+   /* private fun pushUserToFireBaseDB(user: User) {
+
+        var newActivity = HashMap<String, Any>()
+
+
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE,)
+        newActivity.put(DBContract.USER_TABLE.USER_NAME,user.user_name)
+        newActivity.put(DBContract.USER_TABLE.USER_EMAIL,user.user_email)
+        newActivity.put(DBContract.USER_TABLE.USER_PHONE,user.user_phone)
+
+
+    }*/
+
     override fun saveActivity(activity: Activities) {
-        Single.fromCallable {
+
+        var newActivity = HashMap<String, Any>()
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE,activity.title)
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION,activity.description)
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS,activity.members)
+
+        firestoreDb?.collection("activities")?.add(newActivity)
+
+                ?.addOnSuccessListener {DocumentReference ->
+                    DocumentReference.id
+                    //success
+                    activity.id = DocumentReference.id
+                    Single.fromCallable {
+                        db= getAppDatabase(context)
+                        db?.activitesDao()?.insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
+                        for(tag in activity.tags){
+                            AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
+                        }
+                    }.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe()
+                }
+
+                ?.addOnFailureListener { e ->
+                    //failure
+                }
+
+        /*Single.fromCallable {
 
             db= getAppDatabase(context)
            db?.activitesDao()?.insertIntoActivitiesTable(activity) // .database?.personDao()?.insert(person)
@@ -70,7 +112,8 @@ class MainPresenter:IMainPresenter {
 
 
         }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe()
+                .observeOn(AndroidSchedulers.mainThread()).subscribe()*/
+
 
     }
 }

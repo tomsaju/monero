@@ -39,7 +39,7 @@ class ExpenseListAdapter(var expenseList:ArrayList<Expense>,var context: Context
     }
 
     override fun getItemId(position: Int): Long {
-       return expenseList[position].id
+       return 0
     }
 
     override fun getCount(): Int {
