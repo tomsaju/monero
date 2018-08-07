@@ -124,18 +124,11 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
     }
 
     override fun onContactsfetched(contactsList:List<Contact>){
-        Log.d("contacts fetched","now")
-        val bundle = Bundle()
-        val gson = Gson()
-        val type = object : TypeToken<List<Contact>>() {}.type
-        val listString = gson.toJson(contactsList, type)
 
-        bundle.putString("list",listString)
         selectContactsFragment= SelectContactsFragment()
-        selectContactsFragment.arguments = bundle
-        selectContactsFragment.show(fragmentManager,"selectContacts")
+        supportFragmentManager.beginTransaction().add(selectContactsFragment,"select_contacts").commit()
 
-    }
+           }
 
     override fun onContactSelected(contactList: MutableList<Contact>?) {
         Log.d("contact","sele")
@@ -155,5 +148,13 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
             }
         }
 
+    }
+
+    override fun getAllContactList() {
+
+    }
+
+    override fun closeContactSelectFragment() {
+        (supportFragmentManager.findFragmentByTag("select_contacts") as SelectContactsFragment)
     }
 }

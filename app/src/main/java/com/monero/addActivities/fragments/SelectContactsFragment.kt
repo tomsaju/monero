@@ -1,10 +1,14 @@
 package com.monero.addActivities.fragments
 
 import android.app.Activity
-import android.app.Dialog
 import android.app.DialogFragment
+import android.content.ContentResolver
 import android.content.Context
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.support.v4.app.Fragment
+import android.support.v7.widget.SearchView
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,23 +21,14 @@ import com.google.gson.reflect.TypeToken
 import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
 import com.monero.models.Contact
-import com.monero.models.Tag
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
-import android.widget.TextView
 import com.monero.Views.CircularProfileImage
-import com.monero.Views.ContactsView
-import com.pchmn.materialchips.ChipView
-import de.hdodenhof.circleimageview.CircleImageView
-import me.gujun.android.taggroup.TagGroup
-
-
-
 
 
 /**
  * Created by tom.saju on 3/13/2018.
  */
-class SelectContactsFragment : DialogFragment(),CircularProfileImage.ICircularProfileImageListener {
+class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener {
 
 
     var contactsListView:ListView?=null
@@ -43,19 +38,15 @@ class SelectContactsFragment : DialogFragment(),CircularProfileImage.ICircularPr
     lateinit var horizontalList:LinearLayout
     var mListener:OnCotactSelectedListener?=null
     var selectedContactList:MutableList<Contact>?= null
+    lateinit var mSearchView:SearchView
+    lateinit var mContext:Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val listString:String? = arguments?.getString("list")
-        val gson = Gson()
-        val type = object : TypeToken<List<Contact>>() {
-        }.type
-        contacts= gson.fromJson(listString, type)
-        selectedContactList = mutableListOf<Contact>()
-
+       // contacts = getContacts()
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater?.inflate(R.layout.select_contact_fragment_layout, container,
                 false)
@@ -63,47 +54,53 @@ class SelectContactsFragment : DialogFragment(),CircularProfileImage.ICircularPr
         horizontalList = rootView?.findViewById<LinearLayout>(R.id.horizontal_list) as LinearLayout
         doneButton = rootView?.findViewById<Button>(R.id.done_action_select_contacts) as Button
         cancelButton = rootView?.findViewById<Button>(R.id.cancel_action_select_contacts) as Button
+        mSearchView = rootView?.findViewById(R.id.contacs_searchView)
 
-        loadContacts(contacts)
-        dialog?.setTitle("Select participants")
+        contactsListView?.isTextFilterEnabled = true
+        setupSearchView()
+        selectedContactList = ArrayList()
+
+     //   loadContacts(contacts)
+        //dialog?.setTitle("Select participants")
         // Do something else
+
+        cancelButton?.setOnClickListener{v: View? ->
+            mListener?.closeContactSelectFragment()
+        }
 
         doneButton?.setOnClickListener(View.OnClickListener {
             mListener?.onContactSelected(selectedContactList)
-            dialog?.dismiss()
+            mListener?.closeContactSelectFragment()
+           // dialog?.dismiss()
         })
 
         return rootView
     }
 
+    private fun setupSearchView() {
+        mSearchView.setIconifiedByDefault(false)
+        mSearchView.setOnQueryTextListener(this)
+        mSearchView.isSubmitButtonEnabled = true
+        mSearchView.queryHint = "Search Here"
+    }
+
     override fun onResume() {
         super.onResume()
-        val width = resources.displayMetrics.widthPixels
-        val height = resources.displayMetrics.heightPixels
-        dialog.window!!.setLayout(width, height)
+        var contactList =  getContacts()
+        loadContacts(contactList)
     }
 
 
     public fun loadContacts(contactsList:List<Contact>){
-        val contactsAdapter:ContactListAdapter = ContactListAdapter(activity,contactsList,this)
+        val contactsAdapter:ContactListAdapter = ContactListAdapter(requireContext(),contactsList,this)
         contactsListView?.adapter = contactsAdapter
     }
 
      fun onContactSelected(contact:Contact) {
-
-
-
-
          var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), contact.name, true, contact.phoneNumber + " id ")
-
-
-
          selectedContactList?.add(contact)
          horizontalList.addView(profileImage)
-
          horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
-
-
      }
 
 
@@ -111,7 +108,9 @@ class SelectContactsFragment : DialogFragment(),CircularProfileImage.ICircularPr
         super.onAttach(context)
         if(context is OnCotactSelectedListener){
           mListener = context
+
         }
+        mContext = context!!
     }
 
     override fun onAttach(activity: Activity?) {
@@ -122,9 +121,59 @@ class SelectContactsFragment : DialogFragment(),CircularProfileImage.ICircularPr
     }
     interface OnCotactSelectedListener {
         fun onContactSelected(contactList:MutableList<Contact>?)
+        fun getAllContactList()
+        fun closeContactSelectFragment()
     }
     override fun onProfileClosed(name: String?) {
 
     }
 
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (TextUtils.isEmpty(newText)) {
+            contactsListView?.clearTextFilter()
+        } else {
+            (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
+        }
+        return true
+    }
+
+
+    fun getContacts(): ArrayList<Contact> {
+        val PROJECTION = arrayOf(ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+        val contactsList: ArrayList<Contact> = ArrayList()
+        val builder = StringBuilder()
+        val resolver: ContentResolver = mContext?.contentResolver
+
+
+        val cursor = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION, null, null, null);
+        if (cursor != null) {
+            try {
+                val nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
+                var name: String
+                var number: String
+                while (cursor.moveToNext()) {
+                    name = cursor.getString(nameIndex)
+                    number = cursor.getString(numberIndex)
+
+                    var newCOntact: Contact = Contact(name, number)
+                    contactsList.add(newCOntact)
+                }
+            } finally {
+                cursor.close()
+            }
+
+        }
+        return contactsList
+    }
+
 }
+

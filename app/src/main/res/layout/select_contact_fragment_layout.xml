@@ -5,27 +5,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:orientation="vertical">
-<android.support.v7.widget.Toolbar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/colorAccent">
+    <include layout="@layout/toolbar"></include>
+
     <android.support.v7.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="8dp"
+        android:id="@+id/contacs_searchView"
         android:background="@android:color/white"
         app:queryHint="search" />
-
-</android.support.v7.widget.Toolbar>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#000000"></View>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -48,10 +40,7 @@
 
     </HorizontalScrollView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#000000"></View>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -59,7 +48,7 @@
     <ListView
         android:id="@+id/all_contacts_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         xmlns:tools="http://schemas.android.com/tools"

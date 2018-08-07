@@ -39,6 +39,8 @@ import io.reactivex.internal.util.HalfSerializer.onComplete
 
 
 class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
+
+
     private var content:FrameLayout? = null
     lateinit var mMainPresenter:IMainPresenter
     val TIME_INTERVAL:Long =2000
@@ -85,10 +87,10 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         mMainPresenter.saveActivity(activity)
         supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("activity_add_fragment")).commit()
 
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        /*var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
         if(currentFragment is ActivityFragment){
             currentFragment.refreshList()
-        }
+        }*/
     }
 
     override fun getActivity(id: String): Activities {
@@ -228,16 +230,18 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
     }
 
 
-    override fun showAddContactsPage(bundle:Bundle) {
+    override fun showAddContactsPage() {
 
-        selectContactsFragment= SelectContactsFragment()
-        selectContactsFragment.arguments = bundle
-        selectContactsFragment.show(fragmentManager,"selectContacts")
+        var ft = supportFragmentManager.beginTransaction()
+        var frag =  SelectContactsFragment()
+        ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+        ft.add(android.R.id.content, frag,"select_contacts").commit()
+      //  selectContactsFragment.show(fragmentManager,"selectContacts")
 
     }
 
     override fun hideAddContactsPage() {
-       selectContactsFragment.dismiss()
+    //   selectContactsFragment.dismiss()
     }
 
     override fun onContactSelected(contactList: MutableList<Contact>?) {
@@ -300,6 +304,13 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         }
     }
 
+    override fun getAllContactList() {
+
+    }
+
+    override fun closeContactSelectFragment() {
+        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("select_contacts")).commit()
+    }
 }
 
 

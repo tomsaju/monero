@@ -12,6 +12,8 @@ class DBContract {
             const val ACTIVITY_TITLE = "title"
             const val ACTIVITY_DESCRIPTION = "description"
             const val ACTIVITY_USERS = "users"
+            const val ACTIVITY_MODE ="mode"
+            const val ACTIVITY_TAGS = "tags"
         }
 
     }
@@ -35,6 +37,7 @@ class DBContract {
             const val EXPENSE_CREDITS = "credits"
             const val EXPENSE_DEBIT = "debits"
             const val EXPENSE_ACTIVITY_ID = "activity_id"
+            const val EXPENSE_AMOUNT = "amount"
 
         }
 

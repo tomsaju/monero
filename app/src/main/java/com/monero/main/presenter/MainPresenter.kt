@@ -6,11 +6,13 @@ import android.support.annotation.WorkerThread
 import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
 import com.monero.Application.ApplicationController
 import com.monero.Dao.DBContract
 import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.db
 import com.monero.helper.AppDatabase.Companion.getAppDatabase
+import com.monero.helper.converters.TagConverter
 import com.monero.models.Activities
 import com.monero.models.User
 import io.reactivex.Observable
@@ -40,6 +42,7 @@ class MainPresenter:IMainPresenter {
     constructor(context: Context, view: IMainView) {
         this.context = context
         this.view = view
+        firestoreDb = FirebaseFirestore.getInstance()
     }
 
 
@@ -76,16 +79,21 @@ class MainPresenter:IMainPresenter {
     }*/
 
     override fun saveActivity(activity: Activities) {
+        var convertor = TagConverter()
+        var membersJson:String =convertor.convertUserListtoString(activity.members)
+        var tagsJson:String = convertor.convertTagListtoString(activity.tags)
 
         var newActivity = HashMap<String, Any>()
         newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE,activity.title)
         newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION,activity.description)
-        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS,activity.members)
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE,activity.mode)
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS,tagsJson)
+        newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS,membersJson)
 
         firestoreDb?.collection("activities")?.add(newActivity)
 
                 ?.addOnSuccessListener {DocumentReference ->
-                    DocumentReference.id
+
                     //success
                     activity.id = DocumentReference.id
                     Single.fromCallable {

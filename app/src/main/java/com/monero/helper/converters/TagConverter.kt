@@ -28,14 +28,14 @@ class TagConverter {
     }
 
     @TypeConverter
-    fun convertUserListtoString(userList:List<User>):String{
+    public  fun convertUserListtoString(userList:List<User>):String{
         val gson = Gson()
         val type = object : TypeToken<List<User>>() {}.type
         return gson.toJson(userList, type)
     }
 
     @TypeConverter
-    fun convertJSONtoUser(json:String):List<User>{
+    public fun convertJSONtoUser(json:String):List<User>{
         val gson = Gson()
         val type = object : TypeToken<List<User>>() {
 

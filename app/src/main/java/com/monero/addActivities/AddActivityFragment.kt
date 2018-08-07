@@ -140,7 +140,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     interface IAddActivityFragmentListener {
         fun saveActivity(activity: Activities)
         fun getActivity(id: String): Activities
-        fun showAddContactsPage(bundle: Bundle)
+        fun showAddContactsPage()
         fun hideAddContactsPage()
         fun setupPermissions()
     }
@@ -171,7 +171,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         val type = object : TypeToken<List<Contact>>() {}.type
         val listString = gson.toJson(contactsList, type)
         bundle.putString("list",listString)
-        mListener.showAddContactsPage(bundle)
+        mListener.showAddContactsPage()
     }
 
     fun setSelectedContacts(contactList: List<Contact>){

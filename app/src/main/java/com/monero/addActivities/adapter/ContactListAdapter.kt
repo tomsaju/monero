@@ -4,9 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
 import com.monero.models.Contact
@@ -14,16 +12,19 @@ import com.monero.models.Contact
 /**
  * Created by tom.saju on 3/14/2018.
  */
-class ContactListAdapter:BaseAdapter {
+class ContactListAdapter:BaseAdapter, Filterable {
 
     var contactList:List<Contact>;
     var context:Context?=null;
     var parent:SelectContactsFragment
+    lateinit var orig: List<Contact>
+
 
     constructor(context: Context,contactList: List<Contact>,parent: SelectContactsFragment){
         this.context = context
         this.contactList = contactList
         this.parent = parent
+        orig = contactList
     }
 
     override fun getView(position: Int, parent: View?, rootView: ViewGroup?): View {
@@ -53,5 +54,43 @@ class ContactListAdapter:BaseAdapter {
 
     override fun getCount(): Int {
         return contactList.size
+    }
+
+
+
+   override fun getFilter(): Filter {
+        return object : Filter() {
+
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val oReturn = FilterResults()
+                val results = ArrayList<Contact>()
+
+                if (orig == null) {
+                    orig = contactList
+                }
+                if (constraint != null) {
+                    if (orig != null && orig.isNotEmpty()) {
+                        for (g in orig) {
+                            if (g.name.toLowerCase().contains(constraint.toString()))
+                                results.add(g)
+                        }
+                    }
+                    oReturn.values = results
+                    oReturn.count = results.size
+                }
+                return oReturn
+            }
+
+            override fun publishResults(constraint: CharSequence,
+                                         results: FilterResults) {
+                if(results.count>0) {
+                    contactList = results!!.values as ArrayList<Contact>
+                    notifyDataSetChanged()
+                }else{
+                    contactList = emptyList()
+                    notifyDataSetChanged()
+                }
+            }
+        }
     }
 }

@@ -1,8 +1,11 @@
 package com.monero.activitydetail.presenter.expense
 
 import android.content.Context
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import com.monero.Dao.DBContract
 import com.monero.helper.AppDatabase
+import com.monero.helper.converters.TagConverter
 import com.monero.models.Expense
 import com.monero.models.User
 import io.reactivex.Single
@@ -15,34 +18,57 @@ import io.reactivex.schedulers.Schedulers
 class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
 
 
-    var context:Context
-    var view:IExpenseFragmentView
+    var context: Context
+    var view: IExpenseFragmentView
+    var firestoreDb: FirebaseFirestore? = null
 
-    constructor(context: Context, view: IExpenseFragmentView){
+    constructor(context: Context, view: IExpenseFragmentView) {
         this.context = context
         this.view = view
+        firestoreDb = FirebaseFirestore.getInstance()
     }
 
     override fun saveExpense(expense: Expense) {
-        Single.fromCallable {
+        var convertor = TagConverter()
+        var debitJson = convertor.convertDebitListtoString(expense.debitList)
+        var creditJson = convertor.convertCreditListtoString(expense.creditList)
 
-            AppDatabase.db = AppDatabase.getAppDatabase(context)
-            AppDatabase.db?.expenseDao()?.insertIntoAExpensesTable(expense)
+        var newExpense = HashMap<String, Any>()
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID, expense.activity_id)
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_COMMENTS, expense.comments)
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_TITLE, expense.title)
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT, expense.amount)
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT, debitJson)
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS, creditJson)
 
-            for(credit in expense.creditList){
-                AppDatabase.db?.creditDao()?.insertIntoCreditTable(credit)
-            }
+        firestoreDb?.collection("expenses")?.add(newExpense)
 
-            for(debit in expense.debitList){
-                AppDatabase.db?.debitDao()?.insertIntoDebitTable(debit)
-            }
+                ?.addOnSuccessListener { DocumentReference ->
+
+                    expense.id = DocumentReference.id
+                    Single.fromCallable {
+
+                        AppDatabase.db = AppDatabase.getAppDatabase(context)
+                        AppDatabase.db?.expenseDao()?.insertIntoAExpensesTable(expense)
+
+                        for (credit in expense.creditList) {
+                            AppDatabase.db?.creditDao()?.insertIntoCreditTable(credit)
+                        }
+
+                        for (debit in expense.debitList) {
+                            AppDatabase.db?.debitDao()?.insertIntoDebitTable(debit)
+                        }
 
 
-        }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe()
-    }
+                    }.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe()
+                }
+                ?.addOnFailureListener { e ->
+                    //failure
+                }
 
-    /*override fun getAllParticipantsForthisActivity(id: Long): ArrayList<User> {
+
+        /*override fun getAllParticipantsForthisActivity(id: Long): ArrayList<User> {
        var allUserList:ArrayList<User> = ArrayList()
 
         Single.fromCallable {
@@ -57,4 +83,5 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe()
         return allUserList
     }*/
+    }
 }
