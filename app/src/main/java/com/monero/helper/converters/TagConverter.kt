@@ -42,6 +42,21 @@ class TagConverter {
         }.type
         return gson.fromJson(json, type)
     }
+
+    @TypeConverter
+    fun convertUserToString(user: User):String{
+        val gson = Gson()
+        val type = object :TypeToken<User>(){}.type
+        return gson.toJson(user,type)
+    }
+
+    @TypeConverter
+    fun convertJsonToUserObject(json: String):User{
+        val gson = Gson()
+        val type = object :TypeToken<User>(){}.type
+        return gson.fromJson(json, type)
+    }
+
     @TypeConverter
     fun convertExpensetoString(expense: Expense):String{
         val gson = Gson()

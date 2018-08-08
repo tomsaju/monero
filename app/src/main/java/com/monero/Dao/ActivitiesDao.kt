@@ -32,4 +32,10 @@ import io.reactivex.Single
     @Delete
     fun deleteActivity(activity:Activities)
 
+    @Query("UPDATE "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" SET "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :newId ,"+DBContract.ACTIVITY_TABLE.ACTIVITY_SYNC_STATUS +" =1 WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :oldId")
+    fun updateActivityId(oldId: String, newId: String)
+
+    @Query("UPDATE "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" SET "+DBContract.ACTIVITY_TABLE.ACTIVITY_SYNC_STATUS+" = :status WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :Id")
+    fun updateActivitySyncStatus(Id: String,status:Boolean)
+
 }

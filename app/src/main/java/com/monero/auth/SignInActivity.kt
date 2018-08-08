@@ -2,6 +2,7 @@ package com.monero.auth
 
 import android.app.ActionBar
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.support.design.widget.Snackbar
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
@@ -21,7 +23,8 @@ import java.util.*
 class SignInActivity : AppCompatActivity() {
     private val RC_SIGN_IN = 154 //the request code could be any Integer
     val auth = FirebaseAuth.getInstance()!!
-
+    val TIME_INTERVAL:Long =2000
+    var mBackPressed:Long=0
     lateinit var skipNowText:TextView
     lateinit var loginButton:Button
     lateinit var registerButton:Button
@@ -124,4 +127,18 @@ class SignInActivity : AppCompatActivity() {
         showSnackbar(R.string.unknown_sign_in_response) //if the sign in response was unknown
     }
 
+
+    override fun onBackPressed() {
+        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed()
+            finish()
+        } else {
+            "Press back button again to exit".shortToast(this)
+            mBackPressed = System.currentTimeMillis()
+        }
+    }
+
+    fun Any.shortToast(context: Context) {
+        Toast.makeText(context, this.toString(), Toast.LENGTH_SHORT).show()
+    }
 }

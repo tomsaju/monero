@@ -14,6 +14,8 @@ class DBContract {
             const val ACTIVITY_USERS = "users"
             const val ACTIVITY_MODE ="mode"
             const val ACTIVITY_TAGS = "tags"
+            const val ACTIVITY_AUTHOR = "author"
+            const val ACTIVITY_SYNC_STATUS = "syncStatus"
         }
 
     }

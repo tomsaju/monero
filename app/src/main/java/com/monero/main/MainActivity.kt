@@ -311,6 +311,16 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
     override fun closeContactSelectFragment() {
         supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("select_contacts")).commit()
     }
+
+    override fun onResume() {
+        super.onResume()
+        if(auth.currentUser==null){
+          //go to login page
+            var loginIntent = Intent(this,SignInActivity::class.java)
+            startActivity(loginIntent)
+            finish()
+        }
+    }
 }
 
 

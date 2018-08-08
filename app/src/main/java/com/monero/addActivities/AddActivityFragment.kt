@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -45,6 +46,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var addActivityPresenter:IAddActivityPresenter
     lateinit var contactsList:List<Contact>
     var selectedUserList: ArrayList<User> = ArrayList()
+    val auth = FirebaseAuth.getInstance()!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -57,7 +59,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         tagContainer = view.findViewById(R.id.tag_group)
         memberListParent = view.findViewById(R.id.members_layout)
         addTagText = view.findViewById(R.id.add_tag_text) //add_tag_text
-        addMemberBanner = view.findViewById(R.id.add_mebers_banner) // add_mebers_banner
+        addMemberBanner = view.findViewById(R.id.add_mebers_banner) // add_members_banner
         doneButton = view.findViewById(R.id.done_button_new_activity) // done_button_new_activity
         cancelButton = view.findViewById(R.id.cancel_button_new_activity)  // cancel_button_new_activity
         addMembersParent = view.findViewById(R.id.add_members_parent)
@@ -72,7 +74,10 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         doneButton.setOnClickListener { v: View? ->
 
             if (checkifInputValid()) {
-                val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList,1, selectedUserList)
+                val currentUser = auth.currentUser
+                val author  = User(currentUser?.uid!!,currentUser.displayName!!,currentUser.phoneNumber!!,currentUser.email!!)
+
+                val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList,1, selectedUserList,author,false)
                 mListener.saveActivity(activity)
             }
         }
