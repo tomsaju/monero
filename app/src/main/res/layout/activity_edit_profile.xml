@@ -13,7 +13,7 @@
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
         android:id="@+id/profileImage"
-        android:src="@drawable/pete"/>
+        android:src="@drawable/user_big"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,10 +24,19 @@
         android:layout_below="@+id/profileImage"
         android:id="@+id/edittext_display_name"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="Email"
+        android:layout_below="@+id/edittext_display_name"
+        android:id="@+id/edittext_email"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/edittext_display_name"
+        android:layout_below="@+id/edittext_email"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:text="Get Started"

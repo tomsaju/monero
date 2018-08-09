@@ -25,6 +25,7 @@ class EditProfileActivity : AppCompatActivity() {
 
         getStartButton.setOnClickListener{v: View ->
             var displayName:String =edittext_display_name.text.toString()
+
             if(auth.currentUser!=null){
                 val user = auth.currentUser
 
