@@ -39,7 +39,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         addPayerBanner = findViewById(R.id.banner_parent)
         doneButton = findViewById(R.id.done_button_payer_select)
         mPayerSelectorPresenter = PayerSelectorPresenter(this,this)
-
+        allUserList = ArrayList()
         if(intent!=null&&intent.extras!=null){
             activityId = intent.getStringExtra("activity_id")
             enteredTotal = intent.getDoubleExtra("entered_total",0.0)
@@ -137,7 +137,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
     }
 
     override fun getAllusers(): ArrayList<User> {
-        return allUserList
+        return allUserList!!
     }
 
     override fun onUsersFetched(userList: ArrayList<User>) {

@@ -2,10 +2,8 @@ package com.monero.activitydetail.presenter.detail
 
 import android.arch.lifecycle.LiveData
 import android.content.Context
-import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.db
 import com.monero.helper.AppDatabase.Companion.getAppDatabase
-import com.monero.main.presenter.IMainView
 import com.monero.models.Activities
 import com.monero.models.Expense
 import io.reactivex.Single

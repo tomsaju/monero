@@ -16,6 +16,9 @@ import io.reactivex.Single
     @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
     fun getAllActivities():LiveData<List<Activities>>
 
+    @Query("SELECT "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
+    fun getAllActivityIds():List<String>
+
     @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :id")
     fun getActivityForId(id:String):Activities
 

@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.annotation.NonNull
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.ActivityCompat
@@ -28,21 +27,19 @@ import com.monero.main.fragments.Activities.ActivityFragment
 import com.monero.main.fragments.NotificationFragment
 import com.monero.main.fragments.ProfileFragment
 import com.monero.helper.BottomNavigationViewHelper
-import com.monero.main.presenter.IMainPresenter
-import com.monero.main.presenter.IMainView
-import com.monero.main.presenter.MainPresenter
+import com.monero.main.presenter.main.IMainPresenter
+import com.monero.main.presenter.main.IMainView
+import com.monero.main.presenter.main.MainPresenter
 import com.monero.models.Activities
 import com.monero.models.Contact
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import io.reactivex.internal.util.HalfSerializer.onComplete
 
 
-class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
+class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
 
 
     private var content:FrameLayout? = null
-    lateinit var mMainPresenter:IMainPresenter
+    lateinit var mMainPresenter: IMainPresenter
     val TIME_INTERVAL:Long =2000
     var mBackPressed:Long=0
     lateinit var context:Context
@@ -65,7 +62,7 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
         toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-        mMainPresenter = MainPresenter(baseContext,this)
+        mMainPresenter = MainPresenter(baseContext, this)
 
         BottomNavigationViewHelper.removeShiftMode(bottomNavigationMenu)
         bottomNavigationMenu.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -186,16 +183,27 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
     }
 
     override fun onBackPressed() {
+        if(supportFragmentManager.fragments.contains(AddActivityFragment())) {
+            var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")
 
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")
-        if(currentFragment is AddActivityFragment&&currentFragment.isVisible){
-            supportFragmentManager.beginTransaction()
-                    .setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
-                    .detach(currentFragment)
-                    .addToBackStack(currentFragment.javaClass.simpleName)
-                    .commit()
-        }else {
+            if (currentFragment is AddActivityFragment && currentFragment.isVisible) {
+                supportFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+                        .detach(currentFragment)
+                        .addToBackStack(currentFragment.javaClass.simpleName)
+                        .commit()
+            } else {
 
+                if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+                    super.onBackPressed()
+                    finish()
+                } else {
+                    "Press back button again to exit".shortToast(context)
+                    mBackPressed = System.currentTimeMillis()
+                }
+
+            }
+        }else{
             if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
                 super.onBackPressed()
                 finish()
@@ -203,7 +211,6 @@ class MainActivity : AppCompatActivity(),IMainView, ActivityFragment.ActivityFra
                 "Press back button again to exit".shortToast(context)
                 mBackPressed = System.currentTimeMillis()
             }
-
         }
 
 
