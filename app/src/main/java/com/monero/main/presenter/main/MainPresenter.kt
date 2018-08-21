@@ -61,6 +61,13 @@ class MainPresenter: IMainPresenter {
             var tagsJson:String = convertor.convertTagListtoString(activity.tags)
             var author:String = gson.toJson(activity.author,User::class.java)
 
+            var permittedUserArrayList = arrayListOf<String>()
+            for(user in activity.members){
+                permittedUserArrayList.add(user.user_phone)
+            }
+
+
+
             var newActivity = HashMap<String, Any>()
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE,activity.title)
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION,activity.description)
@@ -68,6 +75,7 @@ class MainPresenter: IMainPresenter {
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS,tagsJson)
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS,membersJson)
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR,author)
+            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_ALLOWED_READ_PERMISSION_USERS,permittedUserArrayList)
 
             firestoreDb?.collection("activities")?.add(newActivity)
 
