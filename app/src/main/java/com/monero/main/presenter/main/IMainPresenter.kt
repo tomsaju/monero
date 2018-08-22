@@ -9,5 +9,6 @@ interface IMainPresenter {
 
     fun getAllActivitiesList()
     fun saveActivity(activity:Activities)
+    fun getAllActivitiesFromServer();
 
 }

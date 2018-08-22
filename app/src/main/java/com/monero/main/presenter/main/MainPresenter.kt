@@ -14,6 +14,11 @@ import com.monero.models.User
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.OnCompleteListener
+
+
 
 
 /**
@@ -102,5 +107,16 @@ class MainPresenter: IMainPresenter {
 
 
 
+    }
+
+    override fun getAllActivitiesFromServer() {
+        FirebaseFirestore.getInstance()
+                .collection("activities")
+                .get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val myListOfDocuments = task.result.documents
+                    }
+                }
     }
 }

@@ -31,6 +31,7 @@ class ActivityFragment: Fragment() {
     }
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -53,6 +54,8 @@ class ActivityFragment: Fragment() {
         }
         return rootView
     }
+
+
 
     fun onAllActivitiesFetched(activities: List<Activities>?) {
         //pass result to fragment

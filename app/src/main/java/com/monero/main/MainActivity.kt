@@ -326,6 +326,8 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
             var loginIntent = Intent(this,SignInActivity::class.java)
             startActivity(loginIntent)
             finish()
+        }else{
+            mMainPresenter.getAllActivitiesFromServer();
         }
     }
 }
