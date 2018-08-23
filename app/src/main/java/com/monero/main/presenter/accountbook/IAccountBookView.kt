@@ -7,4 +7,5 @@ import com.monero.models.PendingTransaction
  */
 interface IAccountBookView {
     fun onTransactionsfetched(list:ArrayList<PendingTransaction>)
+    fun onAllActivitiesFetched(activityIds:List<String>)
 }

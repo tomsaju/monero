@@ -5,4 +5,6 @@ package com.monero.main.presenter.accountbook
  */
 interface IAccountBookPresenter {
     fun getAllPendingTransactions()
+    fun getAllActivitiesList()
+    fun getPendingTransactionForActivity(id:String)
 }

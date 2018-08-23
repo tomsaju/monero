@@ -1,11 +1,9 @@
 package com.monero.Application
 
 import android.app.Application
-import com.monero.helper.AppDatabase
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.RoomDatabase
 import android.support.multidex.MultiDex
 import com.facebook.stetho.Stetho
+import com.monero.helper.PreferenceManager
 
 
 /**
@@ -13,12 +11,15 @@ import com.facebook.stetho.Stetho
  */
 class ApplicationController:Application() {
 
+    companion object {
+        var preferenceManager:PreferenceManager?=null
+    }
     //var db = Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
 
     override fun onCreate() {
         super.onCreate()
         MultiDex.install(this)
-
+        preferenceManager = PreferenceManager(applicationContext)
         Stetho.initializeWithDefaults(this)
     }
 }

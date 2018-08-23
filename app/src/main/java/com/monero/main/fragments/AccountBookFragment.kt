@@ -31,7 +31,7 @@ class AccountBookFragment:Fragment(),IAccountBookView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rootView = inflater?.inflate(R.layout.accountbook_fragment,container,false)
         recyclerview = rootView.findViewById<RecyclerView>(R.id.account_list)
-
+        recyclerview.isNestedScrollingEnabled = false
         return rootView
     }
 
@@ -49,4 +49,11 @@ class AccountBookFragment:Fragment(),IAccountBookView {
     }
 
 
+    override fun onAllActivitiesFetched(activityIds: List<String>) {
+
+        for(id in activityIds){
+            mPresenter.getPendingTransactionForActivity(id)
+        }
+
+    }
 }

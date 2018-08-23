@@ -6,6 +6,7 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import android.util.Log
 import com.google.gson.Gson
+import com.monero.Application.ApplicationController
 import com.monero.helper.AppDatabase
 import com.monero.models.Expense
 import com.monero.models.PendingTransaction
@@ -18,6 +19,7 @@ import io.reactivex.schedulers.Schedulers
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by Dreamz on 12-08-2018.
@@ -29,21 +31,57 @@ class AccountBookPresenter :IAccountBookPresenter {
     var allUsers:ArrayList<User> = ArrayList()
     var allPendingTransaction:ArrayList<PendingTransaction> = ArrayList()
     var rawtransactionList:ArrayList<RawTransaction> = ArrayList()
+    private var allActivityIdList: List<String>?=null
+    private var allExpensesForActivity: LiveData<List<Expense>>? = null
+
 
     constructor(context: Context, view: IAccountBookView) {
         this.context = context
         this.view = view
     }
 
+
+
     override fun getAllPendingTransactions() {
+        //1.Get list of all activities
+        //2.For each activities, get list of expense and get pending transactions
+        //3.Add pending transactions from all activities to a list
+
+        //clear pending transaction list
+        allPendingTransaction = ArrayList()
+        getAllActivitiesList()
+
+
+    }
+
+
+
+    override fun getAllActivitiesList() {
         Single.fromCallable {
             AppDatabase.db = AppDatabase.getAppDatabase(context)
-            allExpenses = AppDatabase.db?.expenseDao()?.getAllExpenses()
+             allActivityIdList = AppDatabase.db?.activitesDao()?.getAllActivityIds()
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
-                    val list = allExpenses
+                    val idList = allActivityIdList
+                    if (idList != null) {
+                        view.onAllActivitiesFetched(idList)
+                    }
+                })
+    }
+
+
+
+    override fun getPendingTransactionForActivity(id: String) {
+        Single.fromCallable {
+            AppDatabase.db = AppDatabase.getAppDatabase(context)
+            allExpensesForActivity = AppDatabase.db?.expenseDao()?.getAllExpensesForActivity(id)
+        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(Consumer {
+                    val list = allExpensesForActivity
                     if (list != null) {
                         onExpensesFetched(list)
                     }
@@ -51,35 +89,6 @@ class AccountBookPresenter :IAccountBookPresenter {
     }
 
 
-    /*fun getAllActivityIds() {
-        AppDatabase.db = AppDatabase.getAppDatabase(context)
-        var idList = AppDatabase.db?.activitesDao()?.getAllActivityIds()
-        for(id in idList!!) {
-            getAllPendingTransactions(id)
-        }
-
-    }
-
-    fun getAllPendingTransactions(activityId: String) {
-        getAllExpensesForActivity(activityId)
-    }*/
-
-   /* fun getAllExpensesForActivity(activity_id: String) {
-        // Log.d(logTag,"getALlexpensesForActivity")
-        Single.fromCallable {
-            AppDatabase.db = AppDatabase.getAppDatabase(context)
-            allExpenses = AppDatabase.db?.expenseDao()?.getAllExpenses()
-        }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {
-                    val list = allExpenses
-                    if (list != null) {
-                        onExpensesFetched(list)
-                    }
-                })
-
-    }*/
 
     fun onExpensesFetched(expenses: LiveData<List<Expense>>) {
         //Log.d(logTag,"onExpensesFetched")
@@ -157,8 +166,7 @@ class AccountBookPresenter :IAccountBookPresenter {
             }
 
         }
-        //clear pending transaction list
-        allPendingTransaction = ArrayList()
+
 
 
         /* if(getsumof(totalPaidList) !=getsumof(totalOwedList)){
@@ -198,8 +206,20 @@ class AccountBookPresenter :IAccountBookPresenter {
     }
 
     private fun onPendingTransactionsObtained(pendingTransactions: ArrayList<PendingTransaction>) {
-        allPendingTransaction.addAll(pendingTransactions)
+        allPendingTransaction.addAll(removeAllTransactionsWithoutme(pendingTransactions))
         view.onTransactionsfetched(allPendingTransaction)
+    }
+
+    private fun removeAllTransactionsWithoutme(pendingTransactions: ArrayList<PendingTransaction>):ArrayList<PendingTransaction> {
+        var myCredential = ApplicationController.preferenceManager!!.myCredential
+        var filteredList:ArrayList<PendingTransaction> = ArrayList()
+        for(transaction in pendingTransactions){
+            if(transaction.payer.user_phone==myCredential||transaction.reciepient.user_phone==myCredential){
+                //either i owe or they owe to me
+                filteredList.add(transaction)
+            }
+        }
+        return filteredList
     }
 
     private fun getPendingTransaction(rawList: ArrayList<RawTransaction>): ArrayList<PendingTransaction> {

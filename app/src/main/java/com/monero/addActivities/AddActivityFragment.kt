@@ -13,6 +13,7 @@ import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.monero.Application.ApplicationController
 
 import com.monero.R
 import com.monero.models.Activities
@@ -47,6 +48,9 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var contactsList:List<Contact>
     var selectedUserList: ArrayList<User> = ArrayList()
     val auth = FirebaseAuth.getInstance()!!
+    lateinit var myCredential:String
+    lateinit var myContactName:TextView
+    lateinit var myContactPhone:TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -63,13 +67,18 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         doneButton = view.findViewById(R.id.done_button_new_activity) // done_button_new_activity
         cancelButton = view.findViewById(R.id.cancel_button_new_activity)  // cancel_button_new_activity
         addMembersParent = view.findViewById(R.id.add_members_parent)
+        myContactName = view.findViewById(R.id.contact_name)
+        myContactPhone = view.findViewById(R.id.contact_number)
 
-
+        myCredential = ApplicationController.preferenceManager!!.myCredential
 
         addActivityPresenter = AddActivityPresenter(requireContext(),this)
 
         selectedUserList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
+
+        selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))
+        mListener.setCurrentActivityUserList(selectedUserList)
 
         doneButton.setOnClickListener { v: View? ->
 
@@ -114,10 +123,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         } else if (description.text.isEmpty()) {
             Toast.makeText(context, "Enter a description", Toast.LENGTH_SHORT)
             valid = false
-        }/*else if(selectedUserList.isEmpty()){
-            Toast.makeText(context,"Please add members",Toast.LENGTH_SHORT)
-            valid=false
-        }*/
+        }
 
         return valid
 
@@ -140,6 +146,14 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         }else{
             addMembersParent.visibility = View.GONE
         }
+        //populate my number in members listview
+        if(auth.currentUser!!.phoneNumber!=null) {
+            myContactName.text = "You"
+            myContactPhone.text = ApplicationController.preferenceManager!!.myCredential
+        }else{
+            //go to sign in page
+        }
+
     }
 
     interface IAddActivityFragmentListener {
@@ -148,6 +162,8 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         fun showAddContactsPage()
         fun hideAddContactsPage()
         fun setupPermissions()
+        fun setCurrentActivityUserList(userList:ArrayList<User>)
+        fun getCurrentActivityUserList():ArrayList<User>
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -170,12 +186,12 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
     override fun onContactsfetched(contactList: List<Contact>) {
         this.contactsList = contactList
-        Log.d("contacts fetched","now")
+      /*  Log.d("contacts fetched","now")
         val bundle = Bundle()
         val gson = Gson()
         val type = object : TypeToken<List<Contact>>() {}.type
         val listString = gson.toJson(contactsList, type)
-        bundle.putString("list",listString)
+        bundle.putString("list",listString)*/
         mListener.showAddContactsPage()
     }
 
@@ -185,11 +201,16 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
             memberListParent.removeAllViews()
             selectedUserList.clear()
+            //add my contact
+            var myContact = Contact("You",auth.currentUser!!.phoneNumber!!)
+            selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))
+            memberListParent.addView(getContactView(myContact))
+
             for(contact in contactList){
                 selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
                 memberListParent.addView(getContactView(contact))
-
             }
+
             addMembersParent.visibility = View.GONE
 
         }
@@ -204,7 +225,11 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         var name:TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
         var number:TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
 
-        name.text = contact.name
+        if(contact.phoneNumber==myCredential){
+            name.text = "You"
+        }else {
+            name.text = contact.name
+        }
         number.text = contact.phoneNumber
         return  view
     }
