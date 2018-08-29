@@ -33,6 +33,8 @@ import com.monero.main.presenter.main.MainPresenter
 import com.monero.models.Activities
 import com.monero.models.Contact
 import com.google.firebase.auth.FirebaseAuth
+import com.monero.Application.ApplicationController
+import com.monero.models.User
 
 
 class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     lateinit var selectContactsFragment:SelectContactsFragment
     private val READ_CONTACTS_REQUEST_CODE: Int = 3
     val auth = FirebaseAuth.getInstance()!!
-
+    lateinit var currentActivityContactList:ArrayList<User>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -243,7 +245,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         var frag =  SelectContactsFragment()
         ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
         ft.add(android.R.id.content, frag,"select_contacts").commit()
-      //  selectContactsFragment.show(fragmentManager,"selectContacts")
+
 
     }
 
@@ -259,6 +261,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
                 if(currentFragment is AddActivityFragment&&currentFragment.isVisible){
 
                     currentFragment.setSelectedContacts(contactList)
+                   // currentActivityContactList.add(User())
                 }
             }
         }
@@ -322,13 +325,23 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     override fun onResume() {
         super.onResume()
         if(auth.currentUser==null){
-          //go to login page
+            ApplicationController.preferenceManager!!.myCredential =""
+            //go to login page
             var loginIntent = Intent(this,SignInActivity::class.java)
             startActivity(loginIntent)
             finish()
         }else{
+            ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
             mMainPresenter.getAllActivitiesFromServer();
         }
+    }
+
+    override fun setCurrentActivityUserList(userList: java.util.ArrayList<User>) {
+        this.currentActivityContactList = userList
+    }
+
+    override fun getCurrentActivityUserList(): java.util.ArrayList<User> {
+        return this.currentActivityContactList
     }
 }
 

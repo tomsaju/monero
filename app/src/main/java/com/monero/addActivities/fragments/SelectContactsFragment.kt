@@ -23,6 +23,7 @@ import com.monero.addActivities.adapter.ContactListAdapter
 import com.monero.models.Contact
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import com.monero.Views.CircularProfileImage
+import com.monero.models.User
 
 
 /**
@@ -40,7 +41,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     var selectedContactList:MutableList<Contact>?= null
     lateinit var mSearchView:SearchView
     lateinit var mContext:Context
-
+    lateinit var myContact:Contact
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
        // contacts = getContacts()
@@ -59,7 +60,11 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
         selectedContactList = ArrayList()
+        var currentUserList = mListener.getCurrentActivityUserList()
 
+        for(user in currentUserList){
+            selectedContactList?.add(Contact(user.user_name,user.user_phone))
+        }
      //   loadContacts(contacts)
         //dialog?.setTitle("Select participants")
         // Do something else
@@ -88,6 +93,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         super.onResume()
         var contactList =  getContacts()
         loadContacts(contactList)
+
     }
 
 
@@ -123,6 +129,8 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         fun onContactSelected(contactList:MutableList<Contact>?)
         fun getAllContactList()
         fun closeContactSelectFragment()
+        fun setCurrentActivityUserList(userList: java.util.ArrayList<User>)
+        fun getCurrentActivityUserList(): java.util.ArrayList<User>
     }
     override fun onProfileClosed(name: String?) {
 

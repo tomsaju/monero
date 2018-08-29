@@ -15,6 +15,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.monero.Application.ApplicationController
 import com.monero.BuildConfig
 import com.monero.R
 import com.monero.main.MainActivity
@@ -98,6 +99,7 @@ class SignInActivity : AppCompatActivity() {
                 /*
                     Checks if the User sign in was successful
                  */
+                ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
 
                 var mainIntent = Intent(this,MainActivity::class.java)
                 startActivity(mainIntent)
