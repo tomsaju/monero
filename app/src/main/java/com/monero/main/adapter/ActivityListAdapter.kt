@@ -5,9 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
 import com.monero.models.Activities
@@ -31,8 +29,8 @@ class ActivityListAdapter : BaseAdapter {
         view = inflater.inflate(R.layout.activities_list_item,parent,false)
 
         var title:TextView = view.findViewById(R.id.activites_title)
-        var description:TextView = view.findViewById(R.id.activities_description)
-        var parent:RelativeLayout = view.findViewById(R.id.mainListItemParent)
+        var description:TextView = view.findViewById(R.id.activities_users_names)
+        var parent:LinearLayout = view.findViewById(R.id.mainListItemParent)
 
         parent.setOnClickListener{_:View->
             var intent:Intent = Intent(context,DetailActivity::class.java)

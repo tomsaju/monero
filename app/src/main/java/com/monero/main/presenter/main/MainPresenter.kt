@@ -123,7 +123,10 @@ class MainPresenter: IMainPresenter {
                 .get()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val myListOfDocuments = task.result.documents
+                        for(document in task.result){
+                            Log.d("after",document.data.toString());
+                        }
+
                     }
                 }
     }
