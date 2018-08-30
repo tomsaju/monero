@@ -10,5 +10,7 @@
         <attr name="text" format="string"></attr>
         <attr name="isCancelable" format="boolean"></attr>
     </declare-styleable>
+    <attr format="string" name="fontPath"/>
+    <item name="calligraphy_tag_id" type="id"/>
     
 </resources>

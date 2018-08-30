@@ -1,14 +1,17 @@
 package com.monero.main.fragments.Activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ListView
 import com.monero.R
+import com.monero.activitydetail.DetailActivity
 import com.monero.main.adapter.ActivityListAdapter
 import com.monero.models.Activities
 import com.monero.models.Tag
@@ -63,6 +66,14 @@ class ActivityFragment: Fragment() {
             adapter = ActivityListAdapter(requireContext(), activities)
             activitiesList?.adapter = adapter
         }
+
+        activitiesList?.setOnItemClickListener { _, _, position, _ ->
+            var intent:Intent = Intent(requireContext(), DetailActivity::class.java)
+            var selection = activities?.get(position)
+            intent.putExtra("activityId",selection?.id)
+            requireContext()?.startActivity(intent)
+        }
+
     }
 
     public fun refreshList(){

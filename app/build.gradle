@@ -72,4 +72,5 @@ dependencies {
     //firebase firestore
     implementation 'com.google.firebase:firebase-firestore:17.0.1'
 
+    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
 }

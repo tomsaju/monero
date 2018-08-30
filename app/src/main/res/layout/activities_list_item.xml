@@ -4,21 +4,13 @@
     xmlns:card_view="http://schemas.android.com/tools"
     android:id="@+id/mainListItemParent"
     android:layout_width="match_parent"
-    android:layout_height="85dp"
-    android:clipToPadding="false"
-    android:elevation="7dp"
-    android:layout_marginTop="12dp"
-    android:layout_marginBottom="12dp"
-    android:paddingBottom="@dimen/cardview_default_elevation"
-    android:paddingRight="@dimen/cardview_default_elevation"
-    android:background="#ffffff">
+    android:layout_height="wrap_content"
+    android:clipToPadding="false">
 
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:cardElevation="10dp"
-        app:cardBackgroundColor="#ffffff">
+        android:layout_height="match_parent">
 
 
         <RelativeLayout
@@ -27,7 +19,7 @@
             android:layout_centerVertical="true">
 
             <View
-                android:layout_width="4dp"
+                android:layout_width="2dp"
                 android:layout_height="match_parent"
                 android:background="@color/colorAccent"></View>
             <TextView
@@ -37,15 +29,16 @@
                 android:layout_alignParentTop="true"
                 android:text="Trip to nevada"
                 android:textColor="#CC000000"
-                android:textStyle="bold"
+                android:textStyle="normal"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="10dp"
-                android:textSize="17sp" />
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Oct 9"
+                android:id="@+id/created_date"
                 android:layout_alignParentRight="true"
                 android:paddingRight="10dp"
                 android:layout_alignBottom="@id/activites_title"/>
@@ -56,26 +49,20 @@
                 android:layout_alignStart="@+id/activites_title"
                 android:layout_below="@+id/activites_title"
                 android:text="John,Alan and 3 others"
+                android:alpha="0.6"
+                android:layout_marginTop="5dp"
+                android:textColor="#000000"
                 android:textSize="14sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <me.gujun.android.taggroup.TagGroup
+                android:id="@+id/tag_group"
                 android:layout_below="@id/activities_users_names"
-                android:id="@+id/tag_section_parent"
-                android:layout_alignLeft="@+id/activites_title"
-                android:orientation="horizontal">
-
-                <com.pchmn.materialchips.ChipView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:label="Chip1"
-                    app:backgroundColor="#e0e0e0">
-
-
-                </com.pchmn.materialchips.ChipView>
-
-            </LinearLayout>
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="9dp"
+                android:layout_marginBottom="5dp"
+                android:paddingBottom="5dp"
+                android:layout_height="wrap_content"
+                style="@style/TagGroup.Small.Custom" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

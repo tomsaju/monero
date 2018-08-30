@@ -84,10 +84,14 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
             if (checkifInputValid()) {
                 val currentUser = auth.currentUser
-                val author  = User(currentUser?.uid!!,currentUser.displayName!!,currentUser.phoneNumber!!,currentUser.email!!)
+                if(currentUser!=null) {
+                    val author = User(currentUser?.uid!!, currentUser.displayName!!, currentUser.phoneNumber!!, currentUser.email!!)
 
-                val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList,1, selectedUserList,author,false)
-                mListener.saveActivity(activity)
+                    val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false,System.currentTimeMillis())
+                    mListener.saveActivity(activity)
+                }else{
+                    Toast.makeText(context, "Error for user", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 

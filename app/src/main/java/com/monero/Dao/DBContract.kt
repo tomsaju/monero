@@ -17,6 +17,7 @@ class DBContract {
             const val ACTIVITY_AUTHOR = "author"
             const val ACTIVITY_SYNC_STATUS = "syncStatus"
             const val ACTIVITY_ALLOWED_READ_PERMISSION_USERS = "allowed_read_permission"
+            const val ACTIVITY_CREATED_DATE = "createdDate"
         }
 
     }

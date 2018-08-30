@@ -19,6 +19,7 @@ import com.monero.helper.AppDatabase
 import com.monero.models.Activities
 import com.monero.models.Contact
 import com.monero.models.Tag
+import com.monero.models.User
 import com.pchmn.materialchips.ChipView
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,8 +27,11 @@ import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_add.*
 import me.gujun.android.taggroup.TagGroup
+import java.util.ArrayList
 
 class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.OnCotactSelectedListener {
+
+
     var toolbar:Toolbar?=null
     var title:EditText?=null
     var description:EditText?=null
@@ -156,5 +160,13 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
 
     override fun closeContactSelectFragment() {
         (supportFragmentManager.findFragmentByTag("select_contacts") as SelectContactsFragment)
+    }
+
+    override fun setCurrentActivityUserList(userList: ArrayList<User>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getCurrentActivityUserList(): ArrayList<User> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

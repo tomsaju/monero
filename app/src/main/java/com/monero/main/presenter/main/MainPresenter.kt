@@ -2,7 +2,6 @@ package com.monero.main.presenter.main
 
 import android.content.Context
 import android.util.Log
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.monero.Dao.DBContract
 import com.monero.helper.AppDatabase
@@ -14,11 +13,12 @@ import com.monero.models.User
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.OnCompleteListener
-
-
+import com.google.firebase.firestore.*
+import java.nio.file.Files.exists
+import com.monero.Application.ApplicationController
+import com.monero.helper.PreferenceManager
 
 
 /**
@@ -81,6 +81,8 @@ class MainPresenter: IMainPresenter {
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS,membersJson)
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR,author)
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_ALLOWED_READ_PERMISSION_USERS,permittedUserArrayList)
+            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE,activity.createdDate)
+
 
             firestoreDb?.collection("activities")?.add(newActivity)
 
@@ -118,16 +120,39 @@ class MainPresenter: IMainPresenter {
     }
 
     override fun getAllActivitiesFromServer() {
-        FirebaseFirestore.getInstance()
-                .collection("activities")
-                .get()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        for(document in task.result){
-                            Log.d("after",document.data.toString());
-                        }
-
-                    }
-                }
+      getActivityIdList()
     }
+
+
+   fun getActivityIdList(){
+
+       
+        var userId = ApplicationController.preferenceManager!!.myCredential
+        var myActivityIds:ArrayList<String> = ArrayList()
+        var stringlist:String =""
+        FirebaseFirestore.getInstance()
+               .collection("pending_reg_users").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+           if (task.isSuccessful) {
+               val document = task.result
+               if (document.exists()) {
+                   val map = document.data
+                   var value =  map?.getValue("activities_id")
+                   stringlist = value.toString()
+
+                   if(stringlist!=null&&!stringlist.isEmpty()){
+                       myActivityIds = ArrayList(stringlist.split(","))
+                   }
+                   printAllIds(myActivityIds)
+               }
+           }
+       })
+   }
+
+   fun printAllIds(list:ArrayList<String>){
+       for(id in list){
+           Log.d("Print",id);
+       }
+   }
+
+
 }

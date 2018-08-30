@@ -9,6 +9,9 @@ import android.widget.*
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
 import com.monero.models.Activities
+import me.gujun.android.taggroup.TagGroup
+import java.util.*
+
 
 /**
  * Created by tom.saju on 3/7/2018.
@@ -31,16 +34,31 @@ class ActivityListAdapter : BaseAdapter {
         var title:TextView = view.findViewById(R.id.activites_title)
         var description:TextView = view.findViewById(R.id.activities_users_names)
         var parent:LinearLayout = view.findViewById(R.id.mainListItemParent)
+        val mTagGroup:TagGroup = view.findViewById(R.id.tag_group)
+        var createdDate:TextView = view.findViewById(R.id.created_date)
 
-        parent.setOnClickListener{_:View->
-            var intent:Intent = Intent(context,DetailActivity::class.java)
-            intent.putExtra("activityId",activitiesList[position].id)
-            context.startActivity(intent)
 
+
+        var tagsList = activitiesList[position].tags
+        var stringListTag = ArrayList<String>()
+        for(tag in tagsList){
+            stringListTag.add(tag.title)
         }
 
         title.text=activitiesList[position].title
         description.text = activitiesList[position].description
+        mTagGroup.setTags(stringListTag)
+
+
+        val calendar = Calendar.getInstance()
+        calendar.time = Date(activitiesList[position].createdDate)
+        val day:String = calendar.get(Calendar.DAY_OF_MONTH).toString()
+        val month = (calendar.get(Calendar.MONTH)+1).toString() //month index starts from 0
+        val year = calendar.get(Calendar.YEAR).toString()
+
+        var formattedDate: String = "$day/$month/$year";
+
+        createdDate.setText(formattedDate)
 
         return view
     }

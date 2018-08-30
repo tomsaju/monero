@@ -3,7 +3,9 @@ package com.monero.Application
 import android.app.Application
 import android.support.multidex.MultiDex
 import com.facebook.stetho.Stetho
+import com.monero.R
 import com.monero.helper.PreferenceManager
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 
 
 /**
@@ -21,5 +23,10 @@ class ApplicationController:Application() {
         MultiDex.install(this)
         preferenceManager = PreferenceManager(applicationContext)
         Stetho.initializeWithDefaults(this)
+
+        CalligraphyConfig.initDefault(CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/RobotoCondensed-Regular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build())
     }
 }

@@ -24,4 +24,16 @@
         <item name="actionMenuTextColor">@android:color/black</item>
     </style>
 
+    app:atg_backgroundColor="#fafafa"
+    app:atg_textColor="#818181"
+    <style name="TagGroup.Small.Custom" parent="TagGroup">
+        <item name="atg_textSize">10sp</item>
+        <item name="atg_horizontalSpacing">6dp</item>
+        <item name="atg_verticalSpacing">3dp</item>
+        <item name="atg_horizontalPadding">8dp</item>
+        <item name="atg_verticalPadding">2dp</item>
+        <item name="atg_textColor">#7b7b7b</item>
+        <item name="atg_backgroundColor">#e0e0e0</item>
+        <item name="atg_borderColor">#e0e0e0</item>
+    </style>
 </resources>

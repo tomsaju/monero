@@ -16,4 +16,5 @@ data class Activities(@ColumnInfo(name = "activity_id") @PrimaryKey var id: Stri
                       val mode:Int,
                       val members:List<User>,
                       val author:User,
-                      var syncStatus:Boolean)
+                      var syncStatus:Boolean,
+                      var createdDate:Long)

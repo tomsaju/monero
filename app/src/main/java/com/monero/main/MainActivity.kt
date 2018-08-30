@@ -35,6 +35,9 @@ import com.monero.models.Contact
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
 import com.monero.models.User
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
+
+
 
 
 class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
@@ -343,6 +346,12 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     override fun getCurrentActivityUserList(): java.util.ArrayList<User> {
         return this.currentActivityContactList
     }
+
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
+    }
+
 }
 
 
