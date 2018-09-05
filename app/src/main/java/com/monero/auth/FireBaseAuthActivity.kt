@@ -20,7 +20,7 @@ import com.firebase.ui.auth.viewmodel.RequestCodes.GOOGLE_PROVIDER
 
 class FireBaseAuthActivity : AppCompatActivity() {
     private val RC_SIGN_IN = 154 //the request code could be any Integer
-    val auth = FirebaseAuth.getInstance()!!
+    var auth = FirebaseAuth.getInstance()!!
     var providers: ArrayList<AuthUI.IdpConfig>? = null
     fun showSnackbar(id : Int){
         Snackbar.make(findViewById(R.id.sign_in_container), resources.getString(id), Snackbar.LENGTH_LONG).show()
@@ -63,7 +63,7 @@ class FireBaseAuthActivity : AppCompatActivity() {
                 /*
                     Checks if the User sign in was successful
                  */
-
+                auth = FirebaseAuth.getInstance();
                 if(auth.currentUser?.displayName!=null) {
 
                     var mainIntent = Intent(this, MainActivity::class.java)

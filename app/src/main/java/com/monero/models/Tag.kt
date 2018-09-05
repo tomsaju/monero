@@ -13,7 +13,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Entity(tableName = DBContract.TAG_TABLE.TABLE_NAME)
 
-@Parcelize data class Tag (@ColumnInfo(name = "Tag_Id") @PrimaryKey(autoGenerate = true) val id:Long, val title:String):Parcelable
+@Parcelize data class Tag (@ColumnInfo(name = "Tag_Id") @PrimaryKey(autoGenerate = true) var id:Long=0, var title:String=""):Parcelable
 
 
 

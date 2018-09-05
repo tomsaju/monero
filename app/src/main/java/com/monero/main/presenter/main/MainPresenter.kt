@@ -19,6 +19,10 @@ import com.google.firebase.firestore.*
 import java.nio.file.Files.exists
 import com.monero.Application.ApplicationController
 import com.monero.helper.PreferenceManager
+import com.google.firebase.firestore.QueryDocumentSnapshot
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.gson.reflect.TypeToken
+import com.monero.models.Tag
 
 
 /**
@@ -35,6 +39,7 @@ class MainPresenter: IMainPresenter {
         this.view = view
         firestoreDb = FirebaseFirestore.getInstance()
     }
+    var PendingDownloadItems:ArrayList<String>?=null
 
 
 
@@ -120,19 +125,89 @@ class MainPresenter: IMainPresenter {
     }
 
     override fun getAllActivitiesFromServer() {
-      getActivityIdList()
+
+        getActivityIdList()
+
+       /* */
     }
 
 
-   fun getActivityIdList(){
+    fun downloadAllActivities(activityIdList: ArrayList<String>){
+        for(id in activityIdList){
+            downloadActivity(id)
+        }
+    }
+
+    fun downloadActivity(activityId: String) {
+        var gson = Gson()
+        FirebaseFirestore.getInstance()
+                .collection("activities").document(activityId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+            if (task.isSuccessful) {
+                val document = task.result
+
+
+
+                val tagType = object : TypeToken<List<Tag>>() {}.type
+                val tagsList = Gson().fromJson<List<Tag>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS).toString(), tagType)
+
+                val tagTypeUser = object : TypeToken<List<User>>() {}.type
+                val usersList = Gson().fromJson<List<User>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS).toString(), tagTypeUser)
+
+
+                var id: String=activityId
+                var title:String=document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE).toString()
+                var description:String=document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION).toString()
+                var tags:List<Tag> = tagsList
+                var mode:Int = Integer.parseInt(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE).toString())
+                var members:List<User> =usersList
+                var author:User= User("","","","")
+                var syncStatus:Boolean=false
+                var createdDate:Long=0
+
+                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate)
+
+
+                saveActivityToLocal(downloadedActivity)
+
+            } else {
+                Log.d("tasklist", "unsuccessfull")
+            }
+
+        })
+    }
+
+    private fun saveActivityToLocal(downloadedActivity: Activities?) {
+        Observable.fromCallable {
+            db= getAppDatabase(context)
+            db?.activitesDao()?.insertIntoActivitiesTable(downloadedActivity!!) // .database?.personDao()?.insert(person)
+            for(tag in downloadedActivity!!.tags){
+                AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
+            }
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+            // set values to UI
+          //  PendingDownloadItems?.remove(downloadedActivity?.id)
+
+        }, { error ->
+            // handle exception if any
+            Log.d("tag","exception")
+        }, {
+            // on complete
+            Log.d("tag","completed")
+        })
+
+    }
+
+
+    fun getActivityIdList(){
 
        
         var userId = ApplicationController.preferenceManager!!.myCredential
         var myActivityIds:ArrayList<String> = ArrayList()
         var stringlist:String =""
         FirebaseFirestore.getInstance()
-               .collection("pending_reg_users").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
-           if (task.isSuccessful) {
+                   .collection("pending_reg_users").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+               if (task.isSuccessful) {
                val document = task.result
                if (document.exists()) {
                    val map = document.data
@@ -142,7 +217,7 @@ class MainPresenter: IMainPresenter {
                    if(stringlist!=null&&!stringlist.isEmpty()){
                        myActivityIds = ArrayList(stringlist.split(","))
                    }
-                   printAllIds(myActivityIds)
+                   downloadAllActivities(myActivityIds)
                }
            }
        })

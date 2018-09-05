@@ -83,9 +83,10 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         doneButton.setOnClickListener { v: View? ->
 
             if (checkifInputValid()) {
-                val currentUser = auth.currentUser
-                if(currentUser!=null) {
-                    val author = User(currentUser?.uid!!, currentUser.displayName!!, currentUser.phoneNumber!!, currentUser.email!!)
+
+                if(auth!=null) {
+                    //val author = User(auth.currentUser?.uid!!, auth.currentUser?.displayName!!, auth.currentUser?.phoneNumber!!, auth.currentUser?.email!!)
+                    val author = User("dummy string", "dummy author", "dummy phone", "dummy mail")
 
                     val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false,System.currentTimeMillis())
                     mListener.saveActivity(activity)

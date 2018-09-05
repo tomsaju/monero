@@ -59,7 +59,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
-        selectedContactList = ArrayList()
+        selectedContactList = ArrayList<Contact>()
         var currentUserList = mListener?.getCurrentActivityUserList()
 
         for(user in currentUserList!!){

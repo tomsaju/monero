@@ -10,4 +10,4 @@ import kotlinx.android.parcel.Parcelize
  * Created by tom.saju on 3/7/2018.
  */
 @Entity(tableName = DBContract.USER_TABLE.TABLE_NAME)
-@Parcelize data class User(@PrimaryKey val user_id: String, val user_name:String, val user_phone:String, val user_email:String):Parcelable
+@Parcelize data class User(@PrimaryKey var user_id: String="", var user_name:String="", var user_phone:String="", var user_email:String=""):Parcelable
