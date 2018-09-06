@@ -20,11 +20,11 @@ class ProfileFragment:Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rootView = inflater?.inflate(R.layout.profile_fragment,container,false)
-        var name:TextView = rootView?.findViewById<TextView>(R.id.username_display) as TextView
+        //var name:TextView = rootView?.findViewById<TextView>(R.id.username_display) as TextView
         if(auth.currentUser!=null){
-            name.text = auth.currentUser?.displayName.toString()
+           // name.text = auth.currentUser?.displayName.toString()
         }else{
-            name.text = "No users signed in"
+          //  name.text = "No users signed in"
         }
         return rootView
     }
