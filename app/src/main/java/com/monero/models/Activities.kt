@@ -22,5 +22,6 @@ data class Activities(@ColumnInfo(name = "activity_id") @PrimaryKey var id: Stri
                       var members:List<User> = emptyList(),
                       var author:User= User("","","",""),
                       var syncStatus:Boolean=false,
-                      var createdDate:Long=0)
+                      var createdDate:Long=0,
+                      var lastModifiedTime:Long=0)
 

@@ -150,9 +150,10 @@ class MainPresenter: IMainPresenter {
                 val tagType = object : TypeToken<List<Tag>>() {}.type
                 val tagsList = Gson().fromJson<List<Tag>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS).toString(), tagType)
 
-                val tagTypeUser = object : TypeToken<List<User>>() {}.type
-                val usersList = Gson().fromJson<List<User>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS).toString(), tagTypeUser)
+                val userListType = object : TypeToken<List<User>>() {}.type
+                val usersList = Gson().fromJson<List<User>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS).toString(), userListType)
 
+                var activityAuthor = TagConverter().convertJsonToUserObject(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR).toString())
 
                 var id: String=activityId
                 var title:String=document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE).toString()
@@ -160,11 +161,11 @@ class MainPresenter: IMainPresenter {
                 var tags:List<Tag> = tagsList
                 var mode:Int = Integer.parseInt(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE).toString())
                 var members:List<User> =usersList
-                var author:User= User("","","","")
-                var syncStatus:Boolean=false
+                var author:User= activityAuthor
+                var syncStatus:Boolean=true //syncstatus is true
                 var createdDate:Long=0
 
-                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate)
+                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,0)
 
 
                 saveActivityToLocal(downloadedActivity)

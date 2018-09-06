@@ -3,9 +3,14 @@ package com.monero.Application
 import android.app.Application
 import android.support.multidex.MultiDex
 import com.facebook.stetho.Stetho
+import com.google.firebase.FirebaseApp
 import com.monero.R
 import com.monero.helper.PreferenceManager
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.FirebaseFirestore
+
+
 
 
 /**
@@ -24,9 +29,5 @@ class ApplicationController:Application() {
         preferenceManager = PreferenceManager(applicationContext)
         Stetho.initializeWithDefaults(this)
 
-        CalligraphyConfig.initDefault(CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/RobotoCondensed-Regular.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build())
     }
 }

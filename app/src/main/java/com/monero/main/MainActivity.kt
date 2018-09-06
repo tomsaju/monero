@@ -18,6 +18,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
+import com.google.firebase.FirebaseApp
 import com.monero.R
 import com.monero.addActivities.AddActivityFragment
 import com.monero.addActivities.fragments.SelectContactsFragment
@@ -33,8 +34,11 @@ import com.monero.main.presenter.main.MainPresenter
 import com.monero.models.Activities
 import com.monero.models.Contact
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.Application.ApplicationController
 import com.monero.models.User
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
 
@@ -51,13 +55,24 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     var toolbar:Toolbar?=null
     lateinit var selectContactsFragment:SelectContactsFragment
     private val READ_CONTACTS_REQUEST_CODE: Int = 3
-    val auth = FirebaseAuth.getInstance()!!
     lateinit var currentActivityContactList:ArrayList<User>
-
+    lateinit var auth:FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        FirebaseApp.initializeApp(applicationContext)
+        val firestore = FirebaseFirestore.getInstance()
+        CalligraphyConfig.initDefault(CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/RobotoCondensed-Regular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build())
 
+
+        val settings = FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build()
+        firestore.firestoreSettings = settings
+         auth = FirebaseAuth.getInstance()!!
 //        Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
         val user = FirebaseAuth.getInstance().currentUser
 
