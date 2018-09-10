@@ -15,6 +15,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
 import java.nio.file.Files.exists
 import com.monero.Application.ApplicationController
@@ -23,6 +24,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.reflect.TypeToken
 import com.monero.models.Tag
+import io.reactivex.Observable
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -164,8 +168,18 @@ class MainPresenter: IMainPresenter {
                 var author:User= activityAuthor
                 var syncStatus:Boolean=true //syncstatus is true
                 var createdDate:Long=0
+                //var simpledateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                var lastModifiedTime = "";
+                if(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME)==null){
+                    lastModifiedTime = "";
+                }else{
 
-                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,0)
+
+                    var dateObject = document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME)
+                    lastModifiedTime =  dateObject.toString();
+                }
+
+                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,lastModifiedTime)
 
 
                 saveActivityToLocal(downloadedActivity)
@@ -209,18 +223,16 @@ class MainPresenter: IMainPresenter {
         FirebaseFirestore.getInstance()
                    .collection("pending_reg_users").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
                if (task.isSuccessful) {
-               val document = task.result
-               if (document.exists()) {
-                   val map = document.data
-                   var value =  map?.getValue("activities_id")
-                   stringlist = value.toString()
+                   try {
+                       val document = task.result
+                       if (document.exists()) {
+                           val activitiesData = document.data!!
 
-                   if(stringlist!=null&&!stringlist.isEmpty()){
-                       myActivityIds = ArrayList(stringlist.split(","))
+                           downloadAllActivities(myActivityIds)
+                       }
+                   } catch (e: Exception) {
                    }
-                   downloadAllActivities(myActivityIds)
                }
-           }
        })
    }
 

@@ -88,7 +88,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
                     //val author = User(auth.currentUser?.uid!!, auth.currentUser?.displayName!!, auth.currentUser?.phoneNumber!!, auth.currentUser?.email!!)
                     val author = User("dummy string", "dummy author", "dummy phone", "dummy mail")
 
-                    val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false,System.currentTimeMillis(),System.currentTimeMillis())
+                    val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false,System.currentTimeMillis(),System.currentTimeMillis().toString())
                     mListener.saveActivity(activity)
                 }else{
                     Toast.makeText(context, "Error for user", Toast.LENGTH_SHORT).show()
