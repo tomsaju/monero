@@ -27,6 +27,7 @@ import com.monero.models.Tag
 import io.reactivex.Observable
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 
 /**
@@ -226,8 +227,20 @@ class MainPresenter: IMainPresenter {
                    try {
                        val document = task.result
                        if (document.exists()) {
-                           val activitiesData = document.data!!
+                            var finalList :HashMap<String,String> = HashMap();
 
+                           val activitiesData:Map<String,Any>? = document.data!!
+                            val activityiesDetails = activitiesData?.get("activities_details") as HashMap<String,Any>;
+                           for ((key, value) in activityiesDetails) {
+                               println("$key = $value")
+                               try {
+                                   var last_modified_time =(value as HashMap<String,Any>).get("last_modified_time").toString();
+                                   finalList[key]= last_modified_time
+                               } catch (e: Exception) {
+
+                               }
+                           }
+                           downloadUpdatedActivities(finalList)
                            downloadAllActivities(myActivityIds)
                        }
                    } catch (e: Exception) {
@@ -236,7 +249,15 @@ class MainPresenter: IMainPresenter {
        })
    }
 
-   fun printAllIds(list:ArrayList<String>){
+    private fun downloadUpdatedActivities(finalList: HashMap<String, String>) {
+        var localList: HashMap<String,String> = HashMap()
+        for((key,value) in finalList){
+            localList[key]=(db?.activitesDao()?.getActivityForId(key) as Activities).lastModifiedTime
+        }
+        println("done man")
+    }
+
+    fun printAllIds(list:ArrayList<String>){
        for(id in list){
            Log.d("Print",id);
        }
