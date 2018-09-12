@@ -5,6 +5,7 @@ import android.arch.persistence.room.*
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
 import android.database.Observable
 import com.monero.models.Activities
+import com.monero.models.ActivitiesMinimal
 import com.monero.models.User
 import io.reactivex.Single
 
@@ -25,7 +26,8 @@ import io.reactivex.Single
     @Query("SELECT members FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :id")
     fun getAllUsersForActivity(id:String):Single<String>
 
-
+    @Query("SELECT "+ DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" , "+DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME +" FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
+    fun getAllActivitiesModifiedDate():Single<List<ActivitiesMinimal>>
 
     @Insert(onConflict = REPLACE)
     fun insertIntoActivitiesTable(activity:Activities)

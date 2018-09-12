@@ -23,11 +23,18 @@ import com.monero.helper.PreferenceManager
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.reflect.TypeToken
+import com.monero.models.ActivitiesMinimal
 import com.monero.models.Tag
 import io.reactivex.Observable
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import io.reactivex.disposables.Disposable
+import io.reactivex.SingleObserver
+import io.reactivex.schedulers.Schedulers.single
+
+
 
 
 /**
@@ -149,7 +156,8 @@ class MainPresenter: IMainPresenter {
                 .collection("activities").document(activityId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
             if (task.isSuccessful) {
                 val document = task.result
-
+                var timestampWithoutNanoseconds = "";
+                var timestampinSeconds = "";
 
 
                 val tagType = object : TypeToken<List<Tag>>() {}.type
@@ -171,16 +179,18 @@ class MainPresenter: IMainPresenter {
                 var createdDate:Long=0
                 //var simpledateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 var lastModifiedTime = "";
-                if(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME)==null){
+                if(document.get("last_modified_time")==null){
                     lastModifiedTime = "";
                 }else{
 
 
-                    var dateObject = document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME)
+                    var dateObject = document.get("last_modified_time")
                     lastModifiedTime =  dateObject.toString();
+                    timestampWithoutNanoseconds = lastModifiedTime.substringBefore(",")
+                    timestampinSeconds =  timestampWithoutNanoseconds.substringAfter("=")
                 }
 
-                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,lastModifiedTime)
+                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,timestampinSeconds)
 
 
                 saveActivityToLocal(downloadedActivity)
@@ -235,13 +245,15 @@ class MainPresenter: IMainPresenter {
                                println("$key = $value")
                                try {
                                    var last_modified_time =(value as HashMap<String,Any>).get("last_modified_time").toString();
-                                   finalList[key]= last_modified_time
+                                   var lastModifiedTimeWithoutNanoseconds = last_modified_time.substringBefore(",")
+                                   var lastModifiedSeconds = lastModifiedTimeWithoutNanoseconds.substringAfter("=")
+                                   finalList[key]= lastModifiedSeconds
                                } catch (e: Exception) {
 
                                }
                            }
                            downloadUpdatedActivities(finalList)
-                           downloadAllActivities(myActivityIds)
+
                        }
                    } catch (e: Exception) {
                    }
@@ -250,11 +262,57 @@ class MainPresenter: IMainPresenter {
    }
 
     private fun downloadUpdatedActivities(finalList: HashMap<String, String>) {
-        var localList: HashMap<String,String> = HashMap()
-        for((key,value) in finalList){
-            localList[key]=(db?.activitesDao()?.getActivityForId(key) as Activities).lastModifiedTime
+        var updatedActivityIdList: ArrayList<String> = ArrayList()
+
+
+        var single:Single<List<ActivitiesMinimal>>?  =  db?.activitesDao()?.getAllActivitiesModifiedDate()
+        if(single!=null) {
+            single.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object : SingleObserver<List<ActivitiesMinimal>> {
+                        override fun onSubscribe(d: Disposable) {
+                            // add it to a CompositeDisposable
+                        }
+
+                        override fun onSuccess(users: List<ActivitiesMinimal>) {
+                            // update the UI
+                            var allActivitiesModifiedTime =users
+                            if(allActivitiesModifiedTime!=null) {
+                                for (activity in allActivitiesModifiedTime) {
+                                    if(finalList.containsKey(activity.id)&&
+                                            finalList.get(activity.id).equals(activity.lastModifiedTime)){
+                                        finalList.remove(activity.id)
+                                    }else{
+                                        updatedActivityIdList.add(activity.id)
+                                    }
+                                }
+                            }
+
+                            if(!finalList.isEmpty()){
+                                for((key,value) in finalList){
+                                    updatedActivityIdList.add(key)
+                                }
+                            }
+
+                            if(updatedActivityIdList!=null&&updatedActivityIdList.isNotEmpty()){
+                                Log.d("DOwnload ","found new items")
+                                downloadAllActivities(updatedActivityIdList)
+                            }else{
+                                Log.d("DOwnload ","No new items")
+                            }
+
+                        }
+
+                        override fun onError(e: Throwable) {
+                            // show an error message
+                            Log.d("download","Error")
+                        }
+                    })
         }
-        println("done man")
+
+
+
+
     }
 
     fun printAllIds(list:ArrayList<String>){
