@@ -316,6 +316,7 @@ class MainPresenter: IMainPresenter {
     }
 
     private fun areModifiedTImeSame(serverModifiedTime: String?, localModifiedTime: String): Boolean {
+       var isEqual = false
         //Compare the modified timestamps
         //Firebase timestamp when fetched as milliseconds and nanseconds... shows difference in value for same timestamp
         //ex September 5 2018 12:00:00 timestamp fetched from two different sections give different values for milliseconds(sometimes) and nanoseconds(always)
@@ -323,6 +324,18 @@ class MainPresenter: IMainPresenter {
         var serverTime = serverModifiedTime?.toLong()
         var localTime = localModifiedTime?.toLong()
 
+        val pattern = "yyyy-MM-dd HH:mm:ss"
+        val simpleDateFormat = SimpleDateFormat(pattern)
+        if(serverTime!=null&&localTime!=null) {
+            var servertimeFormatted = simpleDateFormat.format(Date(serverTime))
+            var localtimeFormatted = simpleDateFormat.format(Date(localTime))
+            if(servertimeFormatted.equals(localtimeFormatted)){
+                isEqual = true
+            }
+        }else{
+            isEqual = false
+        }
+        return isEqual
     }
 
     fun printAllIds(list:ArrayList<String>){
