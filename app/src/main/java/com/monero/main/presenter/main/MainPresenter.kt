@@ -280,7 +280,7 @@ class MainPresenter: IMainPresenter {
                             if(allActivitiesModifiedTime!=null) {
                                 for (activity in allActivitiesModifiedTime) {
                                     if(finalList.containsKey(activity.id)&&
-                                            finalList.get(activity.id).equals(activity.lastModifiedTime)){
+                                           areModifiedTImeSame(finalList.get(activity.id),activity.lastModifiedTime)){
                                         finalList.remove(activity.id)
                                     }else{
                                         updatedActivityIdList.add(activity.id)
@@ -312,6 +312,16 @@ class MainPresenter: IMainPresenter {
 
 
 
+
+    }
+
+    private fun areModifiedTImeSame(serverModifiedTime: String?, localModifiedTime: String): Boolean {
+        //Compare the modified timestamps
+        //Firebase timestamp when fetched as milliseconds and nanseconds... shows difference in value for same timestamp
+        //ex September 5 2018 12:00:00 timestamp fetched from two different sections give different values for milliseconds(sometimes) and nanoseconds(always)
+        //so we are converting them to standard format for comparison
+        var serverTime = serverModifiedTime?.toLong()
+        var localTime = localModifiedTime?.toLong()
 
     }
 
