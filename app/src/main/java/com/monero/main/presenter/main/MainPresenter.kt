@@ -176,7 +176,7 @@ class MainPresenter: IMainPresenter {
                 var members:List<User> =usersList
                 var author:User= activityAuthor
                 var syncStatus:Boolean=true //syncstatus is true
-                var createdDate:Long=0
+                var createdDate:Long=document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE).toString().toLong()
                 //var simpledateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                 var lastModifiedTime = "";
                 if(document.get("last_modified_time")==null){
@@ -189,8 +189,10 @@ class MainPresenter: IMainPresenter {
                     timestampWithoutNanoseconds = lastModifiedTime.substringBefore(",")
                     timestampinSeconds =  timestampWithoutNanoseconds.substringAfter("=")
                 }
-
-                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,timestampinSeconds)
+                var transactionIds=""
+                var historyLogIds=""
+                var expenseListId=""
+                var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,expenseListId,historyLogIds,transactionIds,timestampinSeconds)
 
 
                 saveActivityToLocal(downloadedActivity)
@@ -321,6 +323,8 @@ class MainPresenter: IMainPresenter {
         //Firebase timestamp when fetched as milliseconds and nanseconds... shows difference in value for same timestamp
         //ex September 5 2018 12:00:00 timestamp fetched from two different sections give different values for milliseconds(sometimes) and nanoseconds(always)
         //so we are converting them to standard format for comparison
+
+
         var serverTime = serverModifiedTime?.toLong()
         var localTime = localModifiedTime?.toLong()
 

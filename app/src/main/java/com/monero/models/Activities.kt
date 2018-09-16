@@ -23,5 +23,8 @@ data class Activities(@ColumnInfo(name = "activity_id") @PrimaryKey var id: Stri
                       var author:User= User("","","",""),
                       var syncStatus:Boolean=false,
                       var createdDate:Long=0,
+                      var expenseIdList:String="",
+                      var historyLogIds:String="",
+                      var transactionIds:String="",
                       var lastModifiedTime:String="")
 

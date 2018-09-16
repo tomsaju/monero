@@ -92,8 +92,6 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          paidUsersList = HashMap()
          splitPaymentList = HashMap()
 
-
-         //
          paidByTV.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         paidByTV.setOnClickListener { v: View? ->
 
