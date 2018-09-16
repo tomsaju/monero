@@ -8,8 +8,6 @@ import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.db
 import com.monero.helper.AppDatabase.Companion.getAppDatabase
 import com.monero.helper.converters.TagConverter
-import com.monero.models.Activities
-import com.monero.models.User
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -23,8 +21,7 @@ import com.monero.helper.PreferenceManager
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.reflect.TypeToken
-import com.monero.models.ActivitiesMinimal
-import com.monero.models.Tag
+import com.monero.models.*
 import io.reactivex.Observable
 import java.text.SimpleDateFormat
 import java.util.*
@@ -177,7 +174,7 @@ class MainPresenter: IMainPresenter {
                 var author:User= activityAuthor
                 var syncStatus:Boolean=true //syncstatus is true
                 var createdDate:Long=document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE).toString().toLong()
-                //var simpledateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
                 var lastModifiedTime = "";
                 if(document.get("last_modified_time")==null){
                     lastModifiedTime = "";
@@ -191,7 +188,7 @@ class MainPresenter: IMainPresenter {
                 }
                 var transactionIds=""
                 var historyLogIds=""
-                var expenseListId=""
+                var expenseListId=document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_EXPENSE_LIST).toString()
                 var downloadedActivity = Activities(id,title,description,tags,mode,members,author,syncStatus,createdDate,expenseListId,historyLogIds,transactionIds,timestampinSeconds)
 
 
@@ -222,8 +219,61 @@ class MainPresenter: IMainPresenter {
         }, {
             // on complete
             Log.d("tag","completed")
+            saveExpensesForActivity(downloadedActivity);
+
         })
 
+    }
+
+    private fun saveExpensesForActivity(downloadedActivity: Activities?) {
+        if(downloadedActivity!=null){
+            var expenseListFromServer:ArrayList<String> = ArrayList()
+            if(downloadedActivity.expenseIdList!=null){
+                if(downloadedActivity.expenseIdList.contains(",")){
+                    //more than one item
+                    expenseListFromServer = ArrayList(downloadedActivity.expenseIdList.split(","))
+                }else{
+                    //single item
+                    expenseListFromServer.add(downloadedActivity.expenseIdList)
+                }
+            }
+
+            if(expenseListFromServer!=null&&expenseListFromServer.isNotEmpty()){
+                Observable.fromCallable{
+                    db?.expenseDao()?.getAllExpenseListForActivity(downloadedActivity.id)
+                }.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe({ localList ->
+                        Log.d("Item GOT",localList.size.toString())
+                        if(expenseListMatch(expenseListFromServer,localList)){
+                            //nothing to download
+                        }else{
+                            //download the differences
+                        }
+
+                }, { error ->
+                    // handle exception if any
+                    Log.d("tag","exception")
+                }, {
+                    // on complete
+                    Log.d("tag","completed")
+
+
+                })
+            }
+
+        }
+
+    }
+
+    private fun expenseListMatch(expenseListFromServer: ArrayList<String>, localList: List<Expense>): Boolean {
+        if(expenseListFromServer!=null&&expenseListFromServer.isNotEmpty()&& localList!=null&&localList.isNotEmpty()) {
+            if (expenseListFromServer.size == localList.size) {
+               //check with each element
+            }
+        }else{
+            return false
+        }
+        return false
     }
 
 

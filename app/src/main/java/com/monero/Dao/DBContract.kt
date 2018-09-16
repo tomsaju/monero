@@ -19,6 +19,8 @@ class DBContract {
             const val ACTIVITY_ALLOWED_READ_PERMISSION_USERS = "allowed_read_permission"
             const val ACTIVITY_CREATED_DATE = "createdDate"
             const val ACTIVITY_MODIFIED_TIME = "lastModifiedTime"
+            const val ACTIVITY_EXPENSE_LIST = "expenses_id_list"
+
         }
 
     }
