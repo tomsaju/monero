@@ -421,7 +421,9 @@ class MainPresenter : IMainPresenter {
         //Firebase timestamp when fetched as milliseconds and nanseconds... shows difference in value for same timestamp
         //ex September 5 2018 12:00:00 timestamp fetched from two different sections give different values for milliseconds(sometimes) and nanoseconds(always)
         //so we are converting them to standard format for comparison
-
+        if(localModifiedTime==""){
+            return  false;
+        }
 
         var serverTime = serverModifiedTime?.toLong()
         var localTime = localModifiedTime?.toLong()

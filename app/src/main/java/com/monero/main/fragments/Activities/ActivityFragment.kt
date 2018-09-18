@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
+import android.widget.ProgressBar
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
 import com.monero.main.adapter.ActivityListAdapter
@@ -24,6 +25,8 @@ class ActivityFragment: Fragment() {
     var mActivityFragmentListener: ActivityFragmentListener?=null
     var activitiesList:ListView?=null
     var adapter:ActivityListAdapter?=null
+    lateinit var progressBar: ProgressBar
+
     companion object {
         fun newInstance(): ActivityFragment {
             var activityFragment = ActivityFragment()
@@ -49,6 +52,7 @@ class ActivityFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var rootView = inflater?.inflate(R.layout.activitylist_fragment,container,false)
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
+        progressBar = rootView?.findViewById(R.id.progressBar)
         val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
         addActivityButton.setOnClickListener { _:View->
             var taglist:MutableList<Tag> = mutableListOf<Tag>()
@@ -61,6 +65,7 @@ class ActivityFragment: Fragment() {
 
 
     fun onAllActivitiesFetched(activities: List<Activities>?) {
+        hideProgressBar()
         //pass result to fragment
         if(activities!=null) {
             adapter = ActivityListAdapter(requireContext(), activities)
@@ -80,6 +85,17 @@ class ActivityFragment: Fragment() {
         adapter?.notifyDataSetChanged();
     }
 
+
+   public fun showProgressBar(){
+        if(progressBar!=null){
+            progressBar.visibility = View.VISIBLE
+        }
+    }
+   public fun hideProgressBar(){
+        if(progressBar!=null){
+            progressBar.visibility = View.GONE
+        }
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

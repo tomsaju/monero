@@ -118,7 +118,7 @@ class TagConverter {
         val type = object : TypeToken<List<Credit>>() {
 
         }.type
-        return gson.fromJson(json, type)
+        return gson.fromJson<List<Credit>>(json, type)
     }
     @TypeConverter
     fun convertDebitListtoString(debitList:List<Debit>):String{
@@ -130,10 +130,8 @@ class TagConverter {
     @TypeConverter
     fun convertJSONtoDebitList(json:String):List<Debit>{
         val gson = Gson()
-        val type = object : TypeToken<List<Debit>>() {
-
-        }.type
-        return gson.fromJson(json, type)
+        val type = object : TypeToken<List<Debit>>() {}.type
+        return gson.fromJson<List<Debit>>(json, type)
     }
 
 }

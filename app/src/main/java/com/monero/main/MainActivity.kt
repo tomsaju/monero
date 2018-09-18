@@ -16,7 +16,9 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.FrameLayout
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.google.firebase.FirebaseApp
 import com.monero.R
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     private val READ_CONTACTS_REQUEST_CODE: Int = 3
     lateinit var currentActivityContactList:ArrayList<User>
     lateinit var auth:FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -80,6 +83,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         content = findViewById<FrameLayout>(R.id.container) as FrameLayout
         val bottomNavigationMenu = findViewById<BottomNavigationMenuView>(R.id.bottomNavigation) as BottomNavigationView
         toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
+
         setSupportActionBar(toolbar)
 
         mMainPresenter = MainPresenter(baseContext, this)
@@ -151,6 +155,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
 
     override fun onActivitiesFetched(activityList: LiveData<List<Activities>>?) {
+      //  hideProgressBar()
         var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
 
                 activityList?.observe(this, object : Observer<List<Activities>> {
@@ -340,6 +345,8 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("select_contacts")).commit()
     }
 
+
+
     override fun onResume() {
         super.onResume()
         if(auth.currentUser==null){
@@ -349,8 +356,15 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
             startActivity(loginIntent)
             finish()
         }else{
+
             ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
             mMainPresenter.getAllActivitiesFromServer();
+            var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+            if(currentFragment is ActivityFragment&&currentFragment.isVisible){
+
+                currentFragment.showProgressBar()
+            }
+
         }
     }
 

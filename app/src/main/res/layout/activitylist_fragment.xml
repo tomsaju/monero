@@ -7,13 +7,13 @@
 <FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ListView
         android:id="@+id/activity_listview"
         android:divider="#e0e0e0"
         android:layout_width="match_parent"
         tools:listitem="@layout/activities_list_item"
         android:dividerHeight="1dp"
-        android:background="@drawable/list_selector"
         android:layout_height="match_parent"></ListView>
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
@@ -22,6 +22,17 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="25dp"
         android:src="@android:drawable/ic_input_add"/>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateTintMode="src_atop"
+        android:indeterminateTint="@color/colorAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
 </FrameLayout>
     <android.support.v4.widget.Space
         android:layout_width="match_parent"
