@@ -24,6 +24,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import io.reactivex.disposables.Disposable
 import io.reactivex.SingleObserver
+import org.json.JSONArray
 
 
 /**
@@ -31,7 +32,7 @@ import io.reactivex.SingleObserver
  */
 class MainPresenter : IMainPresenter {
 
-
+    var TAG: String = "MainPresenter"
     var context: Context
     var view: IMainView
     var firestoreDb: FirebaseFirestore? = null
@@ -124,7 +125,8 @@ class MainPresenter : IMainPresenter {
     }
 
     override fun getAllActivitiesFromServer() {
-
+        Log.d(TAG,"getAllActivitiesFromServer")
+        view.showLoader()
         getActivityIdList()
 
         /* */
@@ -132,16 +134,20 @@ class MainPresenter : IMainPresenter {
 
 
     fun downloadAllActivities(activityIdList: ArrayList<String>) {
+        Log.d(TAG,"downloadActivitiesin list")
+        view.showLoader()
         for (id in activityIdList) {
             downloadActivity(id)
         }
     }
 
     fun downloadActivity(activityId: String) {
+        Log.d(TAG,"getAllActivity : "+activityId)
         var gson = Gson()
         FirebaseFirestore.getInstance()
                 .collection("activities").document(activityId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
             if (task.isSuccessful) {
+
                 val document = task.result
                 var timestampWithoutNanoseconds = "";
                 var timestampinSeconds = "";
@@ -192,6 +198,7 @@ class MainPresenter : IMainPresenter {
     }
 
     private fun saveActivityToLocal(downloadedActivity: Activities?) {
+        Log.d(TAG,"saveActivityToLocal")
         Observable.fromCallable {
             db = getAppDatabase(context)
             db?.activitesDao()?.insertIntoActivitiesTable(downloadedActivity!!) // .database?.personDao()?.insert(person)
@@ -206,16 +213,21 @@ class MainPresenter : IMainPresenter {
         }, { error ->
             // handle exception if any
             Log.d("tag", "exception")
+            view.hideLoader()
         }, {
             // on complete
             Log.d("tag", "completed")
+            view.hideLoader()
             saveExpensesForActivity(downloadedActivity);
+
 
         })
 
     }
 
     private fun saveExpensesForActivity(downloadedActivity: Activities?) {
+        view.showLoader()
+        Log.d(TAG,"saveExpensesForAvtivity : "+downloadedActivity?.id)
         if (downloadedActivity != null) {
             var expenseListFromServer: ArrayList<String> = ArrayList()
             if (downloadedActivity.expenseIdList != null) {
@@ -239,12 +251,17 @@ class MainPresenter : IMainPresenter {
                 }, { error ->
                     // handle exception if any
                     Log.d("tag", "exception")
+                    view.hideLoader()
                 }, {
                     // on complete
                     Log.d("tag", "completed")
+                    view.hideLoader()
 
 
                 })
+            }else{
+                Log.d(TAG,"Nothing to download")
+                view.hideLoader()
             }
 
         }
@@ -252,6 +269,8 @@ class MainPresenter : IMainPresenter {
     }
 
     private fun downLoadExpensesFromServer(expenseListFromServer: ArrayList<String>, localList: List<String>) {
+        view.showLoader()
+        Log.d(TAG,"downLoadExpensesFromServer")
         if (expenseListFromServer != null && expenseListFromServer.isNotEmpty()) {
 
             if(localList!=null&&localList.isNotEmpty()) {
@@ -277,9 +296,11 @@ class MainPresenter : IMainPresenter {
     }
 
     private fun downloadExpense(expenseId: String) {
+        Log.d(TAG,"downloadExpense")
         FirebaseFirestore.getInstance()
                 .collection("expenses").document(expenseId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
             if (task.isSuccessful) {
+                view.hideLoader()
                 val document = task.result
 
                 var title: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_TITLE).toString()
@@ -294,8 +315,37 @@ class MainPresenter : IMainPresenter {
 
                 }
                 var convertor = TagConverter()
-                var debitArrayList = convertor.convertJSONtoDebitList(debitList)
-                var creditArrayList = convertor.convertJSONtoCreditList(creditList)
+               // var debitArrayList = convertor.convertJSONtoDebitList(debitList)
+               // var creditArrayList = convertor.convertJSONtoCreditList(creditList)
+
+                var debitJson:JSONArray
+                var creditJson :JSONArray
+                var debitArrayList = ArrayList<Debit>()
+                var creditArrayList = ArrayList<Credit>()
+
+                if(debitList!=null&&creditList!=null) {
+                    try {
+                        debitJson = JSONArray(debitList)
+                        creditJson = JSONArray(creditList)
+
+
+
+                    for (i in 0..(debitJson.length() - 1)) {
+                        var debit = convertor.convertStringToDebit(debitJson[i].toString())
+                        debitArrayList.add(debit)
+                    }
+
+
+                    for (i in 0..(creditJson.length() - 1)) {
+                        var credit = convertor.convertStringToCredit(creditJson[i].toString())
+                        creditArrayList.add(credit)
+                    }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+
                 var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList)
 
                 Single.fromCallable {
@@ -317,6 +367,8 @@ class MainPresenter : IMainPresenter {
                         .subscribe()
 
 
+            }else{
+                view.hideLoader()
             }
         })
 
@@ -329,7 +381,7 @@ class MainPresenter : IMainPresenter {
 
     fun getActivityIdList() {
 
-
+        Log.d(TAG,"getActivityIdLIst")
         var userId = ApplicationController.preferenceManager!!.myCredential
         var myActivityIds: ArrayList<String> = ArrayList()
         var stringlist: String = ""
@@ -337,6 +389,7 @@ class MainPresenter : IMainPresenter {
                 .collection("pending_reg_users").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
             if (task.isSuccessful) {
                 try {
+                    view.hideLoader()
                     val document = task.result
                     if (document.exists()) {
                         var finalList: HashMap<String, String> = HashMap();
@@ -358,12 +411,15 @@ class MainPresenter : IMainPresenter {
 
                     }
                 } catch (e: Exception) {
+                    view.hideLoader()
                 }
             }
         })
     }
 
     private fun downloadUpdatedActivities(finalList: HashMap<String, String>) {
+        Log.d(TAG,"downloadUpdatedActivities")
+        view.showLoader()
         var updatedActivityIdList: ArrayList<String> = ArrayList()
 
 
@@ -378,6 +434,7 @@ class MainPresenter : IMainPresenter {
 
                         override fun onSuccess(users: List<ActivitiesMinimal>) {
                             // update the UI
+                            view.hideLoader()
                             var allActivitiesModifiedTime = users
                             if (allActivitiesModifiedTime != null) {
                                 for (activity in allActivitiesModifiedTime) {
@@ -397,10 +454,11 @@ class MainPresenter : IMainPresenter {
                             }
 
                             if (updatedActivityIdList != null && updatedActivityIdList.isNotEmpty()) {
-                                Log.d("DOwnload ", "found new items")
+                                Log.d(TAG, "found new items")
                                 downloadAllActivities(updatedActivityIdList)
                             } else {
-                                Log.d("DOwnload ", "No new items")
+                                Log.d(TAG, "No new items")
+                                view.hideLoader()
                             }
 
                         }
@@ -408,6 +466,7 @@ class MainPresenter : IMainPresenter {
                         override fun onError(e: Throwable) {
                             // show an error message
                             Log.d("download", "Error")
+                            view.hideLoader()
                         }
                     })
         }

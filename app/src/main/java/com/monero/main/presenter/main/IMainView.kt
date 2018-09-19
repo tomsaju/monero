@@ -8,4 +8,6 @@ import com.monero.models.Activities
  */
 interface IMainView {
     fun onActivitiesFetched(activityList:LiveData<List<Activities>>?)
+    fun showLoader()
+    fun hideLoader()
 }

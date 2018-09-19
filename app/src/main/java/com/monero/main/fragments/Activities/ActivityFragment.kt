@@ -65,7 +65,7 @@ class ActivityFragment: Fragment() {
 
 
     fun onAllActivitiesFetched(activities: List<Activities>?) {
-        hideProgressBar()
+      //  hideProgressBar()
         //pass result to fragment
         if(activities!=null) {
             adapter = ActivityListAdapter(requireContext(), activities)

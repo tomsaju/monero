@@ -359,11 +359,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
             ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
             mMainPresenter.getAllActivitiesFromServer();
-            var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
-            if(currentFragment is ActivityFragment&&currentFragment.isVisible){
 
-                currentFragment.showProgressBar()
-            }
 
         }
     }
@@ -381,6 +377,21 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
     }
 
+    override fun showLoader() {
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        if(currentFragment is ActivityFragment&&currentFragment.isVisible){
+
+            currentFragment.showProgressBar()
+        }
+    }
+
+    override fun hideLoader() {
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        if(currentFragment is ActivityFragment&&currentFragment.isVisible){
+
+            currentFragment.hideProgressBar()
+        }
+    }
 }
 
 
