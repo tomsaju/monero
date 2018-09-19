@@ -137,9 +137,8 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle presses on the action bar menu items
         when (item.itemId) {
-            R.id.action_sign_in -> {
-                var intent = Intent(this,SignInActivity::class.java)
-                startActivity(intent)
+            R.id.action_sync -> {
+                mMainPresenter.getAllActivitiesFromServer();
             }
             R.id.action_sign_out->{
                 signout();
@@ -358,7 +357,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         }else{
 
             ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
-            mMainPresenter.getAllActivitiesFromServer();
+
 
 
         }

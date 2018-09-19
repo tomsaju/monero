@@ -14,7 +14,7 @@ import io.reactivex.Single
  */
 @Dao interface ActivitiesDao   {
 
-    @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
+    @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" ORDER BY "+DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME+" DESC")
     fun getAllActivities():LiveData<List<Activities>>
 
     @Query("SELECT "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
@@ -44,4 +44,6 @@ import io.reactivex.Single
     @Query("UPDATE "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" SET "+DBContract.ACTIVITY_TABLE.ACTIVITY_SYNC_STATUS+" = :status WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :Id")
     fun updateActivitySyncStatus(Id: String,status:Boolean)
 
+    @Query("UPDATE "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" SET "+DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME+" = :time  WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :activityId")
+    fun updateActivityModifiedTime(activityId: String, time: String)
 }

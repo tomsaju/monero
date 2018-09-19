@@ -64,6 +64,7 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                 AppDatabase.db?.debitDao()?.insertIntoDebitTable(debit)
             }
 
+            AppDatabase.db?.activitesDao()?.updateActivityModifiedTime(expense.activity_id,System.currentTimeMillis().toString())
 
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
