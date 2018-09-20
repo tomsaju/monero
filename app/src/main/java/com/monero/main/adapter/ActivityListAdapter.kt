@@ -9,8 +9,10 @@ import android.widget.*
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
 import com.monero.models.Activities
+import kotlinx.android.synthetic.main.activities_list_item.view.*
 import me.gujun.android.taggroup.TagGroup
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -20,10 +22,13 @@ class ActivityListAdapter : BaseAdapter {
 
     var context:Context
     var activitiesList:List<Activities>
-
+    lateinit var selectedActivitieslist:ArrayList<String>
+    private val listSelectedRows: ArrayList<View>?= ArrayList()
     constructor(context: Context,activitiesList: List<Activities>){
         this.context=context
         this.activitiesList = activitiesList
+        this.selectedActivitieslist = ArrayList()
+
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -73,5 +78,19 @@ class ActivityListAdapter : BaseAdapter {
 
     override fun getCount(): Int {
       return activitiesList.size
+    }
+
+    fun handleLongPress(position: Int, view: View) {
+        if (listSelectedRows!!.contains(view)) {
+            listSelectedRows!!.remove(view)
+            selectedActivitieslist.remove(activitiesList[position].id)
+            view.card_parent_activities_list_item.setCardBackgroundColor(context.resources.getColor(R.color.colorPrimary))
+
+        } else {
+            selectedActivitieslist.add(activitiesList[position].id)
+            listSelectedRows.add(view)
+            view.card_parent_activities_list_item.setCardBackgroundColor(context.resources.getColor(R.color.colorListSelector))
+
+        }
     }
 }

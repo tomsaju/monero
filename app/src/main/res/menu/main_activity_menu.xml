@@ -10,4 +10,16 @@
         android:id="@+id/action_sign_out"
         android:title="Sign out"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/action_delete"
+        android:title=""
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="collapseActionView|always"/>
+
+    <item android:id="@+id/action_edit"
+        android:title=""
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction="collapseActionView|always"/>
+
+
 </menu>

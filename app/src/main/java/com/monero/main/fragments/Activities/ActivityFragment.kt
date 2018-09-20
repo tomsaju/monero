@@ -16,6 +16,7 @@ import com.monero.activitydetail.DetailActivity
 import com.monero.main.adapter.ActivityListAdapter
 import com.monero.models.Activities
 import com.monero.models.Tag
+import kotlinx.android.synthetic.main.activities_list_item.view.*
 
 
 /**
@@ -65,20 +66,72 @@ class ActivityFragment: Fragment() {
 
 
     fun onAllActivitiesFetched(activities: List<Activities>?) {
-      //  hideProgressBar()
+        //  hideProgressBar()
         //pass result to fragment
-        if(activities!=null) {
+        if (activities != null) {
             adapter = ActivityListAdapter(requireContext(), activities)
             activitiesList?.adapter = adapter
         }
 
-        activitiesList?.setOnItemClickListener { _, _, position, _ ->
-            var intent:Intent = Intent(requireContext(), DetailActivity::class.java)
-            var selection = activities?.get(position)
-            intent.putExtra("activityId",selection?.id)
-            requireContext()?.startActivity(intent)
+        activitiesList?.setOnItemClickListener { _, view, position, _ ->
+            val adapter = adapter
+            if(adapter!=null&&adapter.selectedActivitieslist?.size>=1){
+                adapter?.handleLongPress(position,view) //to add all clicked items after longpressing any item
+
+                if (adapter.selectedActivitieslist?.size == 1) {
+                    toggleEditIcon(true)
+                    toggleDeleteIcon(true)
+                } else {
+                    if (adapter.selectedActivitieslist.size > 1) {
+                        toggleEditIcon(false)
+                        toggleDeleteIcon(true)
+                    } else {
+                        toggleEditIcon(false)
+                        toggleDeleteIcon(false)
+                    }
+                }
+
+
+            }else {
+
+                var intent: Intent = Intent(requireContext(), DetailActivity::class.java)
+                var selection = activities?.get(position)
+                intent.putExtra("activityId", selection?.id)
+                requireContext()?.startActivity(intent)
+            }
         }
 
+        activitiesList?.onItemLongClickListener = object : AdapterView.OnItemLongClickListener {
+            override fun onItemLongClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long): Boolean {
+                val adapter = adapter
+                if (view != null && adapter != null && adapter.selectedActivitieslist != null) {
+                    adapter?.handleLongPress(position, view)
+
+                    if (adapter.selectedActivitieslist?.size == 1) {
+                        toggleEditIcon(true)
+                        toggleDeleteIcon(true)
+                    } else {
+                        if (adapter.selectedActivitieslist.size > 1) {
+                            toggleEditIcon(false)
+                            toggleDeleteIcon(true)
+                        } else {
+                            toggleEditIcon(false)
+                            toggleDeleteIcon(false)
+                        }
+                    }
+                }
+                return true
+            }
+
+        }
+    }
+
+    private fun toggleEditIcon(show: Boolean) {
+       mActivityFragmentListener?.toggleEditIcon(show)
+    }
+
+    private fun toggleDeleteIcon(show: Boolean) {
+        mActivityFragmentListener?.toggleDeleteIcon(show)
     }
 
     public fun refreshList(){
@@ -111,6 +164,13 @@ class ActivityFragment: Fragment() {
    public interface ActivityFragmentListener{
        fun getAllActivitiesList()
        fun addNewActivity()
+       fun toggleEditIcon(show:Boolean)
+       fun toggleDeleteIcon(show: Boolean)
 
     }
+
+
+
 }
+
+

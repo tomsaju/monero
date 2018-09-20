@@ -59,6 +59,12 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     private val READ_CONTACTS_REQUEST_CODE: Int = 3
     lateinit var currentActivityContactList:ArrayList<User>
     lateinit var auth:FirebaseAuth
+    lateinit var activityFragment:ActivityFragment
+    lateinit var accountBookFragment:AccountBookFragment
+    lateinit var notificationFragment:NotificationFragment
+    lateinit var profileFragment:ProfileFragment
+    lateinit var editMenuItem:MenuItem
+    lateinit var deleteMenuItem:MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,8 +96,13 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
         BottomNavigationViewHelper.removeShiftMode(bottomNavigationMenu)
         bottomNavigationMenu.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        val fragment  = ActivityFragment.newInstance()
-        addFragment(fragment)
+        //init fragment
+        activityFragment = ActivityFragment()
+        accountBookFragment = AccountBookFragment()
+        profileFragment = ProfileFragment()
+        notificationFragment = NotificationFragment()
+
+        addFragment(activityFragment)
 
 
 
@@ -131,7 +142,23 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.main_activity_menu, menu)
+
+        editMenuItem = menu!!.findItem(R.id.action_edit)
+        deleteMenuItem = menu.findItem(R.id.action_delete)
+
+        editMenuItem.isVisible = false
+        deleteMenuItem.isVisible = false
+
         return super.onCreateOptionsMenu(menu)
+    }
+
+
+    override fun toggleEditIcon(show: Boolean) {
+       editMenuItem.isVisible = show
+    }
+
+    override fun toggleDeleteIcon(show: Boolean) {
+        deleteMenuItem.isVisible = show
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -179,23 +206,31 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when(item.itemId){
             R.id.action_activities ->{
-                var fragment = ActivityFragment.newInstance()
-                addFragment(fragment)
+                if(activityFragment==null){
+                    activityFragment = ActivityFragment()
+                }
+                addFragment(activityFragment)
                 true
             }
             R.id.action_account_book ->{
-                var fragment =  AccountBookFragment()
-                addFragment(fragment)
+                if(accountBookFragment==null){
+                    accountBookFragment = AccountBookFragment()
+                }
+                addFragment(accountBookFragment)
                 true
             }
             R.id.action_notification ->{
-                var fragment = NotificationFragment()
-                addFragment(fragment)
+                if(notificationFragment==null){
+                    notificationFragment = NotificationFragment()
+                }
+                addFragment(notificationFragment)
                 true
             }
             R.id.action_profile-> {
-                var fragment = ProfileFragment()
-                addFragment(fragment)
+                if(profileFragment==null){
+                    profileFragment = ProfileFragment()
+                }
+                addFragment(profileFragment)
                 true
             }
 
@@ -228,6 +263,9 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
             }
         }else{
+
+            clearSelectedActivitiesList()
+
             if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
                 super.onBackPressed()
                 finish()
@@ -389,6 +427,14 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         if(currentFragment is ActivityFragment&&currentFragment.isVisible){
 
             currentFragment.hideProgressBar()
+        }
+    }
+
+    fun clearSelectedActivitiesList(){
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        if(currentFragment is ActivityFragment&&currentFragment.isVisible){
+
+            currentFragment.adapter?.selectedActivitieslist?.clear()
         }
     }
 }

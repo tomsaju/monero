@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         tools:listitem="@layout/activities_list_item"
         android:dividerHeight="1dp"
-        android:layout_height="match_parent"></ListView>
+        android:drawSelectorOnTop="true"
+        android:layout_height="match_parent"/>
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
