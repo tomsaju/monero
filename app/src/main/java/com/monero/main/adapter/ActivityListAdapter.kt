@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
+import com.monero.main.fragments.Activities.IOnSelectionModifiedListener
 import com.monero.models.Activities
 import kotlinx.android.synthetic.main.activities_list_item.view.*
 import me.gujun.android.taggroup.TagGroup
@@ -64,6 +65,12 @@ class ActivityListAdapter : BaseAdapter {
         var formattedDate: String = "$day/$month/$year";
 
         createdDate.setText(formattedDate)
+
+        if(stringListTag.contains(activitiesList[position].id)){
+            view.card_parent_activities_list_item.setCardBackgroundColor(context.resources.getColor(R.color.colorListSelector))
+        }else{
+            view.card_parent_activities_list_item.setCardBackgroundColor(context.resources.getColor(R.color.colorPrimary))
+        }
 
         return view
     }

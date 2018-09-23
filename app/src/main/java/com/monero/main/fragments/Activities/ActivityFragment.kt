@@ -4,10 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v7.app.AlertDialog
+import android.util.Log
+import android.view.*
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.ProgressBar
@@ -16,7 +17,8 @@ import com.monero.activitydetail.DetailActivity
 import com.monero.main.adapter.ActivityListAdapter
 import com.monero.models.Activities
 import com.monero.models.Tag
-import kotlinx.android.synthetic.main.activities_list_item.view.*
+import android.widget.AdapterView.AdapterContextMenuInfo
+import android.view.ContextMenu.ContextMenuInfo
 
 
 /**
@@ -27,6 +29,7 @@ class ActivityFragment: Fragment() {
     var activitiesList:ListView?=null
     var adapter:ActivityListAdapter?=null
     lateinit var progressBar: ProgressBar
+    lateinit var fabAdd: FloatingActionButton
 
     companion object {
         fun newInstance(): ActivityFragment {
@@ -54,12 +57,25 @@ class ActivityFragment: Fragment() {
         var rootView = inflater?.inflate(R.layout.activitylist_fragment,container,false)
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
         progressBar = rootView?.findViewById(R.id.progressBar)
-        val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
+        fabAdd = rootView?.findViewById(R.id.fabadd)
+
+        /*val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
         addActivityButton.setOnClickListener { _:View->
             var taglist:MutableList<Tag> = mutableListOf<Tag>()
 
             mActivityFragmentListener?.addNewActivity()
-        }
+        }*/
+
+        registerForContextMenu(activitiesList)
+        fabAdd.setOnClickListener(View.OnClickListener {
+            mActivityFragmentListener?.addNewActivity()
+        })
+
+
+
+
+        fabAdd.visibility=View.VISIBLE
+
         return rootView
     }
 
@@ -74,69 +90,102 @@ class ActivityFragment: Fragment() {
         }
 
         activitiesList?.setOnItemClickListener { _, view, position, _ ->
-            val adapter = adapter
-            if(adapter!=null&&adapter.selectedActivitieslist?.size>=1){
-                adapter?.handleLongPress(position,view) //to add all clicked items after longpressing any item
-
-                if (adapter.selectedActivitieslist?.size == 1) {
-                    toggleEditIcon(true)
-                    toggleDeleteIcon(true)
-                } else {
-                    if (adapter.selectedActivitieslist.size > 1) {
-                        toggleEditIcon(false)
-                        toggleDeleteIcon(true)
-                    } else {
-                        toggleEditIcon(false)
-                        toggleDeleteIcon(false)
-                    }
-                }
-
-
-            }else {
-
-                var intent: Intent = Intent(requireContext(), DetailActivity::class.java)
-                var selection = activities?.get(position)
-                intent.putExtra("activityId", selection?.id)
-                requireContext()?.startActivity(intent)
-            }
+            var intent: Intent = Intent(requireContext(), DetailActivity::class.java)
+            var selection = activities?.get(position)
+            intent.putExtra("activityId", selection?.id)
+            requireContext()?.startActivity(intent)
         }
 
-        activitiesList?.onItemLongClickListener = object : AdapterView.OnItemLongClickListener {
-            override fun onItemLongClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long): Boolean {
-                val adapter = adapter
-                if (view != null && adapter != null && adapter.selectedActivitieslist != null) {
-                    adapter?.handleLongPress(position, view)
 
-                    if (adapter.selectedActivitieslist?.size == 1) {
-                        toggleEditIcon(true)
-                        toggleDeleteIcon(true)
-                    } else {
-                        if (adapter.selectedActivitieslist.size > 1) {
-                            toggleEditIcon(false)
-                            toggleDeleteIcon(true)
-                        } else {
-                            toggleEditIcon(false)
-                            toggleDeleteIcon(false)
-                        }
-                    }
-                }
+    }
+
+
+    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+
+        if (v.id == R.id.activity_listview) {
+            val inflater = requireActivity().getMenuInflater()
+            inflater.inflate(R.menu.main_context_menu, menu)
+        }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        // Here's how you can get the correct item in onContextItemSelected()
+        val info = item.menuInfo as AdapterContextMenuInfo
+        val longPressedActivity = activitiesList?.adapter?.getItem(info.position) as Activities
+
+        when (item.getItemId()) {
+            R.id.edit_actv ->{ // edit stuff here
+                Log.d("ContextMenu" ,"clickd with edit on "+longPressedActivity.title)
+                showEditDialog(longPressedActivity.id)
                 return true
             }
 
+             R.id.delete_actv -> {
+                 // remove stuff here
+                 showDeleteDialog(longPressedActivity.id)
+                 Log.d("ContextMenu", "clickd with delte on "+longPressedActivity.title)
+                 return true
+             }
+            else -> return super.onContextItemSelected(item)
         }
     }
 
-    private fun toggleEditIcon(show: Boolean) {
-       mActivityFragmentListener?.toggleEditIcon(show)
-    }
-
-    private fun toggleDeleteIcon(show: Boolean) {
-        mActivityFragmentListener?.toggleDeleteIcon(show)
-    }
 
     public fun refreshList(){
         adapter?.notifyDataSetChanged();
     }
+
+
+    fun showEditDialog(activityId:String){
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Edit Activity")
+        builder.setMessage("Are you want to edit this activity?")
+
+        builder.setPositiveButton("YES"){dialog, which ->
+            // Do something when user press the positive button
+
+        }
+
+        builder.setNegativeButton("No"){dialog,which ->
+
+        }
+
+        builder.setNeutralButton("Cancel"){_,_ ->
+
+        }
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
+
+    }
+
+    fun showDeleteDialog(activityId: String){
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete Activity")
+        builder.setMessage("Are you want to Delete this activity?")
+
+        builder.setPositiveButton("YES"){dialog, which ->
+            // Do something when user press the positive button
+
+        }
+
+        builder.setNegativeButton("No"){dialog,which ->
+
+        }
+
+        builder.setNeutralButton("Cancel"){_,_ ->
+
+        }
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
+    }
+
 
 
    public fun showProgressBar(){
@@ -149,6 +198,8 @@ class ActivityFragment: Fragment() {
             progressBar.visibility = View.GONE
         }
     }
+
+
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -168,6 +219,8 @@ class ActivityFragment: Fragment() {
        fun toggleDeleteIcon(show: Boolean)
 
     }
+
+
 
 
 

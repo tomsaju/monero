@@ -51,6 +51,8 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var myCredential:String
     lateinit var myContactName:TextView
     lateinit var myContactPhone:TextView
+    lateinit var addMembersLayout:FrameLayout
+    lateinit var progressBarContacts:ProgressBar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -69,10 +71,13 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         addMembersParent = view.findViewById(R.id.add_members_parent)
         myContactName = view.findViewById(R.id.contact_name)
         myContactPhone = view.findViewById(R.id.contact_number)
+        addMembersLayout = view.findViewById(R.id.add_member_layout)
+        progressBarContacts = view.findViewById(R.id.contactLoadingProgressBar)
+
 
         myCredential = ApplicationController.preferenceManager!!.myCredential
-
         addActivityPresenter = AddActivityPresenter(requireContext(),this)
+        progressBarContacts.visibility = View.GONE
 
         selectedUserList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
@@ -105,11 +110,13 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         }
 
         addMembersParent.setOnClickListener{  v:View? ->
-
+            progressBarContacts.visibility = View.VISIBLE
             mListener.setupPermissions()
+        }
 
+        cancelButton.setOnClickListener{ v:View? ->
 
-
+           mListener.cancelAddActivityFragment()
         }
 
 
@@ -119,6 +126,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
 
     public fun onContactPermissionGranted(){
+
         addActivityPresenter.getAllContactsList()
     }
 
@@ -148,7 +156,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
     override fun onResume() {
         super.onResume()
-        if(selectedUserList.isEmpty()){
+        if(selectedUserList.size<2){
             addMembersParent.visibility = View.VISIBLE
         }else{
             addMembersParent.visibility = View.GONE
@@ -171,6 +179,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         fun setupPermissions()
         fun setCurrentActivityUserList(userList:ArrayList<User>)
         fun getCurrentActivityUserList():ArrayList<User>
+        fun cancelAddActivityFragment()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -192,6 +201,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
 
     override fun onContactsfetched(contactList: List<Contact>) {
+        progressBarContacts.visibility = View.GONE
         this.contactsList = contactList
       /*  Log.d("contacts fetched","now")
         val bundle = Bundle()

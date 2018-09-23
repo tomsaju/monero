@@ -15,9 +15,9 @@
     <string name="unknown_sign_in_response">Unknown error occured</string>
 <string name="sign_up_completed">Sign in succesfull</string>
     <string-array name="modes_list">
-        <item>Select a Mode</item>
-        <item>Single Mode</item>
-        <item>Group Mode</item>
+        <item>Select visibility</item>
+        <item>Me only</item>
+        <item>All participants</item>
     </string-array>
 
     <string-array name="currency_list">

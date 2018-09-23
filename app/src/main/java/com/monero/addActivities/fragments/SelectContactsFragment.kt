@@ -42,6 +42,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     lateinit var mSearchView:SearchView
     lateinit var mContext:Context
     lateinit var myContact:Contact
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
        // contacts = getContacts()
@@ -56,6 +57,8 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         doneButton = rootView?.findViewById<Button>(R.id.done_action_select_contacts) as Button
         cancelButton = rootView?.findViewById<Button>(R.id.cancel_action_select_contacts) as Button
         mSearchView = rootView?.findViewById(R.id.contacs_searchView)
+
+
 
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
@@ -78,6 +81,9 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
             mListener?.closeContactSelectFragment()
            // dialog?.dismiss()
         })
+
+        var myProfileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), "You", false, "my " + " id ")
+        horizontalList.addView(myProfileImage)
 
         return rootView
     }

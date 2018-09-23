@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     }
 
     override fun onBackPressed() {
-        if(supportFragmentManager.fragments.contains(AddActivityFragment())) {
+
             var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")
 
             if (currentFragment is AddActivityFragment && currentFragment.isVisible) {
@@ -262,18 +262,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
                 }
 
             }
-        }else{
 
-            clearSelectedActivitiesList()
-
-            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-                super.onBackPressed()
-                finish()
-            } else {
-                "Press back button again to exit".shortToast(context)
-                mBackPressed = System.currentTimeMillis()
-            }
-        }
 
 
     }
@@ -292,6 +281,18 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
 
+    }
+
+    override fun cancelAddActivityFragment(){
+        var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")
+
+        if (currentFragment is AddActivityFragment && currentFragment.isVisible) {
+            supportFragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
+                    .detach(currentFragment)
+                    .addToBackStack(currentFragment.javaClass.simpleName)
+                    .commit()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textSize="15sp"
-                android:text="Mode: "/>
+                android:text="Visible to: "/>
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,8 +83,8 @@
     android:paddingBottom="5dp"
     android:paddingLeft="8dp"
     android:textSize="12sp"
-    android:textColor="@android:color/holo_green_dark"
-    android:text="Each user adds there own expenses"/>
+    android:visibility="gone"
+    android:textColor="@android:color/holo_green_dark"/>
 
 <RelativeLayout
     android:layout_width="match_parent"
@@ -185,7 +185,9 @@
             </RelativeLayout>
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:id="@+id/add_member_layout"
+            android:minHeight="100dp">
 
 
             <LinearLayout
@@ -196,7 +198,6 @@
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:alpha=".4"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/multiple_users"
                 android:src="@drawable/multiple_users_silhouette"/>
@@ -220,7 +221,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_below="@id/topSection"
             android:layout_alignParentBottom="true"
@@ -254,6 +255,12 @@
                 android:textColor="#ffffff" />
         </LinearLayout>
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/contactLoadingProgressBar"
+            android:visibility="visible"
+            android:layout_centerInParent="true" />
 
     </RelativeLayout>
 
