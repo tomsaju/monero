@@ -82,7 +82,7 @@ public class CircularProfileImage extends ConstraintLayout {
     }
 
 
-    void setProfileImageListener(ICircularProfileImageListener mCircularProfileImageListener){
+    public void setProfileImageListener(ICircularProfileImageListener mCircularProfileImageListener){
         this.mCircularProfileImageListener = mCircularProfileImageListener;
     }
 
@@ -119,7 +119,9 @@ public class CircularProfileImage extends ConstraintLayout {
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCircularProfileImageListener.onProfileClosed(((String)profileTextView.getTag()).toString());
+                if(mCircularProfileImageListener!=null) {
+                    mCircularProfileImageListener.onProfileClosed(((String) profileTextView.getText()).toString());
+                }
             }
         });
 

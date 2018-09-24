@@ -94,4 +94,17 @@ class DBContract {
          }
      }
 
+    public class CONTACTS_TABLE {
+        companion object {
+            const val TABLE_NAME = "Contacts_Table"
+            const val CONTACT_ID = "Contact_id";
+            const val CONTACT_NAME_LOCAL = "Contact_name_local"
+            const val CONTACT_NAME_PUBLIC = "Contact_name_public"
+            const val CONTACT_PHONE ="Contact_phone"
+            const val CONTACT_EMAIL ="Contact_email"
+            const val CONTACT_UUID = "Contact_uuid"
+            const val CONTACT_PROFILE_IMAGE ="Contact_profile_image"
+        }
+    }
+
 }

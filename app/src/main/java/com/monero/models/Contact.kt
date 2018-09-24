@@ -1,6 +1,20 @@
 package com.monero.models
 
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Index
+import android.arch.persistence.room.PrimaryKey
+import com.monero.Dao.DBContract
+
 /**
- * Created by tom.saju on 3/14/2018.
+ * Created by Dreamz on 23-09-2018.
  */
-data class Contact(val name:String,val phoneNumber:String)
+
+
+@Entity(tableName = DBContract.CONTACTS_TABLE.TABLE_NAME,indices = arrayOf(Index(value = "Contact_phone", unique = true)))
+data class Contact (@PrimaryKey(autoGenerate = true) val Contact_id:Int,
+                    val Contact_name_local:String,
+                    val Contact_name_public:String,
+                    val Contact_phone:String,
+                    val Contact_email:String,
+                    val Contact_uuid:String,
+                    val Contact_profile_image:String)

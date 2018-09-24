@@ -1,7 +1,6 @@
 package com.monero.addActivities
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -10,22 +9,13 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
-import com.monero.helper.AppDatabase
-import com.monero.models.Activities
-import com.monero.models.Contact
+import com.monero.models.ContactMinimal
 import com.monero.models.Tag
 import com.monero.models.User
 import com.pchmn.materialchips.ChipView
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
-import kotlinx.android.synthetic.main.activity_add.*
 import me.gujun.android.taggroup.TagGroup
 import java.util.ArrayList
 
@@ -127,14 +117,14 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
         }*/
     }
 
-    override fun onContactsfetched(contactsList:List<Contact>){
+    override fun onContactsfetched(contactsList:List<ContactMinimal>){
 
         selectContactsFragment= SelectContactsFragment()
         supportFragmentManager.beginTransaction().add(selectContactsFragment,"select_contacts").commit()
 
            }
 
-    override fun onContactSelected(contactList: MutableList<Contact>?) {
+    override fun onContactSelected(contactList: MutableList<ContactMinimal>?) {
         Log.d("contact","sele")
 
 

@@ -3,8 +3,7 @@ package com.monero.addActivities
 import android.content.ContentResolver
 import android.content.Context
 import android.provider.ContactsContract
-import android.util.Log
-import com.monero.models.Contact
+import com.monero.models.ContactMinimal
 
 /**
  * Created by tom.saju on 3/14/2018.
@@ -20,16 +19,16 @@ class AddActivityPresenter :IAddActivityPresenter {
     }
 
     override fun getAllContactsList() {
-        val contactsList:MutableList<Contact> = getContacts()
+        val contactsList:MutableList<ContactMinimal> = getContacts()
         view.onContactsfetched(contactsList)
     }
 
-    private fun getContacts(): MutableList<Contact> {
+    private fun getContacts(): MutableList<ContactMinimal> {
         val PROJECTION = arrayOf(ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
                 ContactsContract.Contacts.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.NUMBER)
 
-        val contactsList: MutableList<Contact> = mutableListOf()
+        val contactsList: MutableList<ContactMinimal> = mutableListOf()
         val builder = StringBuilder()
         val resolver: ContentResolver = context?.contentResolver
 
@@ -46,7 +45,7 @@ class AddActivityPresenter :IAddActivityPresenter {
                     name = cursor.getString(nameIndex)
                     number = cursor.getString(numberIndex)
 
-                    var newCOntact: Contact = Contact(name, number)
+                    var newCOntact: ContactMinimal = ContactMinimal(name, number)
                     contactsList.add(newCOntact)
                 }
             } finally {

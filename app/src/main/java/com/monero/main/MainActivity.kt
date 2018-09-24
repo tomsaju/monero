@@ -16,9 +16,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.FrameLayout
-import android.widget.ProgressBar
 import android.widget.Toast
 import com.google.firebase.FirebaseApp
 import com.monero.R
@@ -34,7 +32,7 @@ import com.monero.main.presenter.main.IMainPresenter
 import com.monero.main.presenter.main.IMainView
 import com.monero.main.presenter.main.MainPresenter
 import com.monero.models.Activities
-import com.monero.models.Contact
+import com.monero.models.ContactMinimal
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -314,7 +312,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     //   selectContactsFragment.dismiss()
     }
 
-    override fun onContactSelected(contactList: MutableList<Contact>?) {
+    override fun onContactSelected(contactList: MutableList<ContactMinimal>?) {
         //show contacts in add page
         contactList?.let {
             for(contact in contactList){

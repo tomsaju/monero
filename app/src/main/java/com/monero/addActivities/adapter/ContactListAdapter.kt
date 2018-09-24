@@ -7,20 +7,20 @@ import android.view.ViewGroup
 import android.widget.*
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
-import com.monero.models.Contact
+import com.monero.models.ContactMinimal
 
 /**
  * Created by tom.saju on 3/14/2018.
  */
 class ContactListAdapter:BaseAdapter, Filterable {
 
-    var contactList:List<Contact>;
+    var contactList:List<ContactMinimal>;
     var context:Context?=null;
     var parent:SelectContactsFragment
-    lateinit var orig: List<Contact>
+    lateinit var orig: List<ContactMinimal>
 
 
-    constructor(context: Context,contactList: List<Contact>,parent: SelectContactsFragment){
+    constructor(context: Context, contactList: List<ContactMinimal>, parent: SelectContactsFragment){
         this.context = context
         this.contactList = contactList
         this.parent = parent
@@ -38,7 +38,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
         number.text = contactList.get(position)?.phoneNumber
 
         layoutParent.setOnClickListener { view:View ->
-            this.parent.onContactSelected(Contact(name.text.toString(),number.text.toString()))
+            this.parent.onContactSelected(ContactMinimal(name.text.toString(),number.text.toString()))
         }
         return view
 
@@ -63,7 +63,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
 
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val oReturn = FilterResults()
-                val results = ArrayList<Contact>()
+                val results = ArrayList<ContactMinimal>()
 
                 if (orig == null) {
                     orig = contactList
@@ -84,7 +84,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
             override fun publishResults(constraint: CharSequence,
                                          results: FilterResults) {
                 if(results.count>0) {
-                    contactList = results!!.values as ArrayList<Contact>
+                    contactList = results!!.values as ArrayList<ContactMinimal>
                     notifyDataSetChanged()
                 }else{
                     contactList = emptyList()

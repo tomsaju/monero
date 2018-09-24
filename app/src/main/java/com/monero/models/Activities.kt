@@ -10,8 +10,7 @@ import com.monero.Dao.DBContract
 /**
  * Created by tom.saju on 3/7/2018.
   */
-var emptyulist= emptyList<User>()
-var emptytags= emptyList<Tag>()
+
 @Entity(tableName = DBContract.ACTIVITY_TABLE.TABLE_NAME)
 
 data class Activities(@ColumnInfo(name = "activity_id") @PrimaryKey var id: String="",

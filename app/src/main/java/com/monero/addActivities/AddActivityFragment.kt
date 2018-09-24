@@ -5,19 +5,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.monero.Application.ApplicationController
 
 import com.monero.R
 import com.monero.models.Activities
-import com.monero.models.Contact
+import com.monero.models.ContactMinimal
 import com.monero.models.Tag
 import com.monero.models.User
 import com.monero.tags.TagActivity
@@ -45,7 +42,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var mListener: IAddActivityFragmentListener
     lateinit var addMembersParent: LinearLayout
     lateinit var addActivityPresenter:IAddActivityPresenter
-    lateinit var contactsList:List<Contact>
+    lateinit var contactsList:List<ContactMinimal>
     var selectedUserList: ArrayList<User> = ArrayList()
     val auth = FirebaseAuth.getInstance()!!
     lateinit var myCredential:String
@@ -200,26 +197,26 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     }
 
 
-    override fun onContactsfetched(contactList: List<Contact>) {
+    override fun onContactsfetched(contactList: List<ContactMinimal>) {
         progressBarContacts.visibility = View.GONE
         this.contactsList = contactList
       /*  Log.d("contacts fetched","now")
         val bundle = Bundle()
         val gson = Gson()
-        val type = object : TypeToken<List<Contact>>() {}.type
+        val type = object : TypeToken<List<ContactMinimal>>() {}.type
         val listString = gson.toJson(contactsList, type)
         bundle.putString("list",listString)*/
         mListener.showAddContactsPage()
     }
 
-    fun setSelectedContacts(contactList: List<Contact>){
+    fun setSelectedContacts(contactList: List<ContactMinimal>){
 
         if(!contactList.isEmpty()){
 
             memberListParent.removeAllViews()
             selectedUserList.clear()
             //add my contact
-            var myContact = Contact("You",auth.currentUser!!.phoneNumber!!)
+            var myContact = ContactMinimal("You",auth.currentUser!!.phoneNumber!!)
             selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))
             memberListParent.addView(getContactView(myContact))
 
@@ -236,7 +233,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     }
 
 
-    fun getContactView(contact: Contact):View{
+    fun getContactView(contact: ContactMinimal):View{
         var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         var view:View = inflater?.inflate(R.layout.contact_list_item_layout,null,false)
         var name:TextView = view.findViewById<TextView>(R.id.contact_name) as TextView

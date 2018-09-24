@@ -17,7 +17,8 @@
         android:theme="@style/MyAppTheme">
         <activity
             android:name=".main.MainActivity"
-            android:theme="@style/MyAppTheme.NoActionBar">
+            android:theme="@style/MyAppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

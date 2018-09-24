@@ -1,9 +1,9 @@
 package com.monero.addActivities.fragments
 
 import android.app.Activity
-import android.app.DialogFragment
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.support.v4.app.Fragment
@@ -12,18 +12,23 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.HorizontalScrollView
-import android.widget.LinearLayout
-import android.widget.ListView
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import android.widget.*
+import com.monero.Dao.ContactDAO
 import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
-import com.monero.models.Contact
+import com.monero.models.ContactMinimal
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import com.monero.Views.CircularProfileImage
+import com.monero.helper.AppDatabase
+import com.monero.helper.AppDatabase.Companion.getAppDatabase
+import com.monero.models.ActivitiesMinimal
+import com.monero.models.Contact
 import com.monero.models.User
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -35,13 +40,14 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     var contactsListView:ListView?=null
     var doneButton:Button?=null
     var cancelButton:Button?=null
-    lateinit var contacts:List<Contact>
+    lateinit var contacts:List<ContactMinimal>
     lateinit var horizontalList:LinearLayout
     var mListener:OnCotactSelectedListener?=null
-    var selectedContactList:MutableList<Contact>?= null
+    var selectedContactList:MutableList<ContactMinimal>?= null
     lateinit var mSearchView:SearchView
     lateinit var mContext:Context
-    lateinit var myContact:Contact
+    lateinit var myContact: ContactMinimal
+    lateinit var refreshButton:TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,20 +63,25 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         doneButton = rootView?.findViewById<Button>(R.id.done_action_select_contacts) as Button
         cancelButton = rootView?.findViewById<Button>(R.id.cancel_action_select_contacts) as Button
         mSearchView = rootView?.findViewById(R.id.contacs_searchView)
-
+        refreshButton = rootView?.findViewById(R.id.refresh_contact_list)
 
 
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
-        selectedContactList = ArrayList<Contact>()
+        selectedContactList = ArrayList<ContactMinimal>()
         var currentUserList = mListener?.getCurrentActivityUserList()
 
         for(user in currentUserList!!){
-            selectedContactList?.add(Contact(user.user_name,user.user_phone))
+            selectedContactList?.add(ContactMinimal(user.user_name,user.user_phone))
         }
      //   loadContacts(contacts)
         //dialog?.setTitle("Select participants")
         // Do something else
+
+        refreshButton.setOnClickListener{
+            _:View?->
+            refreshContacts()
+        }
 
         cancelButton?.setOnClickListener{v: View? ->
             mListener?.closeContactSelectFragment()
@@ -95,21 +106,57 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         mSearchView.queryHint = "Search Here"
     }
 
+    fun refreshContacts(){
+        var contactList =  getContacts()
+
+        var db = getAppDatabase(requireContext())
+
+
+        Single.fromCallable({
+            db?.contactDao()?.insertAllContactIntoContactTable(contactList)
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doAfterSuccess {
+                    loadAllContacts();
+                }
+                .subscribe()
+    }
+
     override fun onResume() {
         super.onResume()
-        var contactList =  getContacts()
-        loadContacts(contactList)
+        loadAllContacts()
+    }
 
+    private fun loadAllContacts() {
+
+        var single: Single<List<Contact>>? = AppDatabase.db?.contactDao()?.getAllContactsMinimal()
+        if (single != null) {
+            single.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doAfterSuccess({ listFromDB: List<Contact> ->
+                        var minimalContactList = ArrayList<ContactMinimal>()
+                        for(contact in listFromDB){
+                            minimalContactList.add(ContactMinimal(contact.Contact_name_local,contact.Contact_phone))
+                        }
+                        loadContacts(minimalContactList)
+                    })
+                    .subscribe()
+
+        }
     }
 
 
-    public fun loadContacts(contactsList:List<Contact>){
-        val contactsAdapter:ContactListAdapter = ContactListAdapter(requireContext(),contactsList,this)
+     fun loadContacts(contactsList:List<ContactMinimal>){
+
+        var sortedList = contactsList.sortedWith(compareBy({ it.name }))
+
+        val contactsAdapter:ContactListAdapter = ContactListAdapter(requireContext(),sortedList,this)
         contactsListView?.adapter = contactsAdapter
     }
 
-     fun onContactSelected(contact:Contact) {
+     fun onContactSelected(contact: ContactMinimal) {
          var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), contact.name, true, contact.phoneNumber + " id ")
+         profileImage.setProfileImageListener { this@SelectContactsFragment as CircularProfileImage.ICircularProfileImageListener }
          selectedContactList?.add(contact)
          horizontalList.addView(profileImage)
          horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
@@ -132,15 +179,26 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         }
     }
     interface OnCotactSelectedListener {
-        fun onContactSelected(contactList:MutableList<Contact>?)
+        fun onContactSelected(contactList:MutableList<ContactMinimal>?)
         fun getAllContactList()
         fun closeContactSelectFragment()
         fun setCurrentActivityUserList(userList: java.util.ArrayList<User>)
         fun getCurrentActivityUserList(): java.util.ArrayList<User>
     }
     override fun onProfileClosed(name: String?) {
+        var selectedItem = selectedContactList?.filter { contactMinimal: ContactMinimal -> contactMinimal.name==name }
+        if(selectedItem!=null&&selectedContactList!=null) {
+            selectedContactList?.remove(selectedItem as ContactMinimal)
+            horizontalList.removeAllViews();
+            for(item in selectedContactList!!){
+                onContactSelected(item);
+
+            }
+        }
 
     }
+
+
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         return false
@@ -156,35 +214,41 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     }
 
 
+
     fun getContacts(): ArrayList<Contact> {
-        val PROJECTION = arrayOf(ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                ContactsContract.Contacts.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER)
+        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)//plus any other properties you wish to query
+        var contactsList = ArrayList<Contact>()
+        var cursor: Cursor? = null
+        try {
+            cursor = context?.getContentResolver()?.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, projection, null, null, null)
+        } catch (e: SecurityException) {
+            //SecurityException can be thrown if we don't have the right permissions
+        }
 
-        val contactsList: ArrayList<Contact> = ArrayList()
-        val builder = StringBuilder()
-        val resolver: ContentResolver = mContext?.contentResolver
 
-
-        val cursor = resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, PROJECTION, null, null, null);
         if (cursor != null) {
             try {
-                val nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
-                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                val normalizedNumbersAlreadyFound = HashSet<Any?>()
+                val indexOfNormalizedNumber = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)
+                val indexOfDisplayName = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val indexOfDisplayNumber = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
-                var name: String
-                var number: String
-                while (cursor.moveToNext()) {
-                    name = cursor.getString(nameIndex)
-                    number = cursor.getString(numberIndex)
+                while (cursor!!.moveToNext()) {
+                    val normalizedNumber = cursor!!.getString(indexOfNormalizedNumber)
+                    if (normalizedNumbersAlreadyFound.add(normalizedNumber)) {
+                        val displayName = cursor!!.getString(indexOfDisplayName)
+                        val displayNumber = cursor!!.getString(indexOfDisplayNumber)
+                        //haven't seen this number yet: do something with this contact!
+                        var contact  = Contact(0,displayName,"unknown",displayNumber,"unknoen","unknoen","unknown")
 
-                    var newCOntact: Contact = Contact(name, number)
-                    contactsList.add(newCOntact)
+                        contactsList.add(contact)
+                    } else {
+                        //don't do anything with this contact because we've already found this number
+                    }
                 }
             } finally {
-                cursor.close()
+                cursor!!.close()
             }
-
         }
         return contactsList
     }
