@@ -27,6 +27,7 @@ import com.monero.models.User
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -109,6 +110,8 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     fun refreshContacts(){
         var contactList =  getContacts()
 
+        syncContactsWithServer(contactList);
+
         var db = getAppDatabase(requireContext())
 
 
@@ -120,6 +123,10 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
                     loadAllContacts();
                 }
                 .subscribe()
+    }
+
+    private fun syncContactsWithServer(contactList: ArrayList<Contact>) {
+        mListener?.syncContactsWithServer(contactList)
     }
 
     override fun onResume() {
@@ -184,6 +191,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         fun closeContactSelectFragment()
         fun setCurrentActivityUserList(userList: java.util.ArrayList<User>)
         fun getCurrentActivityUserList(): java.util.ArrayList<User>
+        fun syncContactsWithServer(contactList: ArrayList<Contact>)
     }
     override fun onProfileClosed(name: String?) {
         var selectedItem = selectedContactList?.filter { contactMinimal: ContactMinimal -> contactMinimal.name==name }

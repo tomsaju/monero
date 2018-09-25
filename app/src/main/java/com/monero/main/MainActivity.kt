@@ -37,6 +37,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.Application.ApplicationController
+import com.monero.models.Contact
 import com.monero.models.User
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
@@ -434,6 +435,12 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         if(currentFragment is ActivityFragment&&currentFragment.isVisible){
 
             currentFragment.adapter?.selectedActivitieslist?.clear()
+        }
+    }
+
+    override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
+        if(contactList!=null){
+            mMainPresenter.syncContactsWithServer(contactList)
         }
     }
 }

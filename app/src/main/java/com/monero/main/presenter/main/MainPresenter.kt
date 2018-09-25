@@ -17,6 +17,7 @@ import com.monero.Application.ApplicationController
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.reflect.TypeToken
 import com.monero.models.*
+import com.monero.network.RestService
 import io.reactivex.Observable
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,6 +53,12 @@ class MainPresenter : IMainPresenter {
         view.onActivitiesFetched(allActivities)
     }
 
+
+    val RestAPIService by lazy {
+        RestService.create()
+    }
+
+    var disposable: Disposable? = null
 
     override fun saveActivity(activity: Activities) {
 
@@ -508,4 +515,32 @@ class MainPresenter : IMainPresenter {
     }
 
 
+    override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
+        var contactArray:JSONArray = JSONArray()
+        for(contact in contactList){
+            contactArray.put(contact.Contact_phone)
+        }
+        if(contactArray!=null&&contactArray.length()>0){
+            sendContactsJSON(contactArray)
+        }
+    }
+
+    private fun sendContactsJSON(contactArray: JSONArray) {
+        disposable = RestAPIService.getAllRegisteredContacts()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                { result -> showResult(result) },
+                                { error -> showError(error.message) }
+                        )
+    }
+
+    private fun showError(message: String?) {
+        Log.d("Rest",message)
+
+    }
+
+    private fun showResult(totalhits: Any) {
+        Log.d("Rest",totalhits.toString())
+    }
 }

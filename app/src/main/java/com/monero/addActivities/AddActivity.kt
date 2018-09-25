@@ -11,15 +11,18 @@ import android.view.View
 import android.widget.*
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
+import com.monero.models.Contact
 import com.monero.models.ContactMinimal
 import com.monero.models.Tag
 import com.monero.models.User
 import com.pchmn.materialchips.ChipView
 
 import me.gujun.android.taggroup.TagGroup
-import java.util.ArrayList
 
 class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.OnCotactSelectedListener {
+    override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
 
     var toolbar:Toolbar?=null

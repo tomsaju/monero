@@ -71,6 +71,11 @@ dependencies {
 
     //firebase firestore
     implementation 'com.google.firebase:firebase-firestore:17.0.1'
-
+    //maintaining single font calligraphy
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
+
+    //retrofit
+    compile "com.squareup.retrofit2:retrofit:2.3.0"
+    compile "com.squareup.retrofit2:adapter-rxjava2:2.3.0"
+    compile "com.squareup.retrofit2:converter-gson:2.3.0"
 }
