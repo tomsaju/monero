@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -21,7 +22,7 @@ interface RestService {
                                  @Query("requestToken") requestToken: String):Observable<Contact>*/
 
     @POST("api/v1/submitcontacts")
-    fun getAllRegisteredContacts():Observable<Contact>
+    fun getRegisteredContactForNumber(@Body phoneNumber:String):Observable<Contact>
 
 
 

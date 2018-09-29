@@ -516,31 +516,46 @@ class MainPresenter : IMainPresenter {
 
 
     override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
-        var contactArray:JSONArray = JSONArray()
+
         for(contact in contactList){
-            contactArray.put(contact.Contact_phone)
+          syncContactWithServer(contact)
         }
-        if(contactArray!=null&&contactArray.length()>0){
+        /*if(contactArray!=null&&contactArray.length()>0){
             sendContactsJSON(contactArray)
-        }
+        }*/
     }
 
+
+    fun syncContactWithServer(contact: Contact){
+        disposable = RestAPIService.getRegisteredContactForNumber(contact.Contact_phone)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        { result -> showResult(result) },
+                        { error -> showError(error.message) }
+                )
+
+    }
+
+    private fun showError(message: String?) {
+        //do nothing
+        //set sync status false
+    }
+
+    private fun showResult(result: Contact) {
+        //if contact not null, search that number and get details
+    }
+
+
     private fun sendContactsJSON(contactArray: JSONArray) {
-        disposable = RestAPIService.getAllRegisteredContacts()
+       /* disposable = RestAPIService.getAllRegisteredContacts()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 { result -> showResult(result) },
                                 { error -> showError(error.message) }
-                        )
+                        )*/
     }
 
-    private fun showError(message: String?) {
-        Log.d("Rest",message)
 
-    }
-
-    private fun showResult(totalhits: Any) {
-        Log.d("Rest",totalhits.toString())
-    }
 }

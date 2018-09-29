@@ -41,6 +41,14 @@
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity android:name=".auth.FireBaseAuthActivity" />
         <activity android:name=".auth.EditProfileActivity"></activity>
+
+        <service
+            android:exported="false"
+            android:name=".service.ContactsSyncService">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.monero.main
 
 import android.Manifest
+import android.app.job.JobService
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.CoordinatorLayout.Behavior.setTag
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -18,6 +20,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.GooglePlayDriver
+import com.firebase.jobdispatcher.Job
 import com.google.firebase.FirebaseApp
 import com.monero.R
 import com.monero.addActivities.AddActivityFragment
@@ -39,6 +44,7 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.Application.ApplicationController
 import com.monero.models.Contact
 import com.monero.models.User
+import com.monero.service.ContactsSyncService
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
@@ -81,6 +87,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
                 .build()
         firestore.firestoreSettings = settings
          auth = FirebaseAuth.getInstance()!!
+
 //        Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
         val user = FirebaseAuth.getInstance().currentUser
 
@@ -103,8 +110,14 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
         addFragment(activityFragment)
 
-
-
+        /*var dispatcher =  FirebaseJobDispatcher(GooglePlayDriver(context));
+        if(dispatcher!=null) {
+            var myJob = dispatcher ?. newJobBuilder ()
+                    .setService() // the JobService that will be called
+                            .setTag("my-unique-tag")        // uniquely identifies the job
+                            .build()
+            dispatcher.mustSchedule (myJob);
+        }*/
     }
 
 
