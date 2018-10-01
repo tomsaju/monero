@@ -4,11 +4,13 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v7.view.menu.MenuBuilder
+import android.support.v7.view.menu.MenuPopupHelper
+import android.support.v7.widget.PopupMenu
+import android.view.*
 
 import com.monero.R
+import kotlinx.android.synthetic.main.profile_fragment.*
 
 /**
  * A simple [Fragment] subclass.
@@ -32,6 +34,32 @@ class ProfileFragment : Fragment() {
         if (mListener != null) {
             mListener!!.onFragmentInteraction(uri)
         }
+    }
+
+
+    fun showImagePopup(){
+        var menu =  PopupMenu(requireContext(), profileImage);
+        menu.inflate(R.menu.profile_menu);
+        menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {
+
+            menu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+
+                when (item!!.itemId) {
+                    R.id.delete_image -> {
+
+                    }
+                    R.id.edit_image -> {
+
+                    }
+
+                }
+
+                true
+            })
+
+            true
+        });
+        menu.show()
     }
 
     override fun onAttach(context: Context?) {

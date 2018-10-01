@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
@@ -44,7 +45,10 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.Application.ApplicationController
 import com.monero.models.Contact
 import com.monero.models.User
+import com.monero.network.RestService
 import com.monero.service.ContactsSyncService
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
@@ -70,6 +74,10 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     lateinit var profileFragment:ProfileFragment
     lateinit var editMenuItem:MenuItem
     lateinit var deleteMenuItem:MenuItem
+
+    val RestAPIService by lazy {
+        RestService.create()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -409,9 +417,34 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
             ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
 
+           Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
+           Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())
+
+                  /*  .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            {
+                                result ->
+                                showResult(result)
+                            },
+                            { error ->
+                                showError(error.message) }
+                    )*/
 
 
         }
+    }
+
+
+    private fun showError(message: String?) {
+        //do nothing
+        //set sync status false
+        Log.d("tag",message)
+    }
+
+    private fun showResult(result: String) {
+        //if contact not null, search that number and get details
+        Log.d("result",result);
     }
 
     override fun setCurrentActivityUserList(userList: java.util.ArrayList<User>) {

@@ -42,6 +42,7 @@ class MainPresenter : IMainPresenter {
         this.context = context
         this.view = view
         firestoreDb = FirebaseFirestore.getInstance()
+
     }
 
     var PendingDownloadItems: ArrayList<String>? = null
@@ -526,24 +527,31 @@ class MainPresenter : IMainPresenter {
     }
 
 
-    fun syncContactWithServer(contact: Contact){
-        disposable = RestAPIService.getRegisteredContactForNumber(contact.Contact_phone)
+    fun syncContactWithServer(contact: Contact){/*
+      disposable = RestAPIService.getRegisteredContactForNumber(contact.Contact_phone)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        { result -> showResult(result) },
-                        { error -> showError(error.message) }
+                        {
+                            result ->
+                              showResult(result)
+                        },
+                        { error ->
+                            showError(error.message) }
                 )
 
-    }
+
+    */}
 
     private fun showError(message: String?) {
         //do nothing
         //set sync status false
+        Log.d("tag",message)
     }
 
-    private fun showResult(result: Contact) {
+    private fun showResult(result: String) {
         //if contact not null, search that number and get details
+        Log.d("result",result);
     }
 
 

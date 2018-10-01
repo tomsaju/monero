@@ -13,7 +13,7 @@
     <string name="no_internet_connection">no internet connection</string>
     <string name="unknown_error">Error</string>
     <string name="unknown_sign_in_response">Unknown error occured</string>
-<string name="sign_up_completed">Sign in succesfull</string>
+    <string name="sign_up_completed">Sign in succesfull</string>
     <string-array name="modes_list">
         <item>Select visibility</item>
         <item>Me only</item>

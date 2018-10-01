@@ -43,13 +43,13 @@ class ContactsSyncService : com.firebase.jobdispatcher.JobService() {
 
 
     fun syncContactWithServer(contact: Contact){
-                  disposable = RestAPIService.getRegisteredContactForNumber(contact.Contact_phone)
+                  /*disposable = RestAPIService.getRegisteredContactForNumber(contact.Contact_phone)
                           .subscribeOn(Schedulers.io())
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(
                                   { result -> showResult(result) },
                                   { error -> showError(error.message) }
-                          )
+                          )*/
 
     }
 
@@ -58,7 +58,7 @@ class ContactsSyncService : com.firebase.jobdispatcher.JobService() {
         //set sync status false
     }
 
-    private fun showResult(result: Contact) {
+    private fun showResult(result: String) {
        //if contact not null, search that number and get details
     }
 }

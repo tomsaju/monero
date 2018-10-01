@@ -3,7 +3,9 @@ package com.monero.network
 import android.graphics.ColorSpace
 import com.monero.models.Contact
 import io.reactivex.Observable
+import retrofit2.Call
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.Result
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -22,7 +24,7 @@ interface RestService {
                                  @Query("requestToken") requestToken: String):Observable<Contact>*/
 
     @POST("api/v1/submitcontacts")
-    fun getRegisteredContactForNumber(@Body phoneNumber:String):Observable<Contact>
+    fun getRegisteredContactForNumber(@Body phoneNumber:String):Call<String>
 
 
 

@@ -41,7 +41,6 @@ class FireBaseAuthActivity : AppCompatActivity() {
                            .createSignInIntentBuilder()
                            .setIsSmartLockEnabled(!BuildConfig.DEBUG)
                            .setAvailableProviders(Arrays.asList(
-                                    AuthUI.IdpConfig.EmailBuilder().build(),
                                     AuthUI.IdpConfig.PhoneBuilder().build()))
                            .setTosAndPrivacyPolicyUrls("link","link")
                            .build(),

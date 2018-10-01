@@ -71,6 +71,10 @@ dependencies {
 
     //firebase firestore
     implementation 'com.google.firebase:firebase-firestore:17.0.1'
+
+    //firebase storage
+    compile 'com.google.firebase:firebase-storage:16.0.1'
+
     //maintaining single font calligraphy
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
 
@@ -81,4 +85,8 @@ dependencies {
 
     //FIREBASE JOB DISPATCHER
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
 }
