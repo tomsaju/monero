@@ -8,10 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 /**
  * Created by Dreamz on 25-09-2018.
@@ -23,8 +20,8 @@ interface RestService {
     fun getAllRegisteredContacts(@Query("contact_list") contactList: String,
                                  @Query("requestToken") requestToken: String):Observable<Contact>*/
 
-    @POST("api/v1/submitcontacts")
-    fun getRegisteredContactForNumber(@Body phoneNumber:String):Call<String>
+    @POST("api/v1/getRegisteredUsers")
+    fun getRegisteredContactForNumber(@Query ("localContacts[]") localContacts:String):Observable<String>
 
 
 

@@ -518,17 +518,43 @@ class MainPresenter : IMainPresenter {
 
     override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
 
-        for(contact in contactList){
-          syncContactWithServer(contact)
+      /*  var params="[";
+        for( i in 0 .. contactList.size-1){
+            var number:String=contactList[i].Contact_phone.replace("+","");
+            number = number.replace("\\s".toRegex(), "")
+            params+=number
+          if(i!=contactList.size-1){
+              params+=","
+          }
         }
+        params+="]"
+
+
+*/
+       // var array=Array<String>(contactList.size){"it = $it"}
+        var numberLIst:ArrayList<String> = ArrayList()
+        for(contact in contactList){
+            var number:String=contact.Contact_phone.replace("+","");
+            number = number.replace("\\s".toRegex(), "")
+            numberLIst.add(number)
+        }
+        val array = arrayOfNulls<String>(numberLIst.size)
+        numberLIst.toArray(array)
+
+      //  println(Arrays.toString(array))
+
+      //  var params = Array
+
+        syncContactWithServer(Arrays.toString(array))
+
         /*if(contactArray!=null&&contactArray.length()>0){
             sendContactsJSON(contactArray)
         }*/
     }
 
 
-    fun syncContactWithServer(contact: Contact){/*
-      disposable = RestAPIService.getRegisteredContactForNumber(contact.Contact_phone)
+    fun syncContactWithServer(localContacts: String){
+      disposable = RestAPIService.getRegisteredContactForNumber(localContacts)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -541,7 +567,7 @@ class MainPresenter : IMainPresenter {
                 )
 
 
-    */}
+    }
 
     private fun showError(message: String?) {
         //do nothing

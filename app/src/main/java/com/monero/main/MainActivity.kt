@@ -417,8 +417,8 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
             ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
 
-           Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
-           Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())
+          // Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
+         //  Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())
 
                   /*  .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
