@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:textColor="#4f5c72"
         android:textSize="18sp"
-        tools:text="Payments:"/>
+        android:text="Payments:"/>
 
     </RelativeLayout>
 

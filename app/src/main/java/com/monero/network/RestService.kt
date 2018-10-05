@@ -21,7 +21,7 @@ interface RestService {
                                  @Query("requestToken") requestToken: String):Observable<Contact>*/
 
     @POST("api/v1/getRegisteredUsers")
-    fun getRegisteredContactForNumber(@Query ("localContacts[]") localContacts:String):Observable<String>
+    fun getRegisteredContactForNumber(@Body localContacts:HashMap<String,String>):Observable<String>
 
 
 

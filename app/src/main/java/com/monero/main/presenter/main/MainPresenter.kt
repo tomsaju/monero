@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.gson.reflect.TypeToken
 import com.monero.models.*
 import com.monero.network.RestService
+import com.monero.network.ServiceRest
 import io.reactivex.Observable
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,6 +27,13 @@ import kotlin.collections.HashMap
 import io.reactivex.disposables.Disposable
 import io.reactivex.SingleObserver
 import org.json.JSONArray
+import com.android.volley.AuthFailureError
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+
+
 
 
 /**
@@ -553,8 +561,53 @@ class MainPresenter : IMainPresenter {
     }
 
 
+    private fun sendAndRequestResponse(localContacts: String) {
+
+        //RequestQueue initialized
+        var mRequestQueue = Volley.newRequestQueue(context)
+
+        var url ="https://us-central1-monero-efbcb.cloudfunctions.net/webApi/api/v1/getRegisteredUsers";
+
+        //String Request initialized
+        var mStringRequest = object : StringRequest(Request.Method.POST, url,  Response.Listener<String> {
+            response ->
+            Log.d("Vol Tag",response)
+
+        },  Response.ErrorListener { error ->
+            Log.d("Vol Tag",error.toString())
+
+        }) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                var gson = Gson()
+                val objectList = gson.fromJson(localContacts, Array<String>::class.java).asList()
+                params.put("localContacts", "[]")
+                return params
+            }
+
+            @Throws(AuthFailureError::class)
+            override fun getHeaders(): Map<String, String> {
+                return HashMap()
+            }
+        }
+
+        mRequestQueue.add(mStringRequest)
+    }
+
+
     fun syncContactWithServer(localContacts: String){
-      disposable = RestAPIService.getRegisteredContactForNumber(localContacts)
+
+      var restService = ServiceRest()
+        var params = HashMap<String,String>()
+        params.put("localContacts",localContacts)
+        sendAndRequestResponse(localContacts)
+        /*restService.getRegisteredContacts(context,"api/v1/getRegisteredUsers",params,{response ->
+          Log.d("result",response)
+      })*/
+
+     /* var map = HashMap<String,String>()
+        map.put("localContacts",localContacts)
+      disposable = RestAPIService.getRegisteredContactForNumber(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -564,7 +617,7 @@ class MainPresenter : IMainPresenter {
                         },
                         { error ->
                             showError(error.message) }
-                )
+                )*/
 
 
     }

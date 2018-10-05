@@ -49,7 +49,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
          mPayerSelectorPresenter?.getAllUsersForActivity(activityId)
 
         addPayerBanner.setOnClickListener{v:View ->
-           selectPayerFragment = SelectPayerFragment()
+            selectPayerFragment = SelectPayerFragment()
             selectPayerFragment.show(supportFragmentManager,"selectContacts")
         }
 

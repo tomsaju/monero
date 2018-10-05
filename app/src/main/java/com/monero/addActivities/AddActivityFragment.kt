@@ -92,8 +92,14 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
                     var expenseIdList = ""
                     var historyIdList = ""
                     var transactionIdList = ""
-                    val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false,System.currentTimeMillis(),expenseIdList,historyIdList,transactionIdList,System.currentTimeMillis().toString())
-                    mListener.saveActivity(activity)
+                    if(selectedUserList.size<2){
+                        Toast.makeText(context, "Please select atleast 2 participants", Toast.LENGTH_SHORT)
+
+                    }else {
+
+                        val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false, System.currentTimeMillis(), expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
+                        mListener.saveActivity(activity)
+                    }
                 }else{
                     Toast.makeText(context, "Error for user", Toast.LENGTH_SHORT).show()
                 }
@@ -216,9 +222,9 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
             memberListParent.removeAllViews()
             selectedUserList.clear()
             //add my contact
-            var myContact = ContactMinimal("You",auth.currentUser!!.phoneNumber!!)
-            selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))
-            memberListParent.addView(getContactView(myContact))
+           /* var myContact = ContactMinimal("You",auth.currentUser!!.phoneNumber!!)
+            selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))*/
+          //  memberListParent.addView(getContactView(myContact))
 
             for(contact in contactList){
                 selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
