@@ -24,12 +24,12 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
     lateinit var addPayerBanner:RelativeLayout
     lateinit var selectPayerFragment:SelectPayerFragment
     lateinit var doneButton:Button
-    var payerList:HashMap<User,Double> = HashMap()
+    var payerList:HashMap<User,Int> = HashMap()
     lateinit var mPayerSelectorPresenter:IPayerSelectorPresenter
     lateinit var allUserList:ArrayList<User>
     var activityId:String =""
-    var enteredTotal:Double =0.0
-    var addedUpTotal:Double =0.0
+    var enteredTotal:Int =0
+    var addedUpTotal:Int =0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +42,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         allUserList = ArrayList()
         if(intent!=null&&intent.extras!=null){
             activityId = intent.getStringExtra("activity_id")
-            enteredTotal = intent.getDoubleExtra("entered_total",0.0)
+            enteredTotal = intent.getIntExtra("entered_total",0)
         }
 
 
@@ -58,7 +58,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
 
             refreshPayerList()
             if(valuesAddUp()) {
-                if(enteredTotal==0.0){
+                if(enteredTotal==0){
                     intent.putExtra("total",addedUpTotal)
                 }
                 intent.putExtra("PayeeList", payerList)
@@ -73,12 +73,12 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
     }
 
     private fun valuesAddUp():Boolean {
-        var sum:Double = 0.0
+        var sum:Int = 0
         for (user in payerList) {
             sum+=user.value
         }
 
-        if(enteredTotal==0.0){
+        if(enteredTotal==0){
             addedUpTotal = sum
             return true
         }else {
@@ -104,7 +104,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
 
                 for (user in payerList){
                     if(user.key.user_id==userId.text.toString()){
-                        user.setValue(amountEdittext.text.toString().toDouble())
+                        user.setValue((amountEdittext.text.toString().toDouble()*100).toInt())
                     }
                 }
             }
@@ -116,7 +116,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
 
         listParent.addView(getPayerListView(user))
         if(!payerList.containsKey(user)) {
-            payerList.put(user, 0.0)
+            payerList.put(user, 0)
         }
     }
 

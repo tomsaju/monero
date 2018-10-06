@@ -1,6 +1,7 @@
 package com.monero.activitydetail.fragments.adapter
 
 import android.content.Context
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,8 +22,13 @@ class PendingTransactionListAdapter(var pendingTransactions:ArrayList<PendingTra
 
         returnView = inflater.inflate(R.layout.pendingtransaction_list_item,parent,false)
         var title = returnView.findViewById<TextView>(R.id.pendingText)
-        var text = pendingTransactions[position].payer.user_name+" must pay "+pendingTransactions[position].amount+" to "+pendingTransactions[position].reciepient.user_name
-        title.text = text
+        var text ="<b>"+ pendingTransactions[position].payer.user_name+"</b>"+" must pay "+ "<font color=\"#08511f\"><b>"+pendingTransactions[position].amount+"</b>"+"</font>"+" to "+ "<b>"+pendingTransactions[position].reciepient.user_name+"</b>"
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            title.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            title.setText(Html.fromHtml(text));
+        }
+       // title.text = text
         return returnView
     }
 

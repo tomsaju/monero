@@ -14,6 +14,8 @@ import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.monero.Application.ApplicationController
 
 import com.monero.R
 import com.monero.activitydetail.presenter.expense.ExpenseFragmentPresenter
@@ -50,17 +52,20 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var discardButton:Button
     lateinit var saveButton:Button
     var amount:BigDecimal?=BigDecimal.ZERO
-    lateinit var paidUsersList:HashMap<User,Double> //<each user,amount paid>
-    lateinit var splitPaymentList:HashMap<User,Double>//<each user,amount owed>
+    lateinit var paidUsersList:HashMap<User,Int> //<each user,amount paid>
+    lateinit var splitPaymentList:HashMap<User,Int>//<each user,amount owed>
     lateinit var debitList:ArrayList<Debit>
     lateinit var creditList:ArrayList<Credit>
     lateinit var mExpenseFragmentPresenter : IExpenseFragmentPresenter
     var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
-    var amountSpend:BigDecimal = BigDecimal.ZERO
+    var amountSpend:Int = 0
     lateinit var totalParticipantList:ArrayList<User>
     var activityId:String = ""
     var currentlyWorkingActivity :Activities?=null
     var expenseId:String = ""
+    val auth = FirebaseAuth.getInstance()!!
+    var myuser:User = User()
+
 
      override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -98,7 +103,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             var intent = Intent(context,PayerSelectorActivity::class.java)
             intent.putExtra("activity_id",activityId)
             if(amountEditText.text.isEmpty()){
-                intent.putExtra("entered_total", 0.0)
+                intent.putExtra("entered_total", 0)
             }else {
                 intent.putExtra("entered_total", amountEditText.text.toString().toDouble())
             }
@@ -109,7 +114,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          saveButton.setOnClickListener { v: View? ->
            if(checkInputValid()){
 
-               amountSpend = BigDecimal(amount_edittext_add_expense.text.toString()).setScale(2,RoundingMode.HALF_UP)
+               amountSpend = (amount_edittext_add_expense.text.toString().toDouble()*100).toInt()
 
                var tempDebitList = ArrayList<Debit>()
                var tempCreditList = ArrayList<Credit>()
@@ -145,7 +150,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
 
-               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,amountEditText.text.toString().toDouble(),tempCreditList,tempDebitList)
+               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList)
                mExpenseFragmentPresenter.saveExpense(expense)
                mListener?.closeFragment()
            }
@@ -155,22 +160,31 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
            mListener?.closeFragment()
          }
 
+         if(auth!=null&&auth.currentUser!=null){
+             val uid = auth.currentUser?.uid
+             if(uid!=null){
+                  myuser = User(uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
+             }
+
+         }
+
+
         return view
     }
 
     private fun splitCredits(splitType: Int) {
 
         if(splitType===SPLIT_EQUALLY_AMONG_ALL){
-           var amountOwed =  (amountSpend.divide(BigDecimal(totalParticipantList.size),2,RoundingMode.DOWN).setScale(2,RoundingMode.HALF_DOWN))
+           var amountOwed =  (amountSpend/totalParticipantList.size)
 
             for(user in totalParticipantList){
-                splitPaymentList.put(user,amountOwed.toDouble())
+                splitPaymentList.put(user,amountOwed)
             }
         }else if(splitType===SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME){
-            var amountOwed =  amountSpend/BigDecimal(totalParticipantList.size-1)
+            var amountOwed =  amountSpend/totalParticipantList.size-1
 
             for(user in totalParticipantList){
-                splitPaymentList.put(user, amountOwed.toDouble())
+                splitPaymentList.put(user, amountOwed)
             }
         }
 
@@ -216,7 +230,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
         }
 
         if(paidByTV.text.equals("me")){
-            return false
+            if(paidUsersList==null||paidUsersList.isEmpty()){
+                paidUsersList.put(myuser,amountEditText.text.toString().toInt())
+            }
+            //return false
         }
 
         return true
@@ -243,9 +260,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_PAYER_SELECTION && data != null) {
-            paidUsersList = data.getSerializableExtra("PayeeList") as HashMap<User, Double>
-            var addedUptotal:Double = data.getDoubleExtra("total",0.0)
-            if(addedUptotal!=0.0){
+            paidUsersList = data.getSerializableExtra("PayeeList") as HashMap<User, Int>
+            var addedUptotal:Int = data.getIntExtra("total",0)
+            if(addedUptotal!=0){
                 amountEditText?.setText(addedUptotal.toString())
             }
 

@@ -11,17 +11,13 @@ import com.monero.models.Expense
 import com.monero.models.PendingTransaction
 import com.monero.models.RawTransaction
 import com.monero.models.User
-import com.monero.sample.FindPath
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.schedulers.Schedulers.single
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
-import java.util.Map
 
 
 /**
@@ -114,8 +110,8 @@ class StatsPresenter:IStatsPresenter {
     private fun groupCreditsAndDebits(expenseList: List<Expense>) {
 
         Log.d(logTag,"froup credits and debits")
-        var totalPaidList:HashMap<String,Double> = HashMap() //<User id,amount> ,p(n)
-        var totalOwedList:HashMap<String,Double> = HashMap() //                     o(n)
+        var totalPaidList:HashMap<String,Int> = HashMap() //<User id,amount> ,p(n)
+        var totalOwedList:HashMap<String,Int> = HashMap() //                     o(n)
 
         for (expense in expenseList){
             var creditList = expense.creditList
@@ -153,14 +149,14 @@ class StatsPresenter:IStatsPresenter {
        }*/
 
         if(true){
-            var map = HashMap<String,Double>()
+            var map = HashMap<String,Int>()
             var sum = getsumof(totalPaidList)
-            var amountPaid:Double = 0.0
+            var amountPaid:Int = 0
             for(recepient in totalOwedList){
 
                 var paymentByThisUser = totalPaidList.get(recepient.key)
                 if(paymentByThisUser==null){
-                    amountPaid =0.0
+                    amountPaid =0
                 }else{
                     amountPaid= paymentByThisUser
                 }
@@ -189,8 +185,8 @@ class StatsPresenter:IStatsPresenter {
                 if(paidAmount==debt.value){
                     //group those two together
                     createPendingTransaction(expenseList.get(0).activity_id,payment.key,debt.key,paidAmount)
-                    payment.setValue(0.0)
-                    debt.setValue(0.0)
+                    payment.setValue(0)
+                    debt.setValue(0)
                 }
             }
         }
@@ -288,25 +284,25 @@ class StatsPresenter:IStatsPresenter {
         }
     }
 
-    private fun getsumof(totalPaidList: HashMap<String, Double>): Double {
-        var sum=BigDecimal(0).setScale(2,RoundingMode.HALF_UP)
+    private fun getsumof(totalPaidList: HashMap<String, Int>): Int {
+        var sum=0
         for(items in totalPaidList){
-            sum+=BigDecimal(items.value).setScale(2,RoundingMode.HALF_UP)
+            sum+=items.value
         }
-        return sum.toDouble()
+        return sum
     }
 
-    private fun getNextLargestReceipt(totalOwedList: HashMap<String, Double>): kotlin.collections.Map.Entry<String, Double>? {
+    private fun getNextLargestReceipt(totalOwedList: HashMap<String, Int>): kotlin.collections.Map.Entry<String, Int>? {
         var maxVal = totalOwedList.maxBy { it.value }
         return maxVal
     }
 
-    private fun getNextLargestPayment(totalPaidList: HashMap<String, Double>): kotlin.collections.Map.Entry<String, Double>? {
+    private fun getNextLargestPayment(totalPaidList: HashMap<String, Int>): kotlin.collections.Map.Entry<String, Int>? {
         var maxVal = totalPaidList.maxBy { it.value }
         return maxVal
     }
 
-    private fun pendingtransactionsExist(totalPaidList: HashMap<String, Double>, totalOwedList: HashMap<String, Double>): Boolean {
+    private fun pendingtransactionsExist(totalPaidList: HashMap<String, Int>, totalOwedList: HashMap<String, Int>): Boolean {
         if(testLimit>100){
 
             return false
@@ -328,7 +324,7 @@ class StatsPresenter:IStatsPresenter {
     }
 
 
-    fun createPendingTransaction(activity_id:String,payer_userId:String,recepient_userId:String,amount:Double){
+    fun createPendingTransaction(activity_id:String,payer_userId:String,recepient_userId:String,amount:Int){
         Log.d(logTag,"createPendingTransaction")
         //find user from ID
         var payer = getUserForId(payer_userId,allUsers)
@@ -361,34 +357,33 @@ class StatsPresenter:IStatsPresenter {
 internal var parm: HashMap<String, Double> = HashMap()
 
 
-    fun divideTransactions(poolList: HashMap<String, Double>) {
+    fun divideTransactions(poolList: HashMap<String, Int>) {
 
 
-        val Max_Value = Collections.max(poolList.values) as Double
-        val Min_Value = Collections.min(poolList.values) as Double
-        if (Max_Value !== Min_Value&&Max_Value-Min_Value>0.09) {
+        val Max_Value = Collections.max(poolList.values) as Int
+        val Min_Value = Collections.min(poolList.values) as Int
+        if (Max_Value !== Min_Value&&Max_Value-Min_Value>1) {
             val Max_Key:String = getKeyFromValue(poolList, Max_Value)
             val Min_Key:String = getKeyFromValue(poolList, Min_Value)
-            var result: Double? = Max_Value + Min_Value
-            result = round(result!!, 2)
-            if (result >= 0.09) {
+            var result: Int = Max_Value + Min_Value
+            if (result >= 1) {
                 //printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2));
-                   println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2))
-                var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,round(Math.abs(Min_Value), 2))
+                   println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + Min_Value)
+                var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,Min_Value)
                 rawtransactionList.add(transaction)
                 poolList.remove(Max_Key)
                 poolList.remove(Min_Key)
                 poolList.put(Max_Key, result)
-                poolList.put(Min_Key, 0.0)
+                poolList.put(Min_Key, 0)
             } else {
                 // printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Max_Value), 2));
-                  println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + round(Math.abs(Max_Value), 2))
-                var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,round(Math.abs(Max_Value), 2))
+                  println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + Max_Value)
+                var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,Max_Value)
                 rawtransactionList.add(transaction)
 
                 poolList.remove(Max_Key)
                 poolList.remove(Min_Key)
-                poolList.put(Max_Key, 0.0)
+                poolList.put(Max_Key, 0)
                 poolList.put(Min_Key, result)
             }
             divideTransactions(poolList)
@@ -400,7 +395,7 @@ internal var parm: HashMap<String, Double> = HashMap()
 
     }
 
-    fun getKeyFromValue(hm: HashMap<String, Double>, value: Double?): String {
+    fun getKeyFromValue(hm: HashMap<String, Int>, value: Int?): String {
         for (o in hm.keys) {
             if (hm[o] == value) {
                 return o

@@ -13,6 +13,6 @@ data class Expense(@ColumnInfo(name = "expense_id") @PrimaryKey var id: String,
                    val title:String,
                    val comments:String,
                    val activity_id: String,
-                   val amount:Double,
+                   val amount: Int,
                    val creditList:List<Credit>,
                    val debitList:List<Debit>)

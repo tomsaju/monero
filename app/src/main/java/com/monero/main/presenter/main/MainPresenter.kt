@@ -324,9 +324,9 @@ class MainPresenter : IMainPresenter {
                 var activityId: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID).toString()
                 var creditList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS).toString()
                 var debitList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT).toString()
-                var amount: Double = 0.0
+                var amount: Int = 0
                 try {
-                    amount = document.get(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT).toString().toDouble()
+                    amount = document.get(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT).toString().toInt()
                 }catch (e:Exception){
 
                 }
