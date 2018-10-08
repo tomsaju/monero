@@ -18,6 +18,7 @@ import io.reactivex.schedulers.Schedulers
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import java.util.function.BiConsumer
 
 
 /**
@@ -34,7 +35,7 @@ class StatsPresenter:IStatsPresenter {
     var rawtransactionList:ArrayList<RawTransaction> = ArrayList()
     var safetyCounter=0
     var loopLimit =0 //To prevent non ending loops due to the recursive function of dividing expense
-
+    var totalValuesSum: Int =0
     constructor(context: Context, view: IStatsView) {
         this.context = context
         this.view = view
@@ -171,6 +172,9 @@ class StatsPresenter:IStatsPresenter {
             rawtransactionList.clear()
               safetyCounter = 0
               loopLimit = map.size*2 //actually it is map.size but just incase... we'll provide double freedom
+              totalValuesSum = map.map { it.value }.sum()
+
+
               divideTransactions(map)
             var pendingTransactions = getPendingTransaction(rawtransactionList)
             for(pendingtxn in pendingTransactions){
@@ -390,9 +394,13 @@ internal var parm: HashMap<String, Double> = HashMap()
 
         safetyCounter++
 
+
+
+
+
         val Max_Value = Collections.max(poolList.values) as Int
         val Min_Value = Collections.min(poolList.values) as Int
-        if (Max_Value !== Min_Value&&Max_Value-Min_Value>1) {
+        if (Max_Value !== Min_Value&&Max_Value-Min_Value>totalValuesSum) {
             val Max_Key:String = getKeyFromValue(poolList, Max_Value)
             val Min_Key:String = getKeyFromValue(poolList, Min_Value)
             var result: Int = Max_Value + Min_Value

@@ -97,7 +97,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
                     }else {
 
-                        val activity: Activities = Activities(System.currentTimeMillis().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false, System.currentTimeMillis(), expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
+                        val activity: Activities = Activities(UUID.randomUUID().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false, System.currentTimeMillis(), expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
                         mListener.saveActivity(activity)
                     }
                 }else{

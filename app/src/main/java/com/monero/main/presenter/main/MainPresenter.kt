@@ -107,21 +107,21 @@ class MainPresenter : IMainPresenter {
             newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE, activity.createdDate)
 
 
-            firestoreDb?.collection("activities")?.add(newActivity)
+            firestoreDb?.collection("activities")?.document(activity.id)?.set(newActivity)
 
                     ?.addOnSuccessListener { DocumentReference ->
 
                         //success
                         // activity.id = DocumentReference.id
                         activity.syncStatus = true
-                        Single.fromCallable {
-                            db = getAppDatabase(context)
-                            db?.activitesDao()?.updateActivityId(activity.id, DocumentReference.id) // .database?.personDao()?.insert(person)
-                            /*for(tag in activity.tags){
+                        /*Single.fromCallable {
+                          //  db = getAppDatabase(context)
+                         //   db?.activitesDao()?.updateActivityId(activity.id, DocumentReference.id) // .database?.personDao()?.insert(person)
+                            *//*for(tag in activity.tags){
                                 AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
-                            }*/
+                            }*//*
                         }.subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread()).subscribe()
+                                .observeOn(AndroidSchedulers.mainThread()).subscribe()*/
                     }
 
                     ?.addOnFailureListener { e ->
@@ -324,6 +324,7 @@ class MainPresenter : IMainPresenter {
                 var activityId: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID).toString()
                 var creditList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS).toString()
                 var debitList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT).toString()
+                var createdDate :String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREATED_DATE).toString()
                 var amount: Int = 0
                 try {
                     amount = document.get(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT).toString().toInt()
@@ -362,7 +363,7 @@ class MainPresenter : IMainPresenter {
                 }
 
 
-                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList)
+                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,createdDate)
 
                 Single.fromCallable {
 
