@@ -22,7 +22,13 @@ class PendingTransactionListAdapter(var pendingTransactions:ArrayList<PendingTra
 
         returnView = inflater.inflate(R.layout.pendingtransaction_list_item,parent,false)
         var title = returnView.findViewById<TextView>(R.id.pendingText)
-        var text ="<b>"+ pendingTransactions[position].payer.user_name+"</b>"+" must pay "+ "<font color=\"#08511f\"><b>"+pendingTransactions[position].amount+"</b>"+"</font>"+" to "+ "<b>"+pendingTransactions[position].reciepient.user_name+"</b>"
+
+        var amountInLowerDenomination = pendingTransactions[position].amount
+        var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination/100).toDouble())
+
+
+
+        var text ="<b>"+ pendingTransactions[position].payer.user_name+"</b>"+" must pay "+ "<font color=\"#08511f\"><b>"+amountInHigherDenomination+"</b>"+"</font>"+" to "+ "<b>"+pendingTransactions[position].reciepient.user_name+"</b>"
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             title.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
         } else {

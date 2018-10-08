@@ -150,7 +150,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
 
-               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList)
+               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList,System.currentTimeMillis().toString())
                mExpenseFragmentPresenter.saveExpense(expense)
                mListener?.closeFragment()
            }
@@ -263,7 +263,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             paidUsersList = data.getSerializableExtra("PayeeList") as HashMap<User, Int>
             var addedUptotal:Int = data.getIntExtra("total",0)
             if(addedUptotal!=0){
-                amountEditText?.setText(addedUptotal.toString())
+
+                var amountinHigerDenomination =(addedUptotal/100).toDouble()
+
+                amountEditText?.setText(amountinHigerDenomination.toString())
             }
 
            paidByTV.setText("${paidUsersList.size} people")

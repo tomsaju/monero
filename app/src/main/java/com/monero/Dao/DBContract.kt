@@ -47,6 +47,7 @@ class DBContract {
             const val EXPENSE_DEBIT = "debits"
             const val EXPENSE_ACTIVITY_ID = "activity_id"
             const val EXPENSE_AMOUNT = "amount"
+            const val EXPENSE_CREATED_DATE = "created_date"
 
         }
 

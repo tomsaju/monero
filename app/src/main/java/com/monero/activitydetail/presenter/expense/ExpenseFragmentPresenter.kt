@@ -45,6 +45,7 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
         newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT, expense.amount)
         newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT, debitJson)
         newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS, creditJson)
+        newExpense.put(DBContract.EXPENSE_TABLE.EXPENSE_CREATED_DATE, expense.created_date)
 
         //first save in local.
         //On success, save in cloud.
@@ -69,6 +70,9 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess {
+                    //add this event to history
+
+
                     //Log.d
                     Log.d("Tag","expense saved locally")
                     //push this expense id to activity db

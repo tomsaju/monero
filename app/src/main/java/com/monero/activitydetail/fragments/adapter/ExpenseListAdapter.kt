@@ -28,7 +28,10 @@ class ExpenseListAdapter(var expenseList:ArrayList<Expense>,var context: Context
 
         title.text=expenseList[position].title
         paidBy.text = "paid by "+expenseList[position].debitList.size+" people"
-        amountTv.text = expenseList[position].amount.toString()
+
+        var amountInLowerDenomination = expenseList[position].amount
+        var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination/100).toDouble())
+        amountTv.text = amountInHigherDenomination
 
         return returnView
 
