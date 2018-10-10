@@ -3,19 +3,19 @@ package com.monero.activitydetail.fragments
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.ListView
 
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
-import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
-import com.monero.activitydetail.presenter.detail.IDetailPresenter
+import com.monero.activitydetail.fragments.adapter.ExpenseListRecyclerAdapter
 import com.monero.activitydetail.presenter.expenselist.ExpenseListPresenter
 import com.monero.activitydetail.presenter.expenselist.IExpenseListPresenter
 import com.monero.activitydetail.presenter.expenselist.IExpenseListView
@@ -28,8 +28,8 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
     private var mListenerExpenseList: OnExpenseListFragmentInteractionListener? = null
     lateinit private var expenseList:ArrayList<Expense>
-    private lateinit var expenseAdapter: ExpenseListAdapter
-    private lateinit var listView: ListView
+    private lateinit var expenseAdapter: ExpenseListRecyclerAdapter
+    private lateinit var recyclerView: RecyclerView
     private lateinit var mPresenter:IExpenseListPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,8 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
          var view:View = inflater!!.inflate(R.layout.fragment_expense_list, container, false)
         //fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
-        listView = view.findViewById(R.id.expense_list)
+        recyclerView = view.findViewById(R.id.expense_list)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayout.VERTICAL, false)
         mPresenter=ExpenseListPresenter(requireContext(),this)
 
         return view
@@ -88,9 +89,9 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
     fun setExpenseList(expenseList:ArrayList<Expense>){
         setExpenseTotal(expenseList)
         this.expenseList = expenseList
-        expenseAdapter = ExpenseListAdapter(expenseList,requireActivity())
-        if(listView!=null){
-            listView.adapter = expenseAdapter
+        expenseAdapter = ExpenseListRecyclerAdapter(expenseList,requireActivity())
+        if(recyclerView !=null){
+            recyclerView.adapter = expenseAdapter
         }
     }
 

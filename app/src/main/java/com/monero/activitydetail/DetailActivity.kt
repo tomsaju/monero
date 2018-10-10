@@ -3,6 +3,7 @@ package com.monero.activitydetail
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -27,6 +28,10 @@ import com.monero.activitydetail.presenter.detail.IDetailPresenter
 import com.monero.activitydetail.presenter.detail.IDetailView
 import com.monero.models.Activities
 import com.monero.models.Expense
+import android.view.WindowManager
+import android.os.Build
+
+
 
 class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteractionListener,IDetailView ,ExpenseListFragment.OnExpenseListFragmentInteractionListener,StatsFragment.StatsFragmentListener {
 
@@ -38,7 +43,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     var activityId:String =""
     private var currentlyWorkingActivity:Activities?=null
     lateinit var mDetailPresenter:IDetailPresenter
-    lateinit var totalCost:TextView
+    //lateinit var totalCost:TextView
     lateinit var addExpenseFab:FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +53,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         tabLayout = findViewById<TabLayout>(R.id.detailPageTab) as TabLayout
         mViewPager = findViewById<ViewPager?>(R.id.container)
-        totalCost = findViewById(R.id.totalCost)
+        //totalCost = findViewById(R.id.totalCost)
         addExpenseFab = findViewById(R.id.addexpenseButton)
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
         mDetailPresenter = DetailPresenter(this,this)
@@ -58,6 +63,12 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         mDetailPresenter!!.getActivityForId(activityId)
         setupViewPager()
 
+        //change status bar color
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val window = window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.statusBarColor = Color.parseColor("#536DFE")
+        }
 
     }
 
@@ -142,6 +153,6 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     }
 
     override fun onTotal(total: Double) {
-        totalCost.setText("$"+total)
+      //  totalCost.setText("$"+total)
     }
 }

@@ -5,13 +5,13 @@
     android:layout_marginLeft="5dp"
     tools:context="com.monero.activitydetail.fragments.ExpenseListFragment">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/expense_list"
         tools:listitem="@layout/expense_list_item_layout">
 
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
 
 </FrameLayout>
