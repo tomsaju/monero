@@ -33,7 +33,9 @@ class AccountBookPresenter :IAccountBookPresenter {
     var rawtransactionList:ArrayList<RawTransaction> = ArrayList()
     private var allActivityIdList: List<String>?=null
     private var allExpensesForActivity: LiveData<List<Expense>>? = null
-
+    var safetyCounter =0
+    var loopLimit = 0
+    var totalValuesSum =0
 
     constructor(context: Context, view: IAccountBookView) {
         this.context = context
@@ -194,6 +196,9 @@ class AccountBookPresenter :IAccountBookPresenter {
             }
             // FindPath.findPath(map)
             rawtransactionList.clear()
+            safetyCounter = 0
+            loopLimit = map.size*2 //actually it is map.size but just incase... we'll provide double freedom
+            totalValuesSum = map.map { it.value }.sum()
             divideTransactions(map)
             var pendingTransactions = getPendingTransaction(rawtransactionList)
             for (pendingtxn in pendingTransactions) {
@@ -253,44 +258,80 @@ class AccountBookPresenter :IAccountBookPresenter {
             return sum
         }
 
-        fun divideTransactions(poolList: HashMap<String, Int>) {
+    fun divideTransactions(poolList: HashMap<String, Int>) {
 
-
-            val Max_Value = Collections.max(poolList.values) as Int
-            val Min_Value = Collections.min(poolList.values) as Int
-            if (Max_Value !== Min_Value && Max_Value - Min_Value > 1) {
-                val Max_Key: String = getKeyFromValue(poolList, Max_Value)
-                val Min_Key: String = getKeyFromValue(poolList, Min_Value)
-                var result: Int = Max_Value + Min_Value
-
-                if (result >= 1) {
-                    //printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2));
-                    println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + Min_Value)
-                    var transaction = RawTransaction(System.currentTimeMillis(), Min_Key, Max_Key, Min_Value)
-                    rawtransactionList.add(transaction)
-                    poolList.remove(Max_Key)
-                    poolList.remove(Min_Key)
-                    poolList.put(Max_Key, result)
-                    poolList.put(Min_Key, 0)
-                } else {
-                    // printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Max_Value), 2));
-                    println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + Max_Value)
-                    var transaction = RawTransaction(System.currentTimeMillis(), Min_Key, Max_Key, Max_Value)
-                    rawtransactionList.add(transaction)
-
-                    poolList.remove(Max_Key)
-                    poolList.remove(Min_Key)
-                    poolList.put(Max_Key, 0)
-                    poolList.put(Min_Key, result)
-                }
-                divideTransactions(poolList)
-            }
+        //change this functions implementation such that there should be transaction only with people that
+        //know each other
+        //example is if i have an activity among my family members and other with my friends, do nt settle between
+        //people in these groups since they dont know each other
 
 
 
-            println("Completed loop")
+        //
+        /**
+         * what this method does is actually decides "who pays whom and how much"
+         *
+         * The input contains a hashmap showing a list of user id's to some money amount
+         *  "9233869683354" -> "6667"
+        "4616934841698" -> "-3333"
+        "1538978280562" -> "-3333"
 
+
+        user id -> amount
+        if amount is positive,it is the amount he should get (coz he has spend that money some point earlier)
+        if amount is negative, it is the amount he should give(coz some body have spend that amount for him)
+
+        the function loops through the hashmap and tries to settle (starting by combining largest and smallest money)
+        settles until the amount become less than or equal to 1
+         */
+
+
+        //safety counter to prevent stack overflow errors by infinite loops
+        if(safetyCounter>loopLimit){
+            return
         }
+
+        safetyCounter++
+
+
+
+
+
+        val Max_Value = Collections.max(poolList.values) as Int
+        val Min_Value = Collections.min(poolList.values) as Int
+        if (Max_Value !== Min_Value&&Max_Value-Min_Value>totalValuesSum) {
+            val Max_Key:String = getKeyFromValue(poolList, Max_Value)
+            val Min_Key:String = getKeyFromValue(poolList, Min_Value)
+            var result: Int = Max_Value + Min_Value
+            if (result >= 1) {
+                //printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Min_Value), 2));
+                println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + Min_Value)
+                var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,Math.abs(Min_Value))
+                rawtransactionList.add(transaction)
+                poolList.remove(Max_Key)
+                poolList.remove(Min_Key)
+                poolList.put(Max_Key, result)
+                poolList.put(Min_Key, 0)
+            } else {
+                // printBill.add(Min_Key + " needs to pay " + Max_Key + ":" + round(Math.abs(Max_Value), 2));
+                println(Min_Key.toString() + " needs to pay " + Max_Key + ":" + Max_Value)
+                var transaction = RawTransaction(System.currentTimeMillis(),Min_Key,Max_Key,Math.abs(Max_Value))
+                rawtransactionList.add(transaction)
+
+                poolList.remove(Max_Key)
+                poolList.remove(Min_Key)
+                poolList.put(Max_Key, 0)
+                poolList.put(Min_Key, result)
+            }
+            divideTransactions(poolList)
+        }
+
+
+
+        println("Completed loop")
+        Log.d("Iterations",safetyCounter.toString())
+
+    }
 
         fun getKeyFromValue(hm: HashMap<String, Int>, value: Int): String {
             for (o in hm.keys) {

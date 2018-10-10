@@ -4,9 +4,9 @@
     android:layout_height="match_parent"
     tools:context="com.monero.activitydetail.fragments.StatsFragment">
 
-   <ListView
+   <android.support.v7.widget.RecyclerView
        android:layout_width="match_parent"
        android:layout_height="match_parent"
-       android:id="@+id/transactionList"></ListView>
+       android:id="@+id/transactionList"></android.support.v7.widget.RecyclerView>
 
 </FrameLayout>

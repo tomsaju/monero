@@ -1,7 +1,5 @@
 package com.monero.activitydetail
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -16,21 +14,19 @@ import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.View
-import android.widget.TextView
 import com.monero.R
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
 import com.monero.activitydetail.fragments.HistoryFragment
 import com.monero.activitydetail.fragments.StatsFragment
-import com.monero.activitydetail.fragments.adapter.ExpenseListAdapter
 import com.monero.activitydetail.presenter.detail.DetailPresenter
 import com.monero.activitydetail.presenter.detail.IDetailPresenter
 import com.monero.activitydetail.presenter.detail.IDetailView
 import com.monero.models.Activities
-import com.monero.models.Expense
 import android.view.WindowManager
 import android.os.Build
-
+import android.support.design.widget.CollapsingToolbarLayout
+import android.widget.TextView
 
 
 class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteractionListener,IDetailView ,ExpenseListFragment.OnExpenseListFragmentInteractionListener,StatsFragment.StatsFragmentListener {
@@ -45,7 +41,8 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     lateinit var mDetailPresenter:IDetailPresenter
     //lateinit var totalCost:TextView
     lateinit var addExpenseFab:FloatingActionButton
-
+    lateinit var collapsingToolbarLayout:CollapsingToolbarLayout
+    lateinit var desc_tv:TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
@@ -53,7 +50,11 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         tabLayout = findViewById<TabLayout>(R.id.detailPageTab) as TabLayout
         mViewPager = findViewById<ViewPager?>(R.id.container)
+        collapsingToolbarLayout = findViewById(R.id.collapsibletoolbar)
         //totalCost = findViewById(R.id.totalCost)
+        collapsingToolbarLayout.setTitleEnabled(true);
+        desc_tv = findViewById(R.id.description_text)
+
         addExpenseFab = findViewById(R.id.addexpenseButton)
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
         mDetailPresenter = DetailPresenter(this,this)
@@ -67,7 +68,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val window = window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = Color.parseColor("#536DFE")
+            window.statusBarColor = Color.parseColor("#CC536DFE")
         }
 
     }
@@ -136,7 +137,8 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     override fun onActivityFetched(activity: Activities) {
         Log.d("detailActivity","currently "+activity?.title)
         currentlyWorkingActivity = activity
-
+        collapsingToolbarLayout.title = activity.title
+        desc_tv.text = activity.description
     }
 
 

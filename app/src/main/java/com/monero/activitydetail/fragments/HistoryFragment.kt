@@ -16,7 +16,11 @@ import com.monero.models.User
  */
 class HistoryFragment:Fragment() {
 
-
+    //history log added when
+    // user creates an activity
+    //user adds an expense
+    //user settles a bill
+    //user adds a new comment on an expense
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

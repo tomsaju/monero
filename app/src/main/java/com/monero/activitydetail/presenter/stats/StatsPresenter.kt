@@ -169,17 +169,17 @@ class StatsPresenter:IStatsPresenter {
 
             }
            // FindPath.findPath(map)
-            rawtransactionList.clear()
+              rawtransactionList.clear()
               safetyCounter = 0
               loopLimit = map.size*2 //actually it is map.size but just incase... we'll provide double freedom
               totalValuesSum = map.map { it.value }.sum()
 
 
               divideTransactions(map)
-            var pendingTransactions = getPendingTransaction(rawtransactionList)
-            for(pendingtxn in pendingTransactions){
-                println(pendingtxn.payer.user_name+" should pay "+pendingtxn.reciepient.user_name+" "+pendingtxn.amount)
-            }
+                var pendingTransactions = getPendingTransaction(rawtransactionList)
+                for(pendingtxn in pendingTransactions){
+                    println(pendingtxn.payer.user_name+" should pay "+pendingtxn.reciepient.user_name+" "+pendingtxn.amount)
+             }
             view.onPendingTransactionsObtained(pendingTransactions)
 
             return

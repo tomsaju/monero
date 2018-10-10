@@ -1,17 +1,18 @@
 package com.monero.activitydetail.fragments
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListView
+import android.widget.LinearLayout
 
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
-import com.monero.activitydetail.fragments.adapter.PendingTransactionListAdapter
+import com.monero.activitydetail.fragments.adapter.PendingTransactionRecyclerAdapter
 import com.monero.activitydetail.presenter.stats.IStatsPresenter
 import com.monero.activitydetail.presenter.stats.IStatsView
 import com.monero.activitydetail.presenter.stats.StatsPresenter
@@ -22,8 +23,8 @@ class StatsFragment : Fragment(),IStatsView {
 
     private var mListener: StatsFragmentListener? = null
     private lateinit var mStatsPresenter:IStatsPresenter
-    private lateinit var transactionsListVIew:ListView
-    private lateinit var adapter:PendingTransactionListAdapter
+    private lateinit var transactionsRecyclerVIew:RecyclerView
+    private lateinit var adapter:PendingTransactionRecyclerAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +36,8 @@ class StatsFragment : Fragment(),IStatsView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
        var view=inflater!!.inflate(R.layout.fragment_stats, container, false)
-        transactionsListVIew = view.findViewById(R.id.transactionList)
+        transactionsRecyclerVIew = view.findViewById(R.id.transactionList)
+        transactionsRecyclerVIew.layoutManager = LinearLayoutManager(requireContext(), LinearLayout.VERTICAL, false)
         return view
     }
 
@@ -76,7 +78,7 @@ class StatsFragment : Fragment(),IStatsView {
     }
 
     override fun onPendingTransactionsObtained(pendingTransaction: ArrayList<PendingTransaction>) {
-        adapter = PendingTransactionListAdapter(pendingTransaction,requireContext())
-        transactionsListVIew.adapter = adapter
+        adapter = PendingTransactionRecyclerAdapter(pendingTransaction,requireContext())
+        transactionsRecyclerVIew.adapter = adapter
     }
 }// Required empty public constructor
