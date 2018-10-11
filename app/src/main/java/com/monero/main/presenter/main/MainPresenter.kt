@@ -81,6 +81,18 @@ class MainPresenter : IMainPresenter {
             }
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+            //save the log to history
+            var historyItem = HistoryLogItem(UUID.randomUUID().toString(),
+                                activity.author.user_id,
+                                DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_ACTIVITY,
+                                activity.createdDate.toString(),
+                                activity.title,
+                                "",
+                                activity.id,
+                                activity.id)
+
+            saveLog(historyItem)
+
             // set values to UI
             Log.d("tag", "done")
             ///
@@ -137,6 +149,18 @@ class MainPresenter : IMainPresenter {
             Log.d("tag", "completed")
         })
 
+
+    }
+
+    private fun saveLog(historyItem: HistoryLogItem) {
+        Observable.fromCallable {
+            db = getAppDatabase(context)
+            db?.historyDao()?.insertIntoHistoryTable(historyItem) // .database?.personDao()?.insert(person)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+
+           Log.d(TAG,"log saving complete")
+        })
 
     }
 

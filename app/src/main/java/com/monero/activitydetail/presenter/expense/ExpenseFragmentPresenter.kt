@@ -14,7 +14,10 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import com.google.firebase.firestore.DocumentReference
-
+import com.monero.helper.PreferenceManager
+import com.monero.models.HistoryLogItem
+import io.reactivex.Observable
+import java.util.*
 
 
 /**
@@ -71,7 +74,16 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess {
                     //add this event to history
+                    var historyLog = HistoryLogItem(UUID.randomUUID().timestamp().toString(),
+                            "Author id",
+                            DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_EXPENSE,
+                            expense.created_date,
+                            expense.title,
+                            "",
+                            expense.id,
+                            expense.activity_id)
 
+                    saveHistory(historyLog)
 
                     //Log.d
                     Log.d("Tag","expense saved locally")
@@ -92,6 +104,18 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                             }
                 }
                 .subscribe()
+
+
+    }
+
+    private fun saveHistory(historyLog: HistoryLogItem) {
+
+        Observable.fromCallable {
+            AppDatabase.db = AppDatabase.getAppDatabase(context)
+            AppDatabase.db?.historyDao()?.insertIntoHistoryTable(historyLog) // .database?.personDao()?.insert(person)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+        })
 
 
     }
