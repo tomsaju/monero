@@ -43,5 +43,18 @@ class DetailPresenter:IDetailPresenter {
         })
     }
 
+    override fun getBannerDataForActivity(id: String) {
+        var expenseList:LiveData<List<Expense>>? =null
+        Single.fromCallable {
+            db= getAppDatabase(context)
+            expenseList = db?.expenseDao()?.getAllExpensesForActivity(id)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(Consumer {
 
+            val eLIst =expenseList
+            if(eLIst!=null){
+                view.setBannerData(eLIst)
+            }
+        })
+    }
 }

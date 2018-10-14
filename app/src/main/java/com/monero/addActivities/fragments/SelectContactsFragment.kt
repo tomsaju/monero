@@ -13,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.google.firebase.auth.FirebaseAuth
+import com.monero.Application.ApplicationController
 import com.monero.Dao.ContactDAO
 import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
@@ -49,6 +51,8 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     lateinit var mContext:Context
     lateinit var myContact: ContactMinimal
     lateinit var refreshButton:TextView
+    lateinit var myUser:User
+    var auth = FirebaseAuth.getInstance()!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,14 +70,15 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         mSearchView = rootView?.findViewById(R.id.contacs_searchView)
         refreshButton = rootView?.findViewById(R.id.refresh_contact_list)
 
-
+        myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
+        var myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone)
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
         selectedContactList = ArrayList<ContactMinimal>()
         var currentUserList = mListener?.getCurrentActivityUserList()
 
         for(user in currentUserList!!){
-            selectedContactList?.add(ContactMinimal(user.user_name,user.user_phone))
+            selectedContactList?.add(ContactMinimal(user.user_id,user.user_name,user.user_phone))
         }
      //   loadContacts(contacts)
         //dialog?.setTitle("Select participants")
@@ -143,7 +148,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
                     .doAfterSuccess({ listFromDB: List<Contact> ->
                         var minimalContactList = ArrayList<ContactMinimal>()
                         for(contact in listFromDB){
-                            minimalContactList.add(ContactMinimal(contact.Contact_name_local,contact.Contact_phone))
+                            minimalContactList.add(ContactMinimal(contact.Contact_uuid,contact.Contact_name_local,contact.Contact_phone))
                         }
                         loadContacts(minimalContactList)
                     })

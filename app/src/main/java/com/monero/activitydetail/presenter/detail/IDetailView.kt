@@ -9,5 +9,6 @@ import com.monero.models.Expense
  */
 interface IDetailView {
     fun onActivityFetched(activity:Activities)
+    fun setBannerData(expenseList:LiveData<List<Expense>>)
 
 }

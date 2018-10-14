@@ -74,7 +74,7 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
 
     interface OnExpenseListFragmentInteractionListener {
-        fun onTotal(total:Double)
+        fun onTotal(total:String)
     }
 
     companion object {
@@ -87,6 +87,7 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
 
     fun setExpenseList(expenseList:ArrayList<Expense>){
+
         setExpenseTotal(expenseList)
         this.expenseList = expenseList
         expenseAdapter = ExpenseListRecyclerAdapter(expenseList,requireActivity())
@@ -96,11 +97,13 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
     }
 
     private fun setExpenseTotal(expenseList: ArrayList<Expense>) {
-        var sum:Double =0.0
+        var sum=0
         for(expense in expenseList){
             sum+=expense.amount
         }
-        mListenerExpenseList?.onTotal(sum)
+
+        var amountInHigherDenomination = "%.2f".format((sum/100).toDouble())
+        mListenerExpenseList?.onTotal(amountInHigherDenomination)
     }
 
     override fun onResume() {
@@ -115,11 +118,15 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
         expenses.observe(this,object: Observer<List<Expense>> {
             override fun onChanged(expenseList: List<Expense>?) {
                 if(expenseList!=null) {
+                    (activity as DetailActivity).calculateBannerValues(expenseList)
                     setExpenseList(ArrayList(expenseList)) //expenses
+
                 }
             }
 
         })
     }
+
+
 
 }// Required empty public constructor

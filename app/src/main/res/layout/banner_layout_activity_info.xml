@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Trip to DisneyLand"
+        android:textSize="23sp"
+        android:layout_marginTop="10dp"
+        android:textColor="#ffffff"
+        android:id="@+id/activity_title"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/activity_title"
+        android:text="lorem ipsum dolor sit ameil nsd"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textColor="#e8ebef"
+        android:id="@+id/activity_desc"
+        android:singleLine="true"
+        android:textSize="18sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_desc"
+        android:textSize="15sp"
+        android:id="@+id/user_list"
+        android:textColor="#f7faff"
+        android:text="Captain America, Steve Rogers ,Tony Stark + 3 others"/>
+
+    <me.gujun.android.taggroup.TagGroup
+        android:id="@+id/tag_group"
+        android:layout_below="@id/user_list"
+        android:layout_marginTop="9dp"
+        android:layout_marginBottom="5dp"
+        android:paddingBottom="5dp"
+        android:layout_height="wrap_content"
+        style="@style/TagGroup.Small.Custom">
+
+    </me.gujun.android.taggroup.TagGroup>
+    </RelativeLayout>
+</RelativeLayout>

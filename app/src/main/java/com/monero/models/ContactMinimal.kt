@@ -8,4 +8,4 @@ import com.monero.Dao.DBContract
  * Created by tom.saju on 3/14/2018.
  */
 
-data class ContactMinimal(@ColumnInfo(name = "Contact_name_local") val name:String,@ColumnInfo(name = "Contact_phone") val phoneNumber:String)
+data class ContactMinimal(@ColumnInfo(name = "contact_id") val contact_id:String,@ColumnInfo(name = "Contact_name_local") val name:String,@ColumnInfo(name = "Contact_phone") val phoneNumber:String)

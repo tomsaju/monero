@@ -45,7 +45,7 @@ class AddActivityPresenter :IAddActivityPresenter {
                     name = cursor.getString(nameIndex)
                     number = cursor.getString(numberIndex)
 
-                    var newCOntact: ContactMinimal = ContactMinimal(name, number)
+                    var newCOntact: ContactMinimal = ContactMinimal(System.currentTimeMillis().toString(),name, number)
                     contactsList.add(newCOntact)
                 }
             } finally {

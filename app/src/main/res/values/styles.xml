@@ -38,4 +38,9 @@
         <item name="atg_backgroundColor">#e0e0e0</item>
         <item name="atg_borderColor">#e0e0e0</item>
     </style>
+
+    <style name="TransparentText">
+        <item name="android:textColor">#00000000</item>
+        <item name="android:textSize">0sp</item>
+    </style>
 </resources>

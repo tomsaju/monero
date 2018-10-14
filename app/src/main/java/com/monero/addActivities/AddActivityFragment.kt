@@ -44,12 +44,13 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var addActivityPresenter:IAddActivityPresenter
     lateinit var contactsList:List<ContactMinimal>
     var selectedUserList: ArrayList<User> = ArrayList()
-    val auth = FirebaseAuth.getInstance()!!
+    var auth = FirebaseAuth.getInstance()!!
     lateinit var myCredential:String
     lateinit var myContactName:TextView
     lateinit var myContactPhone:TextView
     lateinit var addMembersLayout:FrameLayout
     lateinit var progressBarContacts:ProgressBar
+    lateinit var myUser:User
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -78,8 +79,9 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
         selectedUserList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
+        myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
 
-        selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))
+        selectedUserList.add(myUser)
         mListener.setCurrentActivityUserList(selectedUserList)
 
         doneButton.setOnClickListener { v: View? ->
@@ -88,7 +90,20 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
                 if(auth!=null) {
                     //val author = User(auth.currentUser?.uid!!, auth.currentUser?.displayName!!, auth.currentUser?.phoneNumber!!, auth.currentUser?.email!!)
-                    val author = User("dummy string", "dummy author", "dummy phone", "dummy mail")
+                    if(auth==null){
+                        auth = FirebaseAuth.getInstance()!!
+                    }
+
+                    var author = User("dummy string", "dummy author", "dummy phone", "dummy mail")
+                    /*if(auth.currentUser!=null) {
+                        var userId = auth.currentUser!!.uid
+                        var displayName =auth.currentUser!!.displayName
+                        var userPhone = auth.currentUser!!.phoneNumber
+                        var email  = auth.currentUser!!.email
+                        author = User(userId,displayName!!,userPhone!!,email!!)
+                    }*/
+                  //  val author = User(auth.currentUser!!.uid,auth.currentUser!!.displayName,auth.currentUser!!.phoneNumber,"")
+
                     var expenseIdList = ""
                     var historyIdList = ""
                     var transactionIdList = ""
@@ -97,7 +112,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
                     }else {
 
-                        val activity: Activities = Activities(UUID.randomUUID().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, author, false, System.currentTimeMillis(), expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
+                        val activity: Activities = Activities(UUID.randomUUID().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, myUser, false, System.currentTimeMillis(), expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
                         mListener.saveActivity(activity)
                     }
                 }else{
@@ -227,7 +242,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
           //  memberListParent.addView(getContactView(myContact))
 
             for(contact in contactList){
-                selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),contact.name,contact.phoneNumber,"sample@yopmail.com"))
+                selectedUserList.add(User(contact.contact_id,contact.name,contact.phoneNumber,"sample@yopmail.com"))
                 memberListParent.addView(getContactView(contact))
             }
 

@@ -10,4 +10,5 @@ import com.monero.models.Expense
 interface IDetailPresenter {
 
     fun getActivityForId(id:String)
+    fun getBannerDataForActivity(id:String)
 }

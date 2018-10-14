@@ -38,7 +38,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
         number.text = contactList.get(position)?.phoneNumber
 
         layoutParent.setOnClickListener { view:View ->
-            this.parent.onContactSelected(ContactMinimal(name.text.toString(),number.text.toString()))
+            this.parent.onContactSelected(contactList[position])
         }
         return view
 

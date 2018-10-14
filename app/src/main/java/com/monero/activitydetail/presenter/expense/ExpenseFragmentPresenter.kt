@@ -74,8 +74,8 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess {
                     //add this event to history
-                    var historyLog = HistoryLogItem(UUID.randomUUID().timestamp().toString(),
-                            "Author id",
+                    var historyLog = HistoryLogItem(System.currentTimeMillis().toString(),
+                            "author id",
                             DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_EXPENSE,
                             expense.created_date,
                             expense.title,

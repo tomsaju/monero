@@ -14,6 +14,9 @@
     <string name="unknown_error">Error</string>
     <string name="unknown_sign_in_response">Unknown error occured</string>
     <string name="sign_up_completed">Sign in succesfull</string>
+    <string name="red">red</string>
+    <string name="blue">blue</string>
+    <string name="orange">orange</string>
     <string-array name="modes_list">
         <item>Select visibility</item>
         <item>Me only</item>

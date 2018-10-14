@@ -4,11 +4,8 @@
     android:layout_height="match_parent"
     android:clickable="true">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:dividerHeight="0dp"
-        android:divider="@null"
-        android:nestedScrollingEnabled="true"
-        android:id="@+id/history_list"></ListView>
+        android:id="@+id/history_list"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

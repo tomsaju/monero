@@ -4,10 +4,14 @@ import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.view.View
 import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.activitydetail.fragments.ExpenseListFragment
 import com.monero.activitydetail.fragments.HistoryFragment
 import com.monero.activitydetail.fragments.StatsFragment
+import android.view.ViewGroup
+
+
 
 /**
  * Created by Dreamz on 01-05-2018.
@@ -46,5 +50,6 @@ class DetailViewPagerAdapter(fm: FragmentManager?,private val context: Context) 
     override fun getPageTitle(position: Int): CharSequence {
         return mFragmentTitleList.get(position)
     }
+
 
 }
