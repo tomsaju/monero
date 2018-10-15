@@ -17,6 +17,8 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
+        android:layout_toLeftOf="@+id/amount_textview_expense_list_item"
+        android:layout_alignParentLeft="true"
         android:orientation="vertical">
 
     <TextView
@@ -34,7 +36,8 @@
         android:id="@+id/paidBy_text_expense_list_item"
         android:layout_below="@+id/expense_title_list_item"
         tools:text="Paid by Tony Stark and 2 others"
-        android:maxLines="1"/>
+        android:layout_marginRight="10dp"
+        android:maxLines="2"/>
     </LinearLayout>
     <TextView
         android:layout_width="wrap_content"

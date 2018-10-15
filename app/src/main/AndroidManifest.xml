@@ -36,8 +36,9 @@
         <activity
             android:name=".tags.TagActivity"
             android:theme="@style/MyAppTheme.NoActionBar" />
-        <activity android:name=".payeeSelector.PayerSelectorActivity"
-            android:theme="@style/MyAppTheme.NoActionBar"/>
+        <activity
+            android:name=".payeeSelector.PayerSelectorActivity"
+            android:theme="@style/MyAppTheme.NoActionBar" />
         <activity
             android:name=".auth.SignInActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
@@ -52,7 +53,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".splash.SplashActivity"></activity>
+        <activity android:name=".splash.SplashActivity" />
+        <activity android:name=".expensedetail.ExpenseActivity"></activity>
     </application>
 
 </manifest>

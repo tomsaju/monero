@@ -25,7 +25,18 @@ class ExpenseListRecyclerAdapter(var expenseList:ArrayList<Expense>, var context
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tvtitle.text=expenseList[position].title
-        holder.tvpaidBy.text = "paid by "+expenseList[position].debitList.size+" people"
+
+        var sortedDebitList = expenseList[position].debitList.sortedWith(compareBy({ it.userName }))
+
+        if(expenseList[position].debitList.size==1){
+            holder.tvpaidBy.text = "paid by "+sortedDebitList[0].userName+""
+        }else if(expenseList[position].debitList.size==2){
+            holder.tvpaidBy.text = "paid by "+sortedDebitList[0].userName+" and 1 other"
+        }else{
+            holder.tvpaidBy.text = "paid by "+sortedDebitList[0].userName+" and some others"
+        }
+
+        //holder.tvpaidBy.text = "paid by "+expenseList[position].debitList.size+" people"
 
         var amountInLowerDenomination = expenseList[position].amount
         var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination/100).toDouble())

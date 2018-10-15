@@ -218,7 +218,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
                     iowe =0
                 }else if(myRemainingShare<0){
                     theyowe=0
-                    iowe = myRemainingShare
+                    iowe = Math.abs(myRemainingShare)
                 }
 
             }
