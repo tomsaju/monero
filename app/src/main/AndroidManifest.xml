@@ -54,7 +54,8 @@
         </service>
 
         <activity android:name=".splash.SplashActivity" />
-        <activity android:name=".expensedetail.ExpenseActivity"></activity>
+        <activity android:name=".expensedetail.ExpenseActivity"
+            android:theme="@style/MyAppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

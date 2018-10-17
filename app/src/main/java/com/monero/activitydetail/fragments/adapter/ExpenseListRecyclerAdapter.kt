@@ -1,12 +1,15 @@
 package com.monero.activitydetail.fragments.adapter
 
 import android.content.Context
+import android.content.Intent
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.monero.R
+import com.monero.expensedetail.ExpenseActivity
 import com.monero.models.Expense
 
 /**
@@ -41,6 +44,13 @@ class ExpenseListRecyclerAdapter(var expenseList:ArrayList<Expense>, var context
         var amountInLowerDenomination = expenseList[position].amount
         var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination/100).toDouble())
         holder.tvamountTv.text = amountInHigherDenomination
+
+        holder.parentLayout.setOnClickListener{
+            var intent: Intent = Intent(context,ExpenseActivity::class.java)
+            intent.putExtra("expenseid",expenseList[position].id)
+            context.startActivity(intent)
+        }
+
     }
 
 
@@ -48,6 +58,7 @@ class ExpenseListRecyclerAdapter(var expenseList:ArrayList<Expense>, var context
 
 class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
     // Holds the TextView that will add each animal to
+    var parentLayout = view.findViewById<CardView>(R.id.expense_list_item_parent)
     var tvtitle = view.findViewById<TextView>(R.id.expense_title_list_item)
     var tvpaidBy = view.findViewById<TextView>(R.id.paidBy_text_expense_list_item)
     var tvamountTv = view.findViewById<TextView>(R.id.amount_textview_expense_list_item)

@@ -2,6 +2,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/expense_list_item_parent"
     xmlns:cardview="http://schemas.android.com/apk/res-auto"
     cardview:cardBackgroundColor="#ffffff"
     cardview:cardUseCompatPadding="true"
