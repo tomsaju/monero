@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.widget.Button
+import android.widget.TableLayout
+import android.widget.TableRow
 import com.monero.R
 import com.monero.activitydetail.DetailViewPagerAdapter
 import com.monero.activitydetail.fragments.adapter.ExpenseListRecyclerAdapter
@@ -17,6 +20,9 @@ import com.monero.models.Expense
 import com.monero.models.Payment
 import com.monero.models.User
 import kotlinx.android.synthetic.main.activity_expense.*
+import android.widget.TextView
+
+
 
 class ExpenseActivity : AppCompatActivity(),IExpenseDetailView {
 var expenseId:String =""
@@ -24,7 +30,7 @@ lateinit var mPresenter:IExpenseDetailPresenter
 lateinit var mRecyclerView:RecyclerView
 lateinit var mAdapter:PayerRecyclerAdapter
 lateinit var toolbar:Toolbar
-
+lateinit var table:TableLayout
 
 
 
@@ -32,6 +38,7 @@ lateinit var toolbar:Toolbar
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense)
         toolbar = findViewById(R.id.toolbar_custom)
+        table = findViewById(R.id.table)
         setSupportActionBar(toolbar)
         getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
         getSupportActionBar()?.setDisplayShowHomeEnabled(true);
@@ -68,11 +75,33 @@ lateinit var toolbar:Toolbar
                 mAdapter = PayerRecyclerAdapter(paymentList)
                 detailPayRecyler.layoutManager = LinearLayoutManager(this@ExpenseActivity)
                 detailPayRecyler.adapter = mAdapter
+
+              setupTable(thisExpense)
             }
 
         });
 
 
 
+    }
+
+    private fun setupTable(thisExpense: Expense?) {
+
+
+        val rank = TextView(this)
+        rank.text = "RANK"
+        val percentage = TextView(this)
+        percentage.text = "PERCENTAGE"
+        val score = TextView(this)
+        score.text = "SCORE"
+
+        val rowHeader = TableRow(this)
+
+        rowHeader.addView(rank)  //Line 39
+        rowHeader.addView(percentage)
+        rowHeader.addView(score)
+
+
+        table.addView(rowHeader)
     }
 }
