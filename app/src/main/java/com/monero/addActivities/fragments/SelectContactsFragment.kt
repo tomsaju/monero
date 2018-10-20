@@ -252,9 +252,16 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
                         val displayName = cursor!!.getString(indexOfDisplayName)
                         val displayNumber = cursor!!.getString(indexOfDisplayNumber)
                         //haven't seen this number yet: do something with this contact!
-                        var contact  = Contact(0,displayName,"unknown",displayNumber,"unknoen","unknoen","unknown")
+                        var defaultId = displayNumber.replace("+","")
+                       var trimmed  = defaultId.replace("\\s".toRegex(), "")
+                        try {
+                            var intId = trimmed.toLong()
+                            var contact  = Contact(intId,displayName,"unknown",displayNumber,"unknoen",intId.toString(),"unknown")
 
-                        contactsList.add(contact)
+                            contactsList.add(contact)
+                        } catch (e: Exception) {
+                        e.printStackTrace()
+                        }
                     } else {
                         //don't do anything with this contact because we've already found this number
                     }

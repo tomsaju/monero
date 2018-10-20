@@ -1,26 +1,25 @@
 package com.monero.expensedetail
 
+import android.app.ActionBar
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
+import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.widget.Button
 import android.widget.TableLayout
 import android.widget.TableRow
 import com.monero.R
-import com.monero.activitydetail.DetailViewPagerAdapter
-import com.monero.activitydetail.fragments.adapter.ExpenseListRecyclerAdapter
 import com.monero.expensedetail.presenter.ExpenseDetailPresenter
 import com.monero.expensedetail.presenter.IExpenseDetailPresenter
 import com.monero.expensedetail.presenter.IExpenseDetailView
-import com.monero.models.Expense
-import com.monero.models.Payment
-import com.monero.models.User
 import kotlinx.android.synthetic.main.activity_expense.*
 import android.widget.TextView
+import com.monero.models.*
+import android.widget.LinearLayout
+
 
 
 
@@ -42,7 +41,7 @@ lateinit var table:TableLayout
         setSupportActionBar(toolbar)
         getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
         getSupportActionBar()?.setDisplayShowHomeEnabled(true);
-        getSupportActionBar()?.setTitle("")
+        getSupportActionBar()?.setTitle("Expense Detail")
         mPresenter = ExpenseDetailPresenter(this,this)
 
 
@@ -87,21 +86,71 @@ lateinit var table:TableLayout
 
     private fun setupTable(thisExpense: Expense?) {
 
+        var creditList = thisExpense?.creditList
+        var numberOfMembers =creditList?.size //assuming that the payer is also included in dividing th expense
+        var tabledata =  ArrayList<splitTableItem>()
+        var amountPaid = 0
+        if(creditList!=null) {
 
-        val rank = TextView(this)
-        rank.text = "RANK"
-        val percentage = TextView(this)
-        percentage.text = "PERCENTAGE"
-        val score = TextView(this)
-        score.text = "SCORE"
+            for (credit in creditList) {// assuming payer is part of this
+                amountPaid = 0
+                for(debit in thisExpense?.debitList!!){
+                    if(debit.user_id==credit.user_id){
+                        amountPaid = debit.amount
+                    }
+                }
+                var individualShare = credit.amount
+                tabledata.add(splitTableItem(credit.user_id, credit.userName, individualShare, amountPaid))
 
-        val rowHeader = TableRow(this)
+                }
+        }
+        val params = TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT)
+       // params.setMargins(15, 10, 10, 10)
 
-        rowHeader.addView(rank)  //Line 39
-        rowHeader.addView(percentage)
-        rowHeader.addView(score)
 
 
-        table.addView(rowHeader)
+        for(data in tabledata){
+            val name =TextView(this)
+            name.text =data.username+"    "
+            name.setPadding(18,10,10,10)
+            name.setTextColor(Color.BLACK)
+
+            val actualShare = TextView(this)
+            name.textSize = 18f
+
+            actualShare.text = getInHIgherDenomination(data.actualShare)
+            actualShare.textSize = 18f
+
+            val paidAmount = TextView(this)
+            paidAmount.text = getInHIgherDenomination(data.paidAMount)
+            paidAmount.textSize = 18f
+            val remaining = TextView(this)
+            var remainingAmount = data.actualShare - data.paidAMount
+            remaining.textSize = 18f
+
+            if(remainingAmount<0){
+                remaining.text = "0.00"
+            }else {
+                remaining.text = getInHIgherDenomination(data.actualShare - data.paidAMount)
+            }
+            val rowHeader = TableRow(this)
+            rowHeader.layoutParams = params
+            rowHeader.addView(name)
+            rowHeader.addView(actualShare)
+            rowHeader.addView(paidAmount)
+            rowHeader.addView(remaining)
+
+            table.addView(rowHeader)
+
+        }
+
+
+
     }
+
+  fun getInHIgherDenomination(amount:Int):String{
+      var amountInHigherDenomination = "%.2f".format((amount/100).toDouble())
+      return amountInHigherDenomination
+  }
+
 }

@@ -11,7 +11,7 @@ import com.monero.Dao.DBContract
 
 
 @Entity(tableName = DBContract.CONTACTS_TABLE.TABLE_NAME,indices = arrayOf(Index(value = "Contact_phone", unique = true)))
-data class Contact (@PrimaryKey(autoGenerate = true) val Contact_id:Int,
+data class Contact (@PrimaryKey val Contact_id:Long,
                     val Contact_name_local:String,
                     val Contact_name_public:String,
                     val Contact_phone:String,

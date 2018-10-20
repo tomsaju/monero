@@ -263,6 +263,22 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
     override fun onBackPressed() {
 
+        val count = fragmentManager.backStackEntryCount
+
+        if (count == 0) {
+            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+                super.onBackPressed()
+                finish()
+            } else {
+                "Press back button again to exit".shortToast(context)
+                mBackPressed = System.currentTimeMillis()
+
+            }
+
+        }else {
+            getFragmentManager().popBackStack();
+        }
+        /*try {
             var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")
 
             if (currentFragment is AddActivityFragment && currentFragment.isVisible) {
@@ -282,7 +298,10 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
                 }
 
             }
+        } catch (e: Exception) {
 
+
+        }*/
 
 
     }

@@ -253,7 +253,6 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
     }
 
-
     fun getContactView(contact: ContactMinimal):View{
         var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         var view:View = inflater?.inflate(R.layout.contact_list_item_layout,null,false)
@@ -268,6 +267,8 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         number.text = contact.phoneNumber
         return  view
     }
+
+
 
     fun ClosedRange<Int>.random() =
             Random().nextInt((endInclusive + 1) - start) +  start
