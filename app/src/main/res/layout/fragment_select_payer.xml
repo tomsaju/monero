@@ -4,11 +4,38 @@
     android:layout_height="match_parent"
 
     tools:context="com.monero.payeeSelector.fragment.SelectPayerFragment">
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
    <ListView
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
+       android:dividerHeight="1dp"
+       android:layout_marginLeft="10dp"
+       android:layout_marginRight="10dp"
+       android:divider="@android:color/darker_gray"
        android:id="@+id/userList"></ListView>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="2">
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/cancelBtn"
+        android:text="Cancel"/>
 
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:id="@+id/selectBtn"
+        android:text="SELECT"/>
+
+</LinearLayout>
+</LinearLayout>
 </FrameLayout>

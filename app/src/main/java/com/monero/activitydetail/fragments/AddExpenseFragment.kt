@@ -10,10 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
 
@@ -48,7 +45,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var currencySymbolTV: TextView
     lateinit var amountEditText:EditText
     lateinit var paidByTV:TextView
-    lateinit var splitTypeTv:TextView
+    lateinit var splitTypeTv: Spinner
     lateinit var discardButton:Button
     lateinit var saveButton:Button
     var amount:BigDecimal?=BigDecimal.ZERO
@@ -84,6 +81,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          if(currentlyWorkingActivity?.members!=null) {
              totalParticipantList = ArrayList(currentlyWorkingActivity?.members)
          }
+
 
          if(expenseId.isEmpty()){
              expenseId = System.currentTimeMillis().toString()
@@ -225,9 +223,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
         }else if(paidByTV.text.isEmpty()){
             return false
-        }else if(splitTypeTv.text.isEmpty()){
+        }/*else if(splitTypeTv.getse.isEmpty()){
             return false
-        }
+        }*/
 
         if(paidByTV.text.equals("me")){
             if(paidUsersList==null||paidUsersList.isEmpty()){

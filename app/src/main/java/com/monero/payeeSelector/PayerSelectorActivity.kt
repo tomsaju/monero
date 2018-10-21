@@ -117,6 +117,8 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         listParent.addView(getPayerListView(user))
         if(!payerList.containsKey(user)) {
             payerList.put(user, 0)
+        }else{
+            payerList.remove(user)
         }
     }
 
@@ -132,8 +134,10 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         return  view
     }
 
-    override fun onUserSelected(user: User) {
-        addUserToPayerList(user)
+    override fun onUserSelected(payerList:HashMap<User,Int>) {
+        for(user in payerList.keys) {
+            addUserToPayerList(user)
+        }
     }
 
     override fun getAllusers(): ArrayList<User> {
