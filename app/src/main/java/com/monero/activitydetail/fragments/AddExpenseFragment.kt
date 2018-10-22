@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
 
 import com.monero.R
+import com.monero.SplitTypeActivity
 import com.monero.activitydetail.presenter.expense.ExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentView
@@ -166,6 +167,18 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
          }
 
+         splitTypeTv.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+             override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                if(position==2){
+                    startActivity(Intent(requireActivity(),SplitTypeActivity::class.java))
+                }
+             }
+
+             override fun onNothingSelected(parentView: AdapterView<*>) {
+
+             }
+
+         }
 
         return view
     }

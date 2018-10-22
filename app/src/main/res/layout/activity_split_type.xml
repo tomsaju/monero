@@ -35,12 +35,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_margin="15dp"
+                android:background="@drawable/round_btn_selector"
+                android:id="@+id/type_select_btn_percentage"
                 android:text="Percentage"/>
             <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@drawable/round_btn_selector"
                 android:layout_margin="15dp"
+                android:id="@+id/type_select_btn_money"
                 android:text="Money"/>
         </LinearLayout>
         <View
