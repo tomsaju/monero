@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import kotlinx.android.synthetic.main.activity_split_type.*
 import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
@@ -23,13 +28,14 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
     var SPLIT_TYPE_PERCENTAGE = 1
     var SPLIT_TYPE_MONEY = 2
     var SPLIT_TYPE_EQUALLY = 2
-    var SPLIT_TYPE = SPLIT_TYPE_PERCENTAGE
+    var SPLIT_TYPE = SPLIT_TYPE_EQUALLY
     lateinit var adapter:SplitTypeRecyclerAdapter
     lateinit var mPresenter:ISplitTypePresenter
     var activityId:String = ""
     var selecteduserList: ArrayList<User> = ArrayList()
     var totalAmount:Int = 0
     var splitList:ArrayList<SplitItem> = ArrayList()
+    var selectedUsersId:ArrayList<String> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,10 +50,19 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
         if(SPLIT_TYPE==SPLIT_TYPE_EQUALLY){
             split_radio_equally.isChecked = true
+            //load the equal split arraylist
+            //diabel the add user button
+            add_user_split_btn.visibility = View.GONE
+            selectedUsersId.clear()
+
         }else if(SPLIT_TYPE==SPLIT_TYPE_PERCENTAGE){
             split_radio_percentage.isChecked = true
+            add_user_split_btn.visibility = View.VISIBLE
+            selectedUsersId.clear()
         }else{
            split_radio_amount.isChecked = true
+            add_user_split_btn.visibility = View.VISIBLE
+            selectedUsersId.clear()
         }
 
         mPresenter = SplitTypePresenter(this,this)
@@ -57,8 +72,39 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
             showAddDialog()
         }
 
+        split_type_radiogroup.setOnCheckedChangeListener(
+                RadioGroup.OnCheckedChangeListener { group, checkedId ->
+                    val radio: RadioButton = findViewById(checkedId)
+                    if(radio.text=="Equally") {
+                    add_user_split_btn.visibility = View.GONE
+                        showEqualList()
+                    }else{
+                        add_user_split_btn.visibility = View.VISIBLE
+                        hideEqualList()
+                    }
+    })
 
 
+
+
+    }
+
+    private fun hideEqualList() {
+        splitList.clear()
+        adapter.notifyDataSetChanged()
+    }
+
+
+    private fun showEqualList(){
+        for(user in selecteduserList){
+
+            var splitItem = SplitItem(((totalAmount)/selecteduserList.size),0.0,user)
+            splitList.add(splitItem)
+                // setList()
+        }
+
+        adapter = SplitTypeRecyclerAdapter(splitList,this,SPLIT_TYPE,totalAmount)
+        split_members_list.adapter = adapter
     }
 
     private fun showAddDialog() {
@@ -66,8 +112,9 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.add_split_item_dialog_layout, null)
         val minimalContactList = ArrayList<ContactMinimal>()
         for(user in selecteduserList){
-
-            minimalContactList.add(ContactMinimal(user.user_id,user.user_name,user.user_phone))
+            if(!selectedUsersId.contains(user.user_id)) {
+                minimalContactList.add(ContactMinimal(user.user_id, user.user_name, user.user_phone))
+            }
         }
         var sortedList = minimalContactList.sortedWith(compareBy({ it.name }))
 
@@ -76,6 +123,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
                 
                 mDialogView.user_name_autocomplete_tv.setText(contact.name)
                 selectedUserId = contact.contact_id
+                selectedUsersId.add(contact.contact_id)
             }
 
         })
@@ -111,7 +159,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
                 }
             }
 
-            adapter = SplitTypeRecyclerAdapter(splitList,this,SPLIT_TYPE)
+            adapter = SplitTypeRecyclerAdapter(splitList,this,SPLIT_TYPE,totalAmount)
             split_members_list.adapter = adapter
 
 
@@ -134,7 +182,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
                 splitList.add(item)
             }
 
-            adapter = SplitTypeRecyclerAdapter(splitList,this,SPLIT_TYPE)
+            adapter = SplitTypeRecyclerAdapter(splitList,this,SPLIT_TYPE,totalAmount)
             split_members_list.adapter = adapter
         }
     }
@@ -142,10 +190,32 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
     override fun onAllusersFetched(userList: ArrayList<User>) {
         selecteduserList = userList
+        if(SPLIT_TYPE==SPLIT_TYPE_EQUALLY){
+            showEqualList()
+        }
       //  setList()
     }
 
     override fun onContactSelected(contact: ContactMinimal) {
+
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.split_activity_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if(item?.itemId==R.id.split_done){
+            doneSplitting()
+
+        }
+        return true
+    }
+
+    private fun doneSplitting() {
 
     }
 }
