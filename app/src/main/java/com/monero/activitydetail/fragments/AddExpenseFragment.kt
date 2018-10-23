@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
 
 import com.monero.R
-import com.monero.SplitTypeActivity
+import com.monero.splittype.SplitTypeActivity
 import com.monero.activitydetail.presenter.expense.ExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentView
@@ -23,7 +23,6 @@ import com.monero.models.*
 import com.monero.payeeSelector.PayerSelectorActivity
 import kotlinx.android.synthetic.main.add_expense_payment_line.*
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -46,7 +45,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var currencySymbolTV: TextView
     lateinit var amountEditText:EditText
     lateinit var paidByTV:TextView
-    lateinit var splitTypeTv: Spinner
+    lateinit var splitTypeTv: TextView
     lateinit var discardButton:Button
     lateinit var saveButton:Button
     var amount:BigDecimal?=BigDecimal.ZERO
@@ -167,18 +166,24 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
          }
 
-         splitTypeTv.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-             override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-                if(position==2){
-                    startActivity(Intent(requireActivity(),SplitTypeActivity::class.java))
-                }
-             }
+       splitTypeTv.setOnClickListener {
 
-             override fun onNothingSelected(parentView: AdapterView<*>) {
+           if(amountEditText.text.toString().isEmpty()||amountEditText.text.toString().isBlank()){
+               Toast.makeText(requireContext(),"Please specify total amount first",Toast.LENGTH_SHORT).show()
+           }else {
 
-             }
+               amountSpend = (amount_edittext_add_expense.text.toString().toDouble() * 100).toInt()
+               if (amountSpend == null || amountSpend == 0) {
+                   Toast.makeText(requireContext(), "Please specify total amount first", Toast.LENGTH_SHORT).show()
 
-         }
+               } else {
+                   var sIntent = Intent(requireContext(), SplitTypeActivity::class.java)
+                   sIntent.putExtra("activityId", activityId)
+                   sIntent.putExtra("total", amountSpend)
+                   startActivity(sIntent)
+               }
+           }
+       }
 
         return view
     }

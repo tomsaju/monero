@@ -57,7 +57,7 @@
         <activity
             android:name=".expensedetail.ExpenseActivity"
             android:theme="@style/MyAppTheme.NoActionBar" />
-        <activity android:name=".SplitTypeActivity"></activity>
+        <activity android:name=".splittype.SplitTypeActivity"></activity>
     </application>
 
 </manifest>

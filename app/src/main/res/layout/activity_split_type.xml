@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.monero.SplitTypeActivity">
+    tools:context="com.monero.splittype.SplitTypeActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,28 +24,35 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="2"
+            android:weightSum="3"
             android:layout_below="@id/split_using_tv"
             android:layout_centerVertical="true"
             android:id="@+id/type_select_parent"
+            android:layout_marginLeft="15dp"
             android:orientation="horizontal">
 
-            <Button
-                android:layout_width="0dp"
+            <RadioGroup
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="15dp"
-                android:background="@drawable/round_btn_selector"
-                android:id="@+id/type_select_btn_percentage"
-                android:text="Percentage"/>
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/round_btn_selector"
-                android:layout_margin="15dp"
-                android:id="@+id/type_select_btn_money"
-                android:text="Money"/>
+                android:id="@+id/split_type_radiogroup">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/split_radio_equally"
+                    android:text="Equally"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/split_radio_percentage"
+                    android:text="Percentage"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/split_radio_amount"
+                    android:text="Amount"/>
+
+            </RadioGroup>
+
         </LinearLayout>
         <View
             android:layout_width="match_parent"
@@ -58,6 +65,13 @@
             android:layout_below="@id/type_select_parent">
         </View>
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add User to Split"
+            android:layout_below="@id/divider"
+            android:id="@+id/add_user_split_btn"/>
+
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,7 +79,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             tools:listitem="@layout/split_type_list_item_layout"
-            android:layout_below="@+id/divider"></android.support.v7.widget.RecyclerView>
+            android:layout_below="@+id/add_user_split_btn"></android.support.v7.widget.RecyclerView>
     </RelativeLayout>
 
 </ScrollView>

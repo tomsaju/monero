@@ -1,6 +1,7 @@
 package com.monero.addActivities.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +17,11 @@ class ContactListAdapter:BaseAdapter, Filterable {
 
     var contactList:List<ContactMinimal>;
     var context:Context?=null;
-    var parent:SelectContactsFragment
+    var parent:IContactSelectedListener
     lateinit var orig: List<ContactMinimal>
 
 
-    constructor(context: Context, contactList: List<ContactMinimal>, parent: SelectContactsFragment){
+    constructor(context: Context, contactList: List<ContactMinimal>, parent: IContactSelectedListener){
         this.context = context
         this.contactList = contactList
         this.parent = parent
@@ -68,27 +69,34 @@ class ContactListAdapter:BaseAdapter, Filterable {
                 if (orig == null) {
                     orig = contactList
                 }
-                if (constraint != null) {
-                    if (orig != null && orig.isNotEmpty()) {
-                        for (g in orig) {
-                            if (g.name.toLowerCase().contains(constraint.toString()))
-                                results.add(g)
+                synchronized (oReturn) {
+                    if (constraint != null&&constraint.isNotEmpty()) {
+                        if (orig != null && orig.isNotEmpty()) {
+                            for (g in orig) {
+                                if (g.name.toLowerCase().contains(constraint.toString()))
+                                    results.add(g)
+                            }
                         }
+                        oReturn.values = results
+                        oReturn.count = results.size
+                    }else{
+                    Log.d("danger","reached no items")
+                        oReturn.values = ArrayList<ContactMinimal>()
+                        oReturn.count = 0
                     }
-                    oReturn.values = results
-                    oReturn.count = results.size
+                    return oReturn
                 }
-                return oReturn
+
             }
 
             override fun publishResults(constraint: CharSequence,
                                          results: FilterResults) {
-                if(results.count>0) {
+                if(results!=null&&results.count>0) {
                     contactList = results!!.values as ArrayList<ContactMinimal>
                     notifyDataSetChanged()
                 }else{
-                    contactList = emptyList()
-                    notifyDataSetChanged()
+                    //contactList = emptyList()
+                    notifyDataSetInvalidated()
                 }
             }
         }

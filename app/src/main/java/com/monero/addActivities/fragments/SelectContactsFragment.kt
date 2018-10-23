@@ -21,6 +21,7 @@ import com.monero.addActivities.adapter.ContactListAdapter
 import com.monero.models.ContactMinimal
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import com.monero.Views.CircularProfileImage
+import com.monero.addActivities.adapter.IContactSelectedListener
 import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.getAppDatabase
 import com.monero.models.ActivitiesMinimal
@@ -37,7 +38,7 @@ import kotlin.collections.ArrayList
 /**
  * Created by tom.saju on 3/13/2018.
  */
-class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener {
+class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener,IContactSelectedListener {
 
 
     var contactsListView:ListView?=null
@@ -162,11 +163,11 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
         var sortedList = contactsList.sortedWith(compareBy({ it.name }))
 
-        val contactsAdapter:ContactListAdapter = ContactListAdapter(requireContext(),sortedList,this)
+        val contactsAdapter = ContactListAdapter(requireContext(),sortedList,this)
         contactsListView?.adapter = contactsAdapter
     }
 
-     fun onContactSelected(contact: ContactMinimal) {
+    override fun onContactSelected(contact: ContactMinimal) {
          var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), contact.name, true, contact.phoneNumber + " id ")
          profileImage.setProfileImageListener { this@SelectContactsFragment as CircularProfileImage.ICircularProfileImageListener }
          selectedContactList?.add(contact)
