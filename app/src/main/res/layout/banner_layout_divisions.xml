@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/detail_page_gradient"
     android:paddingBottom="4dp">
 <RelativeLayout
@@ -21,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="$2,4678.00"
+        android:text="$0.00"
         android:textSize="30sp"
         android:layout_below="@id/total_expense_title"
         android:id="@+id/total_expense_value"
@@ -55,7 +56,7 @@
               android:layout_gravity="center"
               android:textSize="18sp"
               android:id="@+id/my_expenses_value"
-              android:text="$2765.00"/>
+              android:text="$0.00"/>
       </LinearLayout>
         <View
             android:layout_width="1dp"
@@ -83,7 +84,7 @@
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:id="@+id/you_owe_value"
-                android:text="$2765.00"/>
+                android:text="$0.00"/>
         </LinearLayout>
 
         <View
@@ -113,7 +114,7 @@
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:id="@+id/they_owe_value"
-                android:text="$2765.00"/>
+                android:text="$0.00"/>
         </LinearLayout>
 
         

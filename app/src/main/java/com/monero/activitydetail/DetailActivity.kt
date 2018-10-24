@@ -32,6 +32,7 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.activitydetail.banner.BannerViewPager
 import com.monero.models.*
+import com.monero.utility.Utility
 
 
 class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteractionListener,IDetailView ,ExpenseListFragment.OnExpenseListFragmentInteractionListener,StatsFragment.StatsFragmentListener {
@@ -224,7 +225,12 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
 
             }
 
-            bannerItem = BannerItem(sum.toString(),ispent.toString(),iowe.toString(),theyowe.toString())
+            var sumHigher =  Utility.getInHigherDenimonation(sum);
+            var ispentHigher =  Utility.getInHigherDenimonation(ispent);
+            var ioweHigher =  Utility.getInHigherDenimonation(iowe);
+            var theyoweHigher =  Utility.getInHigherDenimonation(theyowe);
+
+            bannerItem = BannerItem(sumHigher,ispentHigher,ioweHigher,theyoweHigher)
             bannerAdapter = BannerViewPager(this,bannerItem)
             bannerViewPager.adapter = bannerAdapter
 
