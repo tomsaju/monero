@@ -39,7 +39,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     val SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME =1
     val SPLIT_AMONG_CUSTOM =2
     var REQUEST_CODE_PAYER_SELECTION = 3
-
+    val customSplitRequest: Int = 9
     private var mListener: OnFragmentInteractionListener? = null
     lateinit var title:AutoCompleteTextView
     lateinit var currencySymbolTV: TextView
@@ -64,7 +64,8 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     var myuser:User = User()
 
 
-     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
              // Inflate the layout for this fragment
          var view:View = inflater!!.inflate(R.layout.add_expense_layout, container, false)
@@ -180,7 +181,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                    var sIntent = Intent(requireContext(), SplitTypeActivity::class.java)
                    sIntent.putExtra("activityId", activityId)
                    sIntent.putExtra("total", amountSpend)
-                   startActivity(sIntent)
+                   startActivityForResult(sIntent,customSplitRequest)
                }
            }
        }
@@ -202,6 +203,8 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             for(user in totalParticipantList){
                 splitPaymentList.put(user, amountOwed)
             }
+        }else if(splitType == SPLIT_AMONG_CUSTOM){
+
         }
 
 
@@ -286,6 +289,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             }
 
            paidByTV.setText("${paidUsersList.size} people")
+        }else if(requestCode == customSplitRequest&& data != null){
+            //get the credit lsit from splitactivity
+            //it might be parcelable
         }
     }
 
