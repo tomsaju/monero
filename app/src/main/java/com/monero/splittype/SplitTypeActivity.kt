@@ -73,7 +73,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
         val contactsAdapter: ContactListAdapter = ContactListAdapter(this,sortedList,object:IContactSelectedListener{
             override fun onContactSelected(contact: ContactMinimal) {
-                
+
                 mDialogView.user_name_autocomplete_tv.setText(contact.name)
                 selectedUserId = contact.contact_id
             }
