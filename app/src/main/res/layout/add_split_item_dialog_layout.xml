@@ -8,6 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#000000"
         android:text="Name:"/>
 
     <AutoCompleteTextView
@@ -21,14 +22,21 @@
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:id="@+id/amount_tv"
+        android:textColor="#000000"
         android:text="Amount:"/>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/amount_edittext_add_split"
+        android:inputType="number"
         android:hint="Enter amount"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/remaining_indicator_tv"
+        android:text="Remaining :  50 %"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

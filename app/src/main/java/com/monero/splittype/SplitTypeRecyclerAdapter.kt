@@ -25,7 +25,7 @@ class SplitTypeRecyclerAdapter(var splitList:ArrayList<SplitItem>,var context: C
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.username.setText(splitList[position].user.user_name)
         if(splitType==SPLIT_TYPE_EQUALLY) {
-            var amounttospend = totalAmount/splitList.size
+            var amounttospend = splitList[position].amount
             var amountInHigherDenomination = "%.2f".format((amounttospend/100).toDouble())
             holder.amount.text = "$"+amountInHigherDenomination
             holder.delete.visibility ==View.INVISIBLE
@@ -40,9 +40,20 @@ class SplitTypeRecyclerAdapter(var splitList:ArrayList<SplitItem>,var context: C
 
         holder.delete.setOnClickListener {
             splitList.remove(splitList[position])
+            refreshSplitList()
             notifyDataSetChanged()
         }
 
+    }
+
+    private fun refreshSplitList() {
+        if(splitType==SPLIT_TYPE_EQUALLY) {
+            var amounttospend = totalAmount/splitList.size
+            var amountInHigherDenomination = "%.2f".format((amounttospend/100).toDouble())
+            for(item in splitList){
+                item.amount = amounttospend
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,6 +62,10 @@ class SplitTypeRecyclerAdapter(var splitList:ArrayList<SplitItem>,var context: C
 
     override fun getItemCount(): Int {
       return splitList.size
+    }
+
+     fun getCurrentList():ArrayList<SplitItem>{
+        return splitList
     }
 }
 

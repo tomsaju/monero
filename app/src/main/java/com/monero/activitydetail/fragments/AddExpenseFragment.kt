@@ -191,7 +191,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
     private fun splitCredits(splitType: Int) {
 
-        if(splitType===SPLIT_EQUALLY_AMONG_ALL){
+      /*  if(splitType===SPLIT_EQUALLY_AMONG_ALL){
            var amountOwed =  (amountSpend/totalParticipantList.size)
 
             for(user in totalParticipantList){
@@ -205,8 +205,15 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             }
         }else if(splitType == SPLIT_AMONG_CUSTOM){
 
-        }
+        }*/
 
+        if(splitPaymentList==null||splitPaymentList.isEmpty()){
+            var amountOwed =  (amountSpend/totalParticipantList.size)
+
+            for(user in totalParticipantList){
+                splitPaymentList.put(user,amountOwed)
+            }
+        }
 
     }
 
@@ -250,7 +257,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
         if(paidByTV.text.equals("me")){
             if(paidUsersList==null||paidUsersList.isEmpty()){
-                paidUsersList.put(myuser,amountEditText.text.toString().toInt())
+                paidUsersList.put(myuser,(amount_edittext_add_expense.text.toString().toDouble()*100).toInt())
             }
             //return false
         }
@@ -292,6 +299,9 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
         }else if(requestCode == customSplitRequest&& data != null){
             //get the credit lsit from splitactivity
             //it might be parcelable
+            "owedList"
+            splitPaymentList = data.getSerializableExtra("owedList") as HashMap<User, Int>
+
         }
     }
 

@@ -168,6 +168,22 @@ class StatsPresenter:IStatsPresenter {
 
 
             }
+            for(payer in totalPaidList){
+                var paymentByThisUser = totalPaidList.get(payer.key)
+                if(paymentByThisUser==null){
+                    amountPaid =0
+                }else{
+                    if(map.get(payer.key)!=null) {
+                        amountPaid = map[payer.key]!!.plus(paymentByThisUser)
+                    }else{
+                        amountPaid = paymentByThisUser
+                        map.put(payer.key,amountPaid)
+                    }
+                }
+
+            }
+
+
            // FindPath.findPath(map)
               rawtransactionList.clear()
               safetyCounter = 0

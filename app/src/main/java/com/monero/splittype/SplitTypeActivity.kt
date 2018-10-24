@@ -1,5 +1,6 @@
 package com.monero.splittype
 
+import android.app.Activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -10,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_split_type.*
 import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
@@ -21,6 +23,7 @@ import com.monero.splittype.presenter.ISplitTypePresenter
 import com.monero.splittype.presenter.ISplitTypeView
 import com.monero.splittype.presenter.SplitTypePresenter
 import kotlinx.android.synthetic.main.add_split_item_dialog_layout.view.*
+import kotlinx.android.synthetic.main.user_selection_list_item_layout.view.*
 
 
 class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedListener {
@@ -36,6 +39,8 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
     var totalAmount:Int = 0
     var splitList:ArrayList<SplitItem> = ArrayList()
     var selectedUsersId:ArrayList<String> = ArrayList()
+    lateinit var splitPaymentList:HashMap<User,Int>//<each user,amount owed>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,9 +81,15 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
                 RadioGroup.OnCheckedChangeListener { group, checkedId ->
                     val radio: RadioButton = findViewById(checkedId)
                     if(radio.text=="Equally") {
-                    add_user_split_btn.visibility = View.GONE
+                        SPLIT_TYPE = SPLIT_TYPE_EQUALLY
+                        add_user_split_btn.visibility = View.GONE
                         showEqualList()
-                    }else{
+                    }else if(radio.text=="Percentage"){
+                        SPLIT_TYPE = SPLIT_TYPE_PERCENTAGE
+                        add_user_split_btn.visibility = View.VISIBLE
+                        hideEqualList()
+                    }else if(radio.text=="Amount"){
+                        SPLIT_TYPE = SPLIT_TYPE_MONEY
                         add_user_split_btn.visibility = View.VISIBLE
                         hideEqualList()
                     }
@@ -109,6 +120,31 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
     private fun showAddDialog() {
         var selectedUserId =""
+        var remaining=0.0
+        var currentSum=0.0
+        if(splitList!=null&&!splitList.isEmpty()){
+            for (item in splitList) {
+                if (SPLIT_TYPE == SPLIT_TYPE_MONEY) {
+                    currentSum += item.amount
+                } else if (SPLIT_TYPE == SPLIT_TYPE_PERCENTAGE) {
+                    currentSum +=item.percentage
+                }
+            }
+
+            if (SPLIT_TYPE == SPLIT_TYPE_MONEY) {
+                remaining = totalAmount-currentSum
+            } else if (SPLIT_TYPE == SPLIT_TYPE_PERCENTAGE) {
+                remaining = 100-currentSum
+            }
+
+        }else{
+            if (SPLIT_TYPE == SPLIT_TYPE_MONEY) {
+                remaining = totalAmount.toDouble()
+            } else if (SPLIT_TYPE == SPLIT_TYPE_PERCENTAGE) {
+                remaining = 100.0
+            }
+        }
+
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.add_split_item_dialog_layout, null)
         val minimalContactList = ArrayList<ContactMinimal>()
         for(user in selecteduserList){
@@ -138,6 +174,16 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
         //show dialog
         mDialogView.user_name_autocomplete_tv.setAdapter(contactsAdapter)
         mDialogView.user_name_autocomplete_tv.threshold =1
+        if (SPLIT_TYPE == SPLIT_TYPE_MONEY) {
+            var amountInHigherDenomination = "%.2f".format((remaining/100))
+            mDialogView.remaining_indicator_tv.text = "Remaining:"+"$"+amountInHigherDenomination
+        } else if (SPLIT_TYPE == SPLIT_TYPE_PERCENTAGE) {
+            mDialogView.remaining_indicator_tv.text = "Remaining:"+remaining+"%"
+        }
+
+        mDialogView.remaining_indicator_tv.setOnClickListener {
+            mDialogView.amount_edittext_add_split.setText(remaining.toString())
+        }
 
         val  mAlertDialog = mBuilder.show()
         //login button click of custom layout
@@ -153,8 +199,15 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
             for(user in selecteduserList){
                 if(user.user_id ==selectedUserId){
-                    var splitItem = SplitItem((amount.toDouble()*100).toInt(),0.0,user)
-                    splitList.add(splitItem)
+                    if (SPLIT_TYPE == SPLIT_TYPE_MONEY) {
+                        var splitItem = SplitItem((amount.toDouble()*100).toInt(),0.0,user)
+                        splitList.add(splitItem)
+                    } else if (SPLIT_TYPE == SPLIT_TYPE_PERCENTAGE) {
+                        var amountOfPercentage = (totalAmount*amount.toDouble())/100
+                        var splitItem = SplitItem(amountOfPercentage.toInt(),amount.toDouble(),user)
+                        splitList.add(splitItem)
+                    }
+
                    // setList()
                 }
             }
@@ -209,13 +262,57 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if(item?.itemId==R.id.split_done){
-            doneSplitting()
+            doSplitting()
 
         }
         return true
     }
 
-    private fun doneSplitting() {
+    private fun doSplitting() {
 
+        splitList = adapter.getCurrentList()
+
+        splitPaymentList = HashMap()
+        if(SPLIT_TYPE==SPLIT_TYPE_PERCENTAGE){
+            for (item in splitList) {
+                var amountOwed = (totalAmount*item.percentage)/100
+                splitPaymentList.put(item.user, amountOwed.toInt())
+            }
+
+        }else {
+            for (item in splitList) {
+                splitPaymentList.put(item.user, item.amount)
+            }
+        }
+
+        if(valuesAddUp()) {
+            intent.putExtra("owedList", splitPaymentList)
+            setResult(Activity.RESULT_OK, intent)
+            finish()
+        }
     }
+
+    private fun valuesAddUp(): Boolean {
+        var sum=0
+        if(SPLIT_TYPE==SPLIT_TYPE_PERCENTAGE){
+            for (item in splitList) {
+                var amountOwed = (totalAmount*item.percentage)/100
+                sum+=amountOwed.toInt()
+            }
+
+        }else {
+            for (item in splitList) {
+                sum+=item.amount
+            }
+        }
+
+        if(sum>=totalAmount-1){
+            return true
+        }else{
+            Toast.makeText(this,"Values remaining",Toast.LENGTH_SHORT).show()
+            return false
+        }
+    }
+
+
 }
