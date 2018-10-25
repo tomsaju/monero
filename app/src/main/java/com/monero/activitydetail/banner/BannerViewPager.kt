@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.models.BannerItem
+import com.monero.utility.Utility
 
 /**
  * Created by Dreamz on 13-10-2018.
@@ -31,17 +33,23 @@ class BannerViewPager(var mContext:Context,var bannerItem:BannerItem): PagerAdap
 
 
     override fun instantiateItem(collection: ViewGroup, position:Int): View {
-        var customPagerEnum:BannerPagerEnum = BannerPagerEnum.values()[position];
+
+
+        var customPagerEnum:BannerPagerEnum = BannerPagerEnum.values()[position]
         var inflater = LayoutInflater.from(mContext);
         var layout =  inflater.inflate(customPagerEnum.getLayoutResId(), collection, false) as ViewGroup;
         var totalTv = layout.findViewById<TextView>(R.id.total_expense_value)
         var myExpenseValue = layout.findViewById<TextView>(R.id.my_expenses_value)
         var youoweValue = layout.findViewById<TextView>(R.id.you_owe_value)
         var theyOweValue = layout.findViewById<TextView>(R.id.they_owe_value)
-        totalTv.text = bannerItem.total
-        myExpenseValue.text = bannerItem.iSpend
-        youoweValue.text = bannerItem.iOwe
-        theyOweValue.text = bannerItem.theyOwe
+
+
+        var prefix = Utility.getCurrencySymbol()
+
+        totalTv.text = prefix + bannerItem.total
+        myExpenseValue.text = prefix+ bannerItem.iSpend
+        youoweValue.text =prefix+ bannerItem.iOwe
+        theyOweValue.text =prefix+ bannerItem.theyOwe
 
         collection.addView(layout);
         return layout;

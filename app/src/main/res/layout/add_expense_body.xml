@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:textColor="#4f5c72"
         android:textSize="18sp"
+        android:visibility="gone"
         android:text="Payments:"/>
 
     </RelativeLayout>
@@ -41,7 +42,7 @@
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:orientation="vertical"
-           android:layout_marginTop="10dp"
+           android:layout_marginTop="0dp"
            android:id="@+id/payment_section_expenses">
 
            <include layout="@layout/add_expense_payment_line"></include>

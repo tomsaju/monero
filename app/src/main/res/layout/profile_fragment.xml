@@ -44,6 +44,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#000000"
                     android:textSize="20sp"
+                    android:layout_marginTop="5dp"
                     android:layout_centerHorizontal="true"
                     android:text="Peter Mckinnon" />
 
@@ -54,7 +55,7 @@
                     android:alpha="0.7"
                     android:layout_centerHorizontal="true"
                     android:textColor="#000000"
-                    android:text="+91 904 8576 020" />
+                    android:id="@+id/text_phone_number" />
 )
             </RelativeLayout>
 
@@ -63,7 +64,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:orientation="vertical">
@@ -80,6 +81,7 @@
             android:layout_height="wrap_content"
             android:text="+91 9048576020"
             android:textColor="#000000"
+            android:id="@+id/user_phone_tv"
             android:textSize="16sp"/>
         <View
             android:layout_width="match_parent"
@@ -100,6 +102,7 @@
             android:layout_height="wrap_content"
             android:text="petermckinnon@toronto.com"
             android:textColor="#000000"
+            android:id="@+id/user_email_tv"
             android:textSize="16sp"/>
         <View
             android:layout_width="match_parent"
@@ -120,6 +123,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/select_currency_row"
             android:layout_marginTop="10dp">
             <ImageView
                 android:layout_width="wrap_content"
@@ -138,9 +142,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Currency"
+                android:text="Currency "
                 android:textColor="#000000"
-
+                android:id="@+id/select_currency_row_title"
                 android:textSize="14sp"/>
             <TextView
                 android:layout_width="wrap_content"
@@ -148,6 +152,7 @@
                 android:text="Select your currency"
                 android:textColor="#000000"
                 android:alpha="0.7"
+                android:id="@+id/select_currency_row_subtitle"
                 android:textSize="12sp"/>
             </LinearLayout>
 

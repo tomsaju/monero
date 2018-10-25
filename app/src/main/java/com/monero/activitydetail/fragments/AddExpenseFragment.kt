@@ -21,6 +21,7 @@ import com.monero.activitydetail.presenter.expense.IExpenseFragmentPresenter
 import com.monero.activitydetail.presenter.expense.IExpenseFragmentView
 import com.monero.models.*
 import com.monero.payeeSelector.PayerSelectorActivity
+import com.monero.utility.Utility
 import kotlinx.android.synthetic.main.add_expense_payment_line.*
 import java.math.BigDecimal
 import java.util.*
@@ -78,6 +79,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          discardButton = view.findViewById(R.id.discard_btn_add_expense)
          mExpenseFragmentPresenter = ExpenseFragmentPresenter(requireContext(),this)
          currentlyWorkingActivity = mListener?.getcurrentWorkingActivity()
+
+
+        currencySymbolTV.text = Utility.getCurrencySymbol()
+
          Log.d(TAG,"currentlyworkingact "+currentlyWorkingActivity?.title)
          if(currentlyWorkingActivity?.members!=null) {
              totalParticipantList = ArrayList(currentlyWorkingActivity?.members)
@@ -255,7 +260,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             return false
         }*/
 
-        if(paidByTV.text.equals("me")){
+        if(paidByTV.text.equals("you")){
             if(paidUsersList==null||paidUsersList.isEmpty()){
                 paidUsersList.put(myuser,(amount_edittext_add_expense.text.toString().toDouble()*100).toInt())
             }
@@ -295,7 +300,15 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                 amountEditText?.setText(amountinHigerDenomination.toString())
             }
 
-           paidByTV.setText("${paidUsersList.size} people")
+            if(paidUsersList.size==1){
+                var entry = paidUsersList.entries.iterator().next()
+                if(entry.key.user_id==auth.currentUser?.uid){
+                    paidByTV.setText("you")
+                }else{
+                    paidByTV.setText(entry.key.user_name)
+                }
+            }
+
         }else if(requestCode == customSplitRequest&& data != null){
             //get the credit lsit from splitactivity
             //it might be parcelable

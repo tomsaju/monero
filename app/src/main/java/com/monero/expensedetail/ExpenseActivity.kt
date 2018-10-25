@@ -19,8 +19,7 @@ import kotlinx.android.synthetic.main.activity_expense.*
 import android.widget.TextView
 import com.monero.models.*
 import android.widget.LinearLayout
-
-
+import com.monero.utility.Utility
 
 
 class ExpenseActivity : AppCompatActivity(),IExpenseDetailView {
@@ -64,7 +63,7 @@ lateinit var table:TableLayout
                 expense_Title_detailpage.text = thisExpense?.title
                 var amountInLowerDenomination = thisExpense?.amount
                 var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination!!/100).toDouble())
-                expense_Amount_detail_page.text = amountInHigherDenomination
+                expense_Amount_detail_page.text = Utility.getCurrencySymbol()+ amountInHigherDenomination
                 var paymentList:ArrayList<Payment> = ArrayList()
                 if(thisExpense?.debitList!=null) {
                     for (debit in thisExpense.debitList) {
@@ -118,20 +117,20 @@ lateinit var table:TableLayout
             val actualShare = TextView(this)
             name.textSize = 18f
 
-            actualShare.text = getInHIgherDenomination(data.actualShare)
+            actualShare.text =Utility.getCurrencySymbol()+ getInHIgherDenomination(data.actualShare)
             actualShare.textSize = 18f
 
             val paidAmount = TextView(this)
-            paidAmount.text = getInHIgherDenomination(data.paidAMount)
+            paidAmount.text =Utility.getCurrencySymbol()+ getInHIgherDenomination(data.paidAMount)
             paidAmount.textSize = 18f
             val remaining = TextView(this)
             var remainingAmount = data.actualShare - data.paidAMount
             remaining.textSize = 18f
 
             if(remainingAmount<0){
-                remaining.text = "0.00"
+                remaining.text =Utility.getCurrencySymbol()+ "0.00"
             }else {
-                remaining.text = getInHIgherDenomination(data.actualShare - data.paidAMount)
+                remaining.text =Utility.getCurrencySymbol()+ getInHIgherDenomination(data.actualShare - data.paidAMount)
             }
             val rowHeader = TableRow(this)
             rowHeader.layoutParams = params

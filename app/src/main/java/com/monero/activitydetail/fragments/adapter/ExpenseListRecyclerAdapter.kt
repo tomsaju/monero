@@ -11,6 +11,7 @@ import android.widget.TextView
 import com.monero.R
 import com.monero.expensedetail.ExpenseActivity
 import com.monero.models.Expense
+import com.monero.utility.Utility
 
 /**
  * Created by tom.saju on 10/10/2018.
@@ -43,7 +44,7 @@ class ExpenseListRecyclerAdapter(var expenseList:ArrayList<Expense>, var context
 
         var amountInLowerDenomination = expenseList[position].amount
         var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination/100).toDouble())
-        holder.tvamountTv.text = amountInHigherDenomination
+        holder.tvamountTv.text = Utility.getCurrencySymbol()+amountInHigherDenomination
 
         holder.parentLayout.setOnClickListener{
             var intent: Intent = Intent(context,ExpenseActivity::class.java)

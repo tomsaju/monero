@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.monero.R
 import com.monero.models.Payment
+import com.monero.utility.Utility
 
 /**
  * Created by Dreamz on 16-10-2018.
@@ -24,7 +25,7 @@ class PayerRecyclerAdapter(var payerList:ArrayList<Payment>):RecyclerView.Adapte
 
         var amountInHigherDenomination = "%.2f".format((amountInLowerDenomination/100).toDouble())
 
-        holder.amount.text =  amountInHigherDenomination
+        holder.amount.text =  Utility.getCurrencySymbol()+amountInHigherDenomination
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): payerRecylerViewHolder {

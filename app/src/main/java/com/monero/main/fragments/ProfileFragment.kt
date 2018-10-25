@@ -2,8 +2,10 @@ package com.monero.main.fragments
 
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.preference.PreferenceFragment
 import android.provider.MediaStore
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -14,6 +16,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -25,7 +28,11 @@ import java.io.IOException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.FirebaseStorage
 import com.monero.Application.ApplicationController
+import com.monero.helper.PreferenceManager
+import com.mynameismidori.currencypicker.CurrencyPicker
+import com.mynameismidori.currencypicker.CurrencyPickerListener
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 
 /**
@@ -40,6 +47,24 @@ class ProfileFragment:Fragment() {
     var storage: FirebaseStorage? = null
     var storageReference: StorageReference? = null
     var myImageReference:StorageReference? = null
+    lateinit var currencySelectionMenuItem:RelativeLayout
+    lateinit var currencySubtitle:TextView
+    lateinit var userName:TextView
+    lateinit var userEmail:TextView
+    lateinit var userPhone:TextView
+
+    var prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+        if(key == ApplicationController.preferenceManager?.PREFERRED_CURRENCY_CODE ||
+                key == ApplicationController.preferenceManager?.PREFERRED_CURRENCY_NAME ||
+                key == ApplicationController.preferenceManager?.PREFERRED_CURRENCY_SYMBOL){
+
+            if(currencySubtitle!=null) {
+                currencySubtitle.text=ApplicationController.preferenceManager?.preferredCurrencyName
+            }
+
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +74,9 @@ class ProfileFragment:Fragment() {
             storageReference = firebaseStorage?.getReference();
         }
 
-        // Create a reference to 'images/mountains.jpg'
+         // Create a reference to 'images/mountains.jpg'
          myImageReference = storageReference?.child("displayImages/"+auth.currentUser?.uid+".jpg")
-
+         ApplicationController.preferenceManager?.prefs?.registerOnSharedPreferenceChangeListener(prefListener)
 
 
     }
@@ -60,12 +85,37 @@ class ProfileFragment:Fragment() {
         var rootView = inflater?.inflate(R.layout.profile_fragment,container,false)
         //var name:TextView = rootView?.findViewById<TextView>(R.id.username_display) as TextView
          profileImageview = rootView.findViewById<CircleImageView>(R.id.profileImage)
+         currencySelectionMenuItem = rootView.findViewById<RelativeLayout>(R.id.select_currency_row)
+         currencySubtitle = rootView.findViewById(R.id.select_currency_row_subtitle)
+         userName = rootView.findViewById(R.id.text_name)
+         userEmail = rootView.findViewById(R.id.user_email_tv)
+         userPhone = rootView.findViewById(R.id.user_phone_tv)
+
          var displayPhoto = ApplicationController.preferenceManager!!.myDisplayPicture
         if(displayPhoto!=null&&displayPhoto.isNotEmpty()) {
             Glide.with(this).load(displayPhoto).into(profileImageview);
         }
+
+        if(auth?.currentUser!=null){
+            userName.text=auth?.currentUser?.displayName
+            userPhone.text = auth?.currentUser?.phoneNumber
+            if(!auth?.currentUser?.email.isNullOrEmpty()){
+                userEmail.text = auth?.currentUser?.email
+            }else{
+                userEmail.text = "Not available"
+            }
+        }
+
+        if(currencySubtitle!=null) {
+            currencySubtitle.text=ApplicationController.preferenceManager?.preferredCurrencyName
+        }
+
         profileImageview.setOnClickListener { _:View->
             showImagePopup()
+        }
+
+        currencySelectionMenuItem.setOnClickListener {
+            showCurrencySelectDialog()
         }
 
         if(auth.currentUser!=null){
@@ -74,6 +124,19 @@ class ProfileFragment:Fragment() {
           //  name.text = "No users signed in"
         }
         return rootView
+    }
+
+    private fun showCurrencySelectDialog() {
+        var picker:CurrencyPicker = CurrencyPicker.newInstance("Select Currency")  // dialog title
+        picker.setListener({ name, code, symbol, flagDrawableResID ->
+
+            ApplicationController.preferenceManager?.preferredCurrencyCode = code
+            ApplicationController.preferenceManager?.preferredCurrencySymbol = symbol
+            ApplicationController.preferenceManager?.preferredCurrencyName = name
+
+            picker.dismiss()
+        })
+        picker.show(activity?.supportFragmentManager, "CURRENCY_PICKER")
     }
 
 
@@ -213,4 +276,9 @@ class ProfileFragment:Fragment() {
         }
 
     }
+
+
+
+
 }
+
