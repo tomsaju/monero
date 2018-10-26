@@ -124,16 +124,8 @@ class MainPresenter : IMainPresenter {
                     ?.addOnSuccessListener { DocumentReference ->
 
                         //success
-                        // activity.id = DocumentReference.id
                         activity.syncStatus = true
-                        /*Single.fromCallable {
-                          //  db = getAppDatabase(context)
-                         //   db?.activitesDao()?.updateActivityId(activity.id, DocumentReference.id) // .database?.personDao()?.insert(person)
-                            *//*for(tag in activity.tags){
-                                AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
-                            }*//*
-                        }.subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread()).subscribe()*/
+
                     }
 
                     ?.addOnFailureListener { e ->
@@ -149,6 +141,79 @@ class MainPresenter : IMainPresenter {
             Log.d("tag", "completed")
         })
 
+
+    }
+
+
+    override fun updateActivity(activity: Activities) {
+
+        Observable.fromCallable {
+            db = getAppDatabase(context)
+            db?.activitesDao()?.updateActivity(activity) // .database?.personDao()?.insert(person)
+            for (tag in activity.tags) {
+                AppDatabase.db?.tagDao()?.insertIntoTagTable(tag)
+            }
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+            //save the log to history
+            var historyItem = HistoryLogItem(UUID.randomUUID().toString(),
+                    activity.author.user_id,
+                    DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_EDITTED_ACTIVITY,
+                    activity.createdDate.toString(),
+                    activity.title,
+                    "",
+                    activity.id,
+                    activity.id)
+
+            saveLog(historyItem)
+
+            // set values to UI
+            Log.d("tag", "done")
+            ///
+            var gson = Gson()
+            var convertor = TagConverter()
+            var membersJson: String = convertor.convertUserListtoString(activity.members)
+            var tagsJson: String = convertor.convertTagListtoString(activity.tags)
+            var author: String = gson.toJson(activity.author, User::class.java)
+
+            var permittedUserArrayList = arrayListOf<String>()
+            for (user in activity.members) {
+                permittedUserArrayList.add(user.user_phone)
+            }
+
+
+            var updatedActivity = HashMap<String, Any>()
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE, activity.title)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION, activity.description)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE, activity.mode)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS, tagsJson)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS, membersJson)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR, author)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_ALLOWED_READ_PERMISSION_USERS, permittedUserArrayList)
+            updatedActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE, activity.createdDate)
+
+
+            firestoreDb?.collection("activities")?.document(activity.id)?.update(updatedActivity)
+
+                    ?.addOnSuccessListener { DocumentReference ->
+
+                        //success
+                        activity.syncStatus = true
+
+                    }
+
+                    ?.addOnFailureListener { e ->
+                        //failure
+                    }
+
+            ///
+        }, { error ->
+            // handle exception if any
+            Log.d("tag", "exception")
+        }, {
+            // on complete
+            Log.d("tag", "completed")
+        })
 
     }
 

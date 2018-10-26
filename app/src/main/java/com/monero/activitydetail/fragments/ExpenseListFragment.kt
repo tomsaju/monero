@@ -5,11 +5,12 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import android.widget.AdapterView
 import android.widget.LinearLayout
 import android.widget.ListView
 
@@ -19,6 +20,7 @@ import com.monero.activitydetail.fragments.adapter.ExpenseListRecyclerAdapter
 import com.monero.activitydetail.presenter.expenselist.ExpenseListPresenter
 import com.monero.activitydetail.presenter.expenselist.IExpenseListPresenter
 import com.monero.activitydetail.presenter.expenselist.IExpenseListView
+import com.monero.models.Activities
 import com.monero.models.Expense
 
 
@@ -127,6 +129,84 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
         })
     }
 
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        registerForContextMenu(recyclerView)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+
+        // Here's how you can get the correct item in onContextItemSelected()
+        val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
+        val longPressedExpense = recyclerView?.adapter?.getItemId(info.position) as Expense
+
+        when (item.getItemId()) {
+            R.id.edit_actv ->{ // edit stuff here
+                Log.d("ContextMenu" ,"clickd with edit on "+longPressedExpense.title)
+                showEditDialog(longPressedExpense.id)
+                return true
+            }
+
+            R.id.delete_actv -> {
+                // remove stuff here
+                showDeleteDialog(longPressedExpense.id)
+                Log.d("ContextMenu", "clickd with delte on "+longPressedExpense.title)
+                return true
+            }
+            else -> return super.onContextItemSelected(item)
+        }
+    }
+
+    fun showEditDialog(activityId:String){
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Edit Activity")
+        builder.setMessage("Are you want to edit this activity?")
+
+        builder.setPositiveButton("YES"){dialog, which ->
+            // Do something when user press the positive button
+           // mActivityFragmentListener?.editActivity(activityId)
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("No"){dialog,which ->
+            dialog.dismiss()
+        }
+
+        builder.setNeutralButton("Cancel"){dialog,_ ->
+            dialog.dismiss()
+        }
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
+
+    }
+
+    fun showDeleteDialog(activityId: String){
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete Activity")
+        builder.setMessage("Are you want to Delete this activity?")
+
+        builder.setPositiveButton("YES"){dialog, which ->
+            // Do something when user press the positive button
+
+        }
+
+        builder.setNegativeButton("No"){dialog,which ->
+
+        }
+
+        builder.setNeutralButton("Cancel"){_,_ ->
+
+        }
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
+    }
 
 
 }// Required empty public constructor

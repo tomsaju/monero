@@ -5,4 +5,5 @@ package com.monero.addActivities
  */
 interface IAddActivityPresenter {
     fun getAllContactsList()
+    fun getActivityForId(id:String)
 }

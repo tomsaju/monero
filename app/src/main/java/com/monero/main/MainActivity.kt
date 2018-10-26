@@ -139,10 +139,6 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         mMainPresenter.saveActivity(activity)
         supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("activity_add_fragment")).commit()
 
-        /*var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
-        if(currentFragment is ActivityFragment){
-            currentFragment.refreshList()
-        }*/
     }
 
     override fun getActivity(id: String): Activities {
@@ -278,30 +274,6 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         }else {
             getFragmentManager().popBackStack();
         }
-        /*try {
-            var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")
-
-            if (currentFragment is AddActivityFragment && currentFragment.isVisible) {
-                supportFragmentManager.beginTransaction()
-                        .setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
-                        .detach(currentFragment)
-                        .addToBackStack(currentFragment.javaClass.simpleName)
-                        .commit()
-            } else {
-
-                if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-                    super.onBackPressed()
-                    finish()
-                } else {
-                    "Press back button again to exit".shortToast(context)
-                    mBackPressed = System.currentTimeMillis()
-                }
-
-            }
-        } catch (e: Exception) {
-
-
-        }*/
 
 
     }
@@ -507,6 +479,16 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         if(contactList!=null){
             mMainPresenter.syncContactsWithServer(contactList)
         }
+    }
+
+    override fun editActivity(id: String) {
+        var ft = supportFragmentManager.beginTransaction()
+        var frag =  AddActivityFragment()
+        val args = Bundle()
+        args.putString("activity_id", id)
+        frag.arguments = args
+        ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+        ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
     }
 }
 

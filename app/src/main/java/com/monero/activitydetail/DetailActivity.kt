@@ -28,9 +28,12 @@ import android.view.WindowManager
 import android.os.Build
 import android.preference.Preference
 import android.support.design.widget.CollapsingToolbarLayout
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.activitydetail.banner.BannerViewPager
+import com.monero.addActivities.AddActivityFragment
 import com.monero.models.*
 import com.monero.utility.Utility
 
@@ -52,6 +55,9 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
     lateinit var bannerViewPager:ViewPager
     lateinit var bannerItem:BannerItem
     lateinit var bannerAdapter:BannerViewPager
+    lateinit var editMenuItem: MenuItem
+    lateinit var deleteMenuItem: MenuItem
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
@@ -126,6 +132,32 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         fragmentTransaction.func()
         fragmentTransaction.commit()
     }
+
+
+ /*   override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.detail_activity_menu, menu)
+
+        editMenuItem = menu!!.findItem(R.id.action_edit)
+        deleteMenuItem = menu.findItem(R.id.action_delete)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.action_edit -> {
+               //edit
+                editActivity(activityId)
+            }
+            R.id.action_delete->{
+              //delete
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }*/
 
     fun showAddExpenseFragment(){
         supportFragmentManager.inTransaction {
@@ -237,4 +269,6 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         }
 
     }
+
+
 }

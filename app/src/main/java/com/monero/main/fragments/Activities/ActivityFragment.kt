@@ -146,15 +146,16 @@ class ActivityFragment: Fragment() {
 
         builder.setPositiveButton("YES"){dialog, which ->
             // Do something when user press the positive button
-
+            mActivityFragmentListener?.editActivity(activityId)
+            dialog.dismiss()
         }
 
         builder.setNegativeButton("No"){dialog,which ->
-
+            dialog.dismiss()
         }
 
-        builder.setNeutralButton("Cancel"){_,_ ->
-
+        builder.setNeutralButton("Cancel"){dialog,_ ->
+            dialog.dismiss()
         }
 
         val dialog: AlertDialog = builder.create()
@@ -217,6 +218,7 @@ class ActivityFragment: Fragment() {
        fun addNewActivity()
        fun toggleEditIcon(show:Boolean)
        fun toggleDeleteIcon(show: Boolean)
+       fun editActivity(id:String)
 
     }
 

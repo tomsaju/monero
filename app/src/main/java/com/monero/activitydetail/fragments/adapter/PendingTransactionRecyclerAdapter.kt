@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.monero.R
 import com.monero.models.PendingTransaction
+import com.monero.utility.Utility
 
 /**
  * Created by Dreamz on 10-10-2018.
@@ -27,7 +28,7 @@ class PendingTransactionRecyclerAdapter(var pendingTransactions:ArrayList<Pendin
 
 
 
-        var text ="<b>"+ pendingTransactions[position].payer.user_name+"</b>"+" must pay "+ "<font color=\"#08511f\"><b>"+amountInHigherDenomination+"</b>"+"</font>"+" to "+ "<b>"+pendingTransactions[position].reciepient.user_name+"</b>"
+        var text ="<b>"+ pendingTransactions[position].payer.user_name+"</b>"+" must pay "+ "<font color=\"#08511f\"><b>"+Utility.getCurrencySymbol()+amountInHigherDenomination+"</b>"+"</font>"+" to "+ "<b>"+pendingTransactions[position].reciepient.user_name+"</b>"
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             holder.title.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
         } else {

@@ -3,7 +3,14 @@ package com.monero.addActivities
 import android.content.ContentResolver
 import android.content.Context
 import android.provider.ContactsContract
+import android.util.Log
+import com.monero.helper.AppDatabase.Companion.db
+import com.monero.helper.AppDatabase.Companion.getAppDatabase
+import com.monero.models.Activities
 import com.monero.models.ContactMinimal
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by tom.saju on 3/14/2018.
@@ -21,6 +28,26 @@ class AddActivityPresenter :IAddActivityPresenter {
     override fun getAllContactsList() {
         val contactsList:MutableList<ContactMinimal> = getContacts()
         view.onContactsfetched(contactsList)
+    }
+
+    override fun getActivityForId(id:String){
+        Observable.fromCallable {
+            db = getAppDatabase(context)
+            db?.activitesDao()?.getActivityForId(id) // .database?.personDao()?.insert(person)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ activity:Activities ->
+
+            view.onActivityFetched(activity)
+
+        }, { error ->
+            // handle exception if any
+            view.onActivityFetchError()
+        }, {
+            // on complete
+            Log.d("tag", "completed")
+
+
+        })
     }
 
     private fun getContacts(): MutableList<ContactMinimal> {

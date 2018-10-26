@@ -20,13 +20,18 @@ import com.monero.models.User
 import com.monero.tags.TagActivity
 import me.gujun.android.taggroup.TagGroup
 import java.util.*
+import kotlin.collections.ArrayList
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+
+
 
 
 /**
  * A simple [Fragment] subclass.
  */
 public class AddActivityFragment : Fragment(),IAddActivityView {
-    var REQUEST_CODE_TAG_SELECTION = 1
+
     lateinit var title: AutoCompleteTextView;
     lateinit var description: AutoCompleteTextView;
     lateinit var modeSelector: Spinner
@@ -43,14 +48,25 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var addMembersParent: LinearLayout
     lateinit var addActivityPresenter:IAddActivityPresenter
     lateinit var contactsList:List<ContactMinimal>
-    var selectedUserList: ArrayList<User> = ArrayList()
-    var auth = FirebaseAuth.getInstance()!!
     lateinit var myCredential:String
     lateinit var myContactName:TextView
     lateinit var myContactPhone:TextView
     lateinit var addMembersLayout:FrameLayout
     lateinit var progressBarContacts:ProgressBar
     lateinit var myUser:User
+    var selectedUserList: ArrayList<User> = ArrayList()
+    var auth = FirebaseAuth.getInstance()!!
+    var REQUEST_CODE_TAG_SELECTION = 1
+    private lateinit var currentActivityId: String
+    private val MODE_PRIVATE = 1
+    private val MODE_PUBLIC = 2
+    private var expenseIdList = ""
+    private var historyIdList = ""
+    private var transactionIdList = ""
+    private var SELECTED_MODE = 0
+
+    private val createdDate: Long = System.currentTimeMillis()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -72,6 +88,23 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         addMembersLayout = view.findViewById(R.id.add_member_layout)
         progressBarContacts = view.findViewById(R.id.contactLoadingProgressBar)
 
+
+        modeSelector.onItemSelectedListener = object : OnItemSelectedListener {
+                override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                    if(position==0){
+                        SELECTED_MODE = 0
+                    }else if(position==1){
+                        SELECTED_MODE = MODE_PRIVATE
+                    }else if(position==2){
+                        SELECTED_MODE = MODE_PUBLIC
+                    }
+                }
+
+                override fun onNothingSelected(parentView: AdapterView<*>) {
+                    // your code here
+                }
+
+            }
 
         myCredential = ApplicationController.preferenceManager!!.myCredential
         addActivityPresenter = AddActivityPresenter(requireContext(),this)
@@ -104,17 +137,9 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
                     }*/
                   //  val author = User(auth.currentUser!!.uid,auth.currentUser!!.displayName,auth.currentUser!!.phoneNumber,"")
 
-                    var expenseIdList = ""
-                    var historyIdList = ""
-                    var transactionIdList = ""
-                    if(selectedUserList.size<2){
-                        Toast.makeText(context, "Please select atleast 2 participants", Toast.LENGTH_SHORT)
+                    val activity = Activities(currentActivityId, title?.text.toString(), description?.text.toString(), selectedTagList, SELECTED_MODE, selectedUserList, myUser, false, createdDate, expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
+                    mListener.saveActivity(activity)
 
-                    }else {
-
-                        val activity: Activities = Activities(UUID.randomUUID().toString(), title?.text.toString(), description?.text.toString(), selectedTagList, 1, selectedUserList, myUser, false, System.currentTimeMillis(), expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
-                        mListener.saveActivity(activity)
-                    }
                 }else{
                     Toast.makeText(context, "Error for user", Toast.LENGTH_SHORT).show()
                 }
@@ -138,9 +163,24 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         }
 
 
+        if(arguments!=null){
+            if(arguments?.getString("activity_id")!=null&&arguments?.getString("activity_id")!=""){
+                currentActivityId = arguments?.getString("activity_id").toString()
+                loadActivityDetails(currentActivityId)
+            }else{
+                currentActivityId=UUID.randomUUID().toString()
+            }
+        }else{
+            currentActivityId=UUID.randomUUID().toString()
+        }
+
+
         return view;
     }
 
+    private fun loadActivityDetails(currentActivityId: String) {
+        addActivityPresenter.getActivityForId(currentActivityId)
+    }
 
 
     public fun onContactPermissionGranted(){
@@ -153,8 +193,18 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         if (title.text.isEmpty()) {
             Toast.makeText(context, "Enter a valid title", Toast.LENGTH_SHORT)
             valid = false
-        } else if (description.text.isEmpty()) {
+        }
+        if (description.text.isEmpty()) {
             Toast.makeText(context, "Enter a description", Toast.LENGTH_SHORT)
+            valid = false
+        }
+
+        if(modeSelector.selectedItemPosition==0){
+            Toast.makeText(context, "Please select visibility", Toast.LENGTH_SHORT)
+            valid = false
+        }
+        if(selectedUserList.size<2){
+            Toast.makeText(context, "Please select atleast 2 participants", Toast.LENGTH_SHORT)
             valid = false
         }
 
@@ -269,6 +319,51 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     }
 
 
+    override fun onActivityFetched(activity: Activities) {
+        //set title and description
+        title.setText(activity.title)
+        description.setText(activity.description)
+
+        //set mode spinner
+        if(activity.mode==0){
+            SELECTED_MODE = 0
+            modeSelector.setSelection(0)
+        }else if(activity.mode==1){
+            SELECTED_MODE = MODE_PRIVATE
+            modeSelector.setSelection(1)
+        }else if(activity.mode==2){
+            SELECTED_MODE = MODE_PUBLIC
+            modeSelector.setSelection(2)
+        }
+
+        //set tags
+        if(activity.tags!=null&&!activity.tags.isEmpty()){
+            addTagText.visibility = View.INVISIBLE
+            selectedTagList = ArrayList(activity.tags)
+            var tagArray = ArrayList<String>()
+            for (i in 0 until selectedTagList.size) {
+                tagArray.add(selectedTagList[i].title)
+            }
+            tagContainer.setTags(tagArray)
+
+        }
+
+        //set user list
+        if(activity.members!=null&&activity.members.isNotEmpty()){
+            var memberlist = ArrayList<ContactMinimal>()
+            for(user in activity.members!!){
+                memberlist?.add(ContactMinimal(user.user_id,user.user_name,user.user_phone))
+            }
+
+            setSelectedContacts(memberlist)
+        }
+
+
+    }
+
+    override fun onActivityFetchError() {
+
+    }
 
     fun ClosedRange<Int>.random() =
             Random().nextInt((endInclusive + 1) - start) +  start

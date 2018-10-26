@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/payer_name"
         tools:text="Tony Stark"
-        android:textSize="18sp"
+        android:textSize="17sp"
         android:textColor="#434443"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"/>

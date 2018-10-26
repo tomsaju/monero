@@ -128,6 +128,7 @@ class DBContract {
             const val TYPE_ADDED_NEW_IMAGE = "new_image"
             const val TYPE_ADDED_NEW_EXPENSE = "new_expense"
             const val TYPE_EDITTED_EXPENSE = "edit_expense"
+            const val TYPE_EDITTED_ACTIVITY = "edit_activity"
         }
     }
 

@@ -11,10 +11,7 @@ import android.view.View
 import android.widget.*
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
-import com.monero.models.Contact
-import com.monero.models.ContactMinimal
-import com.monero.models.Tag
-import com.monero.models.User
+import com.monero.models.*
 import com.pchmn.materialchips.ChipView
 
 import me.gujun.android.taggroup.TagGroup
@@ -160,6 +157,14 @@ class AddActivity : AppCompatActivity(),IAddActivityView,SelectContactsFragment.
     }
 
     override fun getCurrentActivityUserList(): ArrayList<User> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onActivityFetched(activity: Activities) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onActivityFetchError() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

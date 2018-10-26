@@ -41,7 +41,14 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     val SPLIT_AMONG_CUSTOM =2
     var REQUEST_CODE_PAYER_SELECTION = 3
     val customSplitRequest: Int = 9
-    private var mListener: OnFragmentInteractionListener? = null
+    var amount:BigDecimal?=BigDecimal.ZERO
+    var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
+    var amountSpend:Int = 0
+    var activityId:String = ""
+    var currentlyWorkingActivity :Activities?=null
+    var expenseId:String = ""
+    val auth = FirebaseAuth.getInstance()!!
+    var myuser:User = User()
     lateinit var title:AutoCompleteTextView
     lateinit var currencySymbolTV: TextView
     lateinit var amountEditText:EditText
@@ -49,20 +56,14 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     lateinit var splitTypeTv: TextView
     lateinit var discardButton:Button
     lateinit var saveButton:Button
-    var amount:BigDecimal?=BigDecimal.ZERO
     lateinit var paidUsersList:HashMap<User,Int> //<each user,amount paid>
     lateinit var splitPaymentList:HashMap<User,Int>//<each user,amount owed>
     lateinit var debitList:ArrayList<Debit>
     lateinit var creditList:ArrayList<Credit>
     lateinit var mExpenseFragmentPresenter : IExpenseFragmentPresenter
-    var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
-    var amountSpend:Int = 0
     lateinit var totalParticipantList:ArrayList<User>
-    var activityId:String = ""
-    var currentlyWorkingActivity :Activities?=null
-    var expenseId:String = ""
-    val auth = FirebaseAuth.getInstance()!!
-    var myuser:User = User()
+    private var mListener: OnFragmentInteractionListener? = null
+
 
 
 
@@ -102,7 +103,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
          splitPaymentList = HashMap()
 
          paidByTV.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
-        paidByTV.setOnClickListener { v: View? ->
+         paidByTV.setOnClickListener { v: View? ->
 
             var intent = Intent(context,PayerSelectorActivity::class.java)
             intent.putExtra("activity_id",activityId)
@@ -191,7 +192,23 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
            }
        }
 
+
+        if(arguments!=null){
+            if(arguments?.getString("expense_id")!=null&&arguments?.getString("expense_id")!=""){
+                expenseId = arguments?.getString("expense_id").toString()
+                loadExpenseDetails(expenseId)
+            }else{
+                expenseId = System.currentTimeMillis().toString()
+            }
+        }else{
+            expenseId = System.currentTimeMillis().toString()
+        }
+
         return view
+    }
+
+    private fun loadExpenseDetails(expenseId: String) {
+
     }
 
     private fun splitCredits(splitType: Int) {

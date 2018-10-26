@@ -12,5 +12,6 @@ interface IMainPresenter {
     fun saveActivity(activity:Activities)
     fun getAllActivitiesFromServer();
     fun syncContactsWithServer(contactList: ArrayList<Contact>)
+    fun updateActivity(activity:Activities)
 
 }

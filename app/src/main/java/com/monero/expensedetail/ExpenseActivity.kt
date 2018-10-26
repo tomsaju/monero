@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TableLayout
 import android.widget.TableRow
 import com.monero.R
@@ -19,6 +21,7 @@ import kotlinx.android.synthetic.main.activity_expense.*
 import android.widget.TextView
 import com.monero.models.*
 import android.widget.LinearLayout
+import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.utility.Utility
 
 
@@ -29,7 +32,8 @@ lateinit var mRecyclerView:RecyclerView
 lateinit var mAdapter:PayerRecyclerAdapter
 lateinit var toolbar:Toolbar
 lateinit var table:TableLayout
-
+    lateinit var editMenuItem:MenuItem
+    lateinit var deleteMenuItem:MenuItem
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,17 +119,17 @@ lateinit var table:TableLayout
             name.setTextColor(Color.BLACK)
 
             val actualShare = TextView(this)
-            name.textSize = 18f
+            name.textSize = 15f
 
             actualShare.text =Utility.getCurrencySymbol()+ getInHIgherDenomination(data.actualShare)
-            actualShare.textSize = 18f
+            actualShare.textSize = 15f
 
             val paidAmount = TextView(this)
             paidAmount.text =Utility.getCurrencySymbol()+ getInHIgherDenomination(data.paidAMount)
-            paidAmount.textSize = 18f
+            paidAmount.textSize = 15f
             val remaining = TextView(this)
             var remainingAmount = data.actualShare - data.paidAMount
-            remaining.textSize = 18f
+            remaining.textSize = 15f
 
             if(remainingAmount<0){
                 remaining.text =Utility.getCurrencySymbol()+ "0.00"
@@ -151,5 +155,46 @@ lateinit var table:TableLayout
       var amountInHigherDenomination = "%.2f".format((amount/100).toDouble())
       return amountInHigherDenomination
   }
+
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.expense_detail_menu, menu)
+
+        editMenuItem = menu!!.findItem(R.id.action_edit)
+        deleteMenuItem = menu.findItem(R.id.action_delete)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle presses on the action bar menu items
+        when (item.itemId) {
+            R.id.action_edit -> {
+
+                //edit expense
+                editExpense(expenseId)
+
+            }
+            R.id.action_delete->{
+               //delete expense
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun editExpense(expenseId:String){
+        var ft = supportFragmentManager?.beginTransaction()
+        var frag =  AddExpenseFragment()
+        var bundle = Bundle()
+        bundle.putString("expense_id",expenseId)
+        frag.arguments = bundle
+        ft?.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+        ft?.add(android.R.id.content, frag,"activity_add_fragment")?.commit()
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.monero.addActivities
 
+import com.monero.models.Activities
 import com.monero.models.ContactMinimal
 
 /**
@@ -7,4 +8,6 @@ import com.monero.models.ContactMinimal
  */
 interface IAddActivityView {
     fun onContactsfetched(contactList:List<ContactMinimal>)
+    fun onActivityFetched(activity:Activities)
+    fun onActivityFetchError()
 }
