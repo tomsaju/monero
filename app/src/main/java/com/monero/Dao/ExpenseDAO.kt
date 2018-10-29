@@ -19,6 +19,9 @@ import com.monero.models.Expense
     @Query("SELECT * FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME+" WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ID +" = :id")
     fun getExpenseForId(id:String): LiveData<Expense>
 
+    @Query("SELECT * FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME+" WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ID +" = :id")
+    fun getExpenseForIdSingle(id:String): Expense
+
     @Query("SELECT * FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME+" WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID +" = :id")
     fun getAllExpensesForActivity(id:String): LiveData<List<Expense>>
 

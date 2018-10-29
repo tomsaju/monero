@@ -9,5 +9,6 @@ import com.monero.models.User
 interface IExpenseFragmentPresenter {
 
     fun saveExpense(expense: Expense)
+    fun getExpenseForId(expenseId:String)
 
 }

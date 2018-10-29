@@ -30,7 +30,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
     var SPLIT_TYPE_PERCENTAGE = 1
     var SPLIT_TYPE_MONEY = 2
-    var SPLIT_TYPE_EQUALLY = 2
+    var SPLIT_TYPE_EQUALLY = 0
     var SPLIT_TYPE = SPLIT_TYPE_EQUALLY
     lateinit var adapter:SplitTypeRecyclerAdapter
     lateinit var mPresenter:ISplitTypePresenter
@@ -51,12 +51,18 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
         if(intent.extras!=null){
             activityId = intent.getStringExtra("activityId")
             totalAmount = intent.getIntExtra("total",0)
+            try {
+                splitPaymentList= intent.getSerializableExtra("owedList") as HashMap<User, Int>
+                SPLIT_TYPE = intent.getIntExtra("splitType",0)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         if(SPLIT_TYPE==SPLIT_TYPE_EQUALLY){
             split_radio_equally.isChecked = true
             //load the equal split arraylist
-            //diabel the add user button
+            //disable the add user button
             add_user_split_btn.visibility = View.GONE
             selectedUsersId.clear()
 
@@ -96,7 +102,27 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
     })
 
 
+        if(splitPaymentList!=null&&splitPaymentList.isNotEmpty()){
+            splitList.clear()
+            for ((key, value) in splitPaymentList) {
 
+                if(SPLIT_TYPE==SPLIT_TYPE_EQUALLY){
+
+
+                }else if(SPLIT_TYPE==SPLIT_TYPE_PERCENTAGE){
+                    var percentValue =(100* value)/totalAmount
+                    var splitItem = SplitItem(value,percentValue.toDouble(),key)
+                    splitList.add(splitItem)
+                }else{
+                    var splitItem = SplitItem(value,0.0,key)
+                    splitList.add(splitItem)
+                }
+
+            }
+
+            adapter = SplitTypeRecyclerAdapter(splitList,this,SPLIT_TYPE,totalAmount)
+            split_members_list.adapter = adapter
+        }
 
     }
 
@@ -287,6 +313,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
         if(valuesAddUp()) {
             intent.putExtra("owedList", splitPaymentList)
+            intent.putExtra("splitType",SPLIT_TYPE)
             setResult(Activity.RESULT_OK, intent)
             finish()
         }

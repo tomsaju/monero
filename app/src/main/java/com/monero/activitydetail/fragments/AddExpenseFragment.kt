@@ -36,13 +36,13 @@ import kotlin.collections.HashMap
  */
 class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     val TAG = "AddExpenseFragment"
-    val SPLIT_EQUALLY_AMONG_ALL =0
-    val SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME =1
-    val SPLIT_AMONG_CUSTOM =2
+    var SPLIT_TYPE_EQUALLY = 0
+    var SPLIT_TYPE_PERCENTAGE = 1
+    var SPLIT_TYPE_MONEY = 2
     var REQUEST_CODE_PAYER_SELECTION = 3
     val customSplitRequest: Int = 9
     var amount:BigDecimal?=BigDecimal.ZERO
-    var splitType:Int =SPLIT_EQUALLY_AMONG_ALL
+    var splitType:Int =SPLIT_TYPE_EQUALLY
     var amountSpend:Int = 0
     var activityId:String = ""
     var currentlyWorkingActivity :Activities?=null
@@ -131,16 +131,16 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
                for(entry in paidUsersList){
                     var debit = Debit(System.currentTimeMillis()*(1 until 10).random(),
-                                        activityId,
+                                         activityId,
                                          expenseId,
                                          entry.key.user_id,
                                          entry.key.user_name,
                                          entry.value)
 
-                   tempDebitList.add(debit)
+                    tempDebitList.add(debit)
                }
 
-               splitCredits(splitType)
+                    splitCredits(splitType)
 
                for(entry in splitPaymentList){
                    var credit = Credit(System.currentTimeMillis()*(1 until 10).random(),
@@ -155,7 +155,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
 
-               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList,System.currentTimeMillis().toString())
+               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList,splitType,System.currentTimeMillis().toString())
                mExpenseFragmentPresenter.saveExpense(expense)
                mListener?.closeFragment()
            }
@@ -187,6 +187,13 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                    var sIntent = Intent(requireContext(), SplitTypeActivity::class.java)
                    sIntent.putExtra("activityId", activityId)
                    sIntent.putExtra("total", amountSpend)
+
+
+                   if(splitPaymentList!=null&&splitPaymentList.isNotEmpty()){
+                       sIntent.putExtra("owedList",splitPaymentList)
+                       sIntent.putExtra("splitType",splitType)
+                   }
+
                    startActivityForResult(sIntent,customSplitRequest)
                }
            }
@@ -204,6 +211,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             expenseId = System.currentTimeMillis().toString()
         }
 
+        if(expenseId!=null&&expenseId.isNotEmpty()) {
+            mExpenseFragmentPresenter.getExpenseForId(expenseId)
+        }
+
         return view
     }
 
@@ -212,22 +223,6 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
     }
 
     private fun splitCredits(splitType: Int) {
-
-      /*  if(splitType===SPLIT_EQUALLY_AMONG_ALL){
-           var amountOwed =  (amountSpend/totalParticipantList.size)
-
-            for(user in totalParticipantList){
-                splitPaymentList.put(user,amountOwed)
-            }
-        }else if(splitType===SPLIT_EQUALLY_AMONG_ALL_EXCEPT_ME){
-            var amountOwed =  amountSpend/totalParticipantList.size-1
-
-            for(user in totalParticipantList){
-                splitPaymentList.put(user, amountOwed)
-            }
-        }else if(splitType == SPLIT_AMONG_CUSTOM){
-
-        }*/
 
         if(splitPaymentList==null||splitPaymentList.isEmpty()){
             var amountOwed =  (amountSpend/totalParticipantList.size)
@@ -331,6 +326,15 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
             //it might be parcelable
             "owedList"
             splitPaymentList = data.getSerializableExtra("owedList") as HashMap<User, Int>
+            splitType = data.getIntExtra("splitType",0)
+            if(splitType==SPLIT_TYPE_EQUALLY){
+                splitTypeTv.text = "Equally"
+            }else if(splitType==SPLIT_TYPE_PERCENTAGE){
+                splitTypeTv.text = "By Percentage"
+            }else if(splitType==SPLIT_TYPE_MONEY){
+                splitTypeTv.text="By Amount"
+            }
+
 
         }
     }
@@ -339,4 +343,44 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
     }
 
+    override fun onExpenseFetched(expense: Expense) {
+        activityId = expense.activity_id
+        title.setText(expense.title)
+
+        var amountinHigerDenomination =(expense.amount/100).toDouble()
+
+        amountEditText?.setText(amountinHigerDenomination.toString())
+
+        splitType = expense.splitType
+        if(splitType==SPLIT_TYPE_EQUALLY){
+            splitTypeTv.text = "Equally"
+        }else if(splitType==SPLIT_TYPE_PERCENTAGE){
+            splitTypeTv.text = "By Percentage"
+        }else if(splitType==SPLIT_TYPE_MONEY){
+            splitTypeTv.text="By Amount"
+        }
+
+
+
+        for(debit in expense.debitList){
+            paidUsersList.put(User(debit.user_id,debit.userName,""),debit.amount)
+        }
+
+            if (paidUsersList.size == 1) {
+                var entry = paidUsersList.entries.iterator().next()
+                if (entry.key.user_id == auth.currentUser?.uid) {
+                    paidByTV.setText("you")
+                } else {
+                    paidByTV.setText(entry.key.user_name)
+                }
+            }
+
+
+        for(credit in expense.creditList){
+            splitPaymentList.put(User(credit.user_id,credit.userName,""),credit.amount)
+        }
+
+
+
+    }
 }// Required empty public constructor

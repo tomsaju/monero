@@ -14,9 +14,12 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import com.google.firebase.firestore.DocumentReference
+import com.monero.helper.AppDatabase.Companion.db
+import com.monero.helper.AppDatabase.Companion.getAppDatabase
 import com.monero.helper.PreferenceManager
 import com.monero.models.HistoryLogItem
 import io.reactivex.Observable
+import io.reactivex.functions.Consumer
 import java.util.*
 
 
@@ -118,5 +121,20 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
         })
 
 
+    }
+
+    override fun getExpenseForId(expenseId: String) {
+        var expense:Expense?=null
+
+        Single.fromCallable {
+            db= getAppDatabase(context)
+            expense = db?.expenseDao()?.getExpenseForIdSingle(expenseId)
+        }.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(Consumer {
+            val workingExpense = expense
+            if(workingExpense!=null){
+                view.onExpenseFetched(workingExpense)
+            }
+        })
     }
 }

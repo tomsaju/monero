@@ -4,8 +4,10 @@ import android.app.ActionBar
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.graphics.Color
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -25,13 +27,14 @@ import com.monero.activitydetail.fragments.AddExpenseFragment
 import com.monero.utility.Utility
 
 
-class ExpenseActivity : AppCompatActivity(),IExpenseDetailView {
+class ExpenseActivity : AppCompatActivity(),IExpenseDetailView, AddExpenseFragment.OnFragmentInteractionListener {
 var expenseId:String =""
 lateinit var mPresenter:IExpenseDetailPresenter
 lateinit var mRecyclerView:RecyclerView
 lateinit var mAdapter:PayerRecyclerAdapter
 lateinit var toolbar:Toolbar
 lateinit var table:TableLayout
+    lateinit var tableRow:TableRow
     lateinit var editMenuItem:MenuItem
     lateinit var deleteMenuItem:MenuItem
 
@@ -41,9 +44,9 @@ lateinit var table:TableLayout
         setContentView(R.layout.activity_expense)
         toolbar = findViewById(R.id.toolbar_custom)
         table = findViewById(R.id.table)
+        tableRow = findViewById(R.id.tablerowLabels)
         setSupportActionBar(toolbar)
         getSupportActionBar()?.setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar()?.setDisplayShowHomeEnabled(true);
         getSupportActionBar()?.setTitle("Expense Detail")
         mPresenter = ExpenseDetailPresenter(this,this)
 
@@ -89,6 +92,8 @@ lateinit var table:TableLayout
 
     private fun setupTable(thisExpense: Expense?) {
 
+        table.removeAllViews()
+        table.addView(tableRow)
         var creditList = thisExpense?.creditList
         var numberOfMembers =creditList?.size //assuming that the payer is also included in dividing th expense
         var tabledata =  ArrayList<splitTableItem>()
@@ -197,4 +202,25 @@ lateinit var table:TableLayout
         ft?.add(android.R.id.content, frag,"activity_add_fragment")?.commit()
     }
 
+
+    //implemented for handling editing of expenses
+
+    override fun onFragmentInteraction(uri: Uri) {
+
+    }
+
+    override fun getcurrentWorkingActivity(): Activities? {
+        return null
+    }
+
+    override fun closeFragment() {
+        var currentFragment: Fragment =  supportFragmentManager.findFragmentById(android.R.id.content)
+        if(currentFragment is AddExpenseFragment &&currentFragment.isVisible){
+            supportFragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+                    .detach(currentFragment)
+                    //  .addToBackStack(currentFragment.javaClass.simpleName)
+                    .commit()
+        }
+    }
 }

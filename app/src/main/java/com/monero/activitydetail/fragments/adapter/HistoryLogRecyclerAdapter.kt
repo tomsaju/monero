@@ -10,6 +10,14 @@ import android.widget.TextView
 import com.monero.Dao.DBContract
 import com.monero.R
 import com.monero.models.HistoryLogItem
+import android.widget.RelativeLayout
+import com.monero.R.id.view
+import android.R.attr.y
+import android.graphics.Point
+import android.view.Display
+import android.view.WindowManager
+
+
 
 /**
  * Created by Dreamz on 12-10-2018.
@@ -47,14 +55,30 @@ class HistoryLogRecyclerAdapter (var historyLogList:ArrayList<HistoryLogItem>, v
         } else {
             holder.title.setText(Html.fromHtml(text));
         }
+
+        if(position==0){
+            holder.timeLineTop.visibility = View.INVISIBLE
+        }else{
+            holder.timeLineTop.visibility = View.VISIBLE
+        }
+
+        if(position==historyLogList.size-1){
+            holder.timeLineBottom.visibility = View.INVISIBLE
+        }else{
+            holder.timeLineBottom.visibility = View.VISIBLE
+        }
+
+       // holder.timeLine.setLayoutParams(params)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryLogViewHolder {
-        return HistoryLogViewHolder(LayoutInflater.from(context).inflate(R.layout.pendingtransaction_list_item, parent, false))
+        return HistoryLogViewHolder(LayoutInflater.from(context).inflate(R.layout.test_layout, parent, false))
     }
 
 }
 class HistoryLogViewHolder (view: View) : RecyclerView.ViewHolder(view) {
     // Holds the TextView that will add each animal to
     var title = view.findViewById<TextView>(R.id.pendingText)
+    var timeLineTop = view.findViewById<View>(R.id.topPortion_history_line)
+    var timeLineBottom = view.findViewById<View>(R.id.bottomPortion_history_line)
 }

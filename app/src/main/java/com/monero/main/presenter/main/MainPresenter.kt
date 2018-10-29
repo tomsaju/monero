@@ -414,6 +414,14 @@ class MainPresenter : IMainPresenter {
                 var creditList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS).toString()
                 var debitList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT).toString()
                 var createdDate :String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREATED_DATE).toString()
+                var splitType =0
+                try {
+                    splitType = document.get(DBContract.EXPENSE_TABLE.EXPENSE_SPLIT_TYPE) as Int
+                }catch (e:Exception){
+
+                }
+
+
                 var amount: Int = 0
                 try {
                     amount = document.get(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT).toString().toInt()
@@ -452,7 +460,7 @@ class MainPresenter : IMainPresenter {
                 }
 
 
-                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,createdDate)
+                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,splitType,createdDate)
 
                 Single.fromCallable {
 
