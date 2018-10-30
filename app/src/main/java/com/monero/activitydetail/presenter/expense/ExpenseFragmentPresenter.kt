@@ -3,6 +3,7 @@ package com.monero.activitydetail.presenter.expense
 import android.content.Context
 import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.monero.Dao.DBContract
@@ -28,15 +29,18 @@ import java.util.*
  */
 class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
 
-
+    var TAG = "ExpenseFragmentPresenter"
     var context: Context
     var view: IExpenseFragmentView
     var firestoreDb: FirebaseFirestore? = null
+    var auth: FirebaseAuth
+
 
     constructor(context: Context, view: IExpenseFragmentView) {
         this.context = context
         this.view = view
         firestoreDb = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()!!
     }
 
     override fun saveExpense(expense: Expense) {
@@ -76,18 +80,26 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterSuccess {
-                    //add this event to history
-                    var historyLog = HistoryLogItem(System.currentTimeMillis().toString(),
-                            "author id",
-                            DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_EXPENSE,
-                            expense.created_date,
-                            expense.title,
-                            "",
-                            expense.id,
-                            expense.activity_id)
 
-                    saveHistory(historyLog)
+                    val authorId = auth.currentUser?.uid
+                    val authorName = auth.currentUser?.displayName
 
+                    if(authorName!=null&&authorId!=null) {
+
+                        //add this event to history
+                        var historyLog = HistoryLogItem(UUID.randomUUID().toString(),
+                                authorId,
+                                authorName,
+                                DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_EXPENSE,
+                                expense.created_date,
+                                expense.title,
+                                "",
+                                expense.id,
+                                expense.activity_id,
+                                false)
+
+                        saveHistory(historyLog)
+                    }
                     //Log.d
                     Log.d("Tag","expense saved locally")
                     //push this expense id to activity db
@@ -118,9 +130,50 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
             AppDatabase.db?.historyDao()?.insertIntoHistoryTable(historyLog) // .database?.personDao()?.insert(person)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+            //sync to cloud
+
+            saveHistorytoCloud(historyLog)
+
         })
 
 
+    }
+
+
+    private fun saveHistorytoCloud(historyItem: HistoryLogItem) {
+
+        var historylog = HashMap<String, Any>()
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.LOG_ITEM_ID, historyItem.log_id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.AUTHOR_ID, historyItem.Author_Id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.AUTHOR_NAME, historyItem.Author_name)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.EVENT_TYPE, historyItem.Event_Type)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.TIMESTAMP, historyItem.Timestamp)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_NAME, historyItem.Subject_Name)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_URL, historyItem.Subject_Url)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_ID, historyItem.Subject_Id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID, historyItem.Activity_Id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SYNC_STATUS, historyItem.SyncStatus)
+
+        firestoreDb?.collection("HistoryLog")?.document(historyItem.log_id)?.set(historylog)
+
+                ?.addOnSuccessListener { DocumentReference ->
+
+                    historyItem.SyncStatus = true
+                    //success
+                    Observable.fromCallable {
+                        db = getAppDatabase(context)
+                        db?.historyDao()?.insertIntoHistoryTable(historyItem) // .database?.personDao()?.insert(person)
+                    }.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe({ history ->
+
+                        Log.d(TAG,"log saving complete")
+                    })
+                }
+
+                ?.addOnFailureListener { e ->
+                    //failure
+                    Log.d(TAG,e.toString())
+                }
     }
 
     override fun getExpenseForId(expenseId: String) {

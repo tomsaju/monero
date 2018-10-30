@@ -100,6 +100,7 @@ class SignInActivity : AppCompatActivity() {
                     Checks if the User sign in was successful
                  */
                 ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
+                ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid
 
                 var mainIntent = Intent(this,MainActivity::class.java)
                 startActivity(mainIntent)

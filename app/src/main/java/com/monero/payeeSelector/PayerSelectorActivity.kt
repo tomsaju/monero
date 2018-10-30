@@ -15,6 +15,7 @@ import com.monero.payeeSelector.fragment.SelectPayerFragment
 import com.monero.payeeSelector.presenter.IPayerSelectorPresenter
 import com.monero.payeeSelector.presenter.IPayerSelectorView
 import com.monero.payeeSelector.presenter.PayerSelectorPresenter
+import com.monero.utility.Utility
 
 class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPayerFragmentInteractionListener,IPayerSelectorView {
 
@@ -43,6 +44,7 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         if(intent!=null&&intent.extras!=null){
             activityId = intent.getStringExtra("activity_id")
             enteredTotal = intent.getIntExtra("entered_total",0)
+            payerList = intent.getSerializableExtra("PayeeList") as HashMap<User, Int>
         }
 
 
@@ -68,6 +70,12 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
 
             }
 
+        }
+
+        if(payerList!=null&&payerList.isNotEmpty()){
+            for(item in payerList){
+               showPayerList(item.key,item.value)
+            }
         }
 
     }
@@ -112,9 +120,9 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
 
     }
 
-    fun addUserToPayerList(user: User){
+    fun addUserToPayerList(user: User,amount:Int){
 
-        listParent.addView(getPayerListView(user))
+        listParent.addView(getPayerListView(user,amount))
         if(!payerList.containsKey(user)) {
             payerList.put(user, 0)
         }else{
@@ -122,21 +130,58 @@ class PayerSelectorActivity : AppCompatActivity(),SelectPayerFragment.SelectPaye
         }
     }
 
-    fun getPayerListView(user: User): View {
+    fun showPayerList(user:User,amount:Int){
+        listParent.addView(getPayerListView(user,amount))
+    }
+
+    fun getPayerListView(user: User,amount:Int): View {
         var inflater: LayoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         var view: View = inflater?.inflate(R.layout.user_selection_list_item_layout,null,false)
         var nameAutoCompleteText: TextView = view.findViewById<TextView>(R.id.autocomplete_tv_add_payer) as TextView
         var amountEdittext: EditText = view.findViewById<EditText>(R.id.edittext_paid_amount) as EditText
         var userId:TextView = view.findViewById<TextView>(R.id.userId) as TextView
+        var delete:ImageView = view.findViewById(R.id.imageview_delete)
+        var edit:ImageView = view.findViewById(R.id.imageview_edit)
+        var amountTv:TextView = view.findViewById(R.id.amount_tv_payer_list)
+        var save:ImageView = view.findViewById(R.id.imageview_save)
+
+        save.visibility = View.INVISIBLE
 
         nameAutoCompleteText.text = user.user_name
         userId.text = user.user_id.toString()
+        if(amount>0) {
+            amountEdittext.setText(Utility.getInHigherDenimonation(amount))
+            amountTv.setText(Utility.getInHigherDenimonation(amount))
+        }
+       /* edit.setOnClickListener {
+            amountTv.visibility = View.INVISIBLE
+            amountEdittext.visibility = View.VISIBLE
+            save.visibility = View.VISIBLE
+            edit.visibility = View.INVISIBLE
+        }*/
+        edit.visibility = View.INVISIBLE
+        amountTv.visibility = View.INVISIBLE
+
+      /*  amountTv.setOnClickListener {
+            amountTv.visibility = View.VISIBLE
+            amountEdittext.visibility = View.INVISIBLE
+        }*/
+
+       /* save.setOnClickListener {
+            edit.visibility = View.VISIBLE
+
+
+        }*/
+
+        delete.setOnClickListener { view:View->
+
+        }
         return  view
     }
 
     override fun onUserSelected(payerList:HashMap<User,Int>) {
         for(user in payerList.keys) {
-            addUserToPayerList(user)
+            addUserToPayerList(user,0)
         }
     }
 

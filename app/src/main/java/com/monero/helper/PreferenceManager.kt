@@ -14,12 +14,17 @@ class PreferenceManager(context: Context) {
     val PREFERRED_CURRENCY_CODE = "mPreferredCurrencyCode"
     val PREFERRED_CURRENCY_SYMBOL = "mPreferredCurrencySymbol"
     val PREFERRED_CURRENCY_NAME = "mPreferredCurrencyName"
+    val MY_UID="mUID"
 
     val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME,0)
 
     var myCredential: String
         get() = prefs.getString(MY_CREDENTIAL,"")
         set(value) = prefs.edit().putString(MY_CREDENTIAL, value).apply()
+
+    var myUid:String
+        get() = prefs.getString(MY_UID,"")
+        set(value) = prefs.edit().putString(MY_UID,value).apply()
 
     var myDisplayPicture: String
         get() = prefs.getString(MY_PROFILE_IMAGE,"")

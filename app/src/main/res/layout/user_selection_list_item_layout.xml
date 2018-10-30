@@ -24,6 +24,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="10dp"
         android:singleLine="true"
+        android:layout_toLeftOf="@+id/edittext_paid_amount"
         android:textSize="18sp"/>
     <ImageView
         android:layout_width="wrap_content"
@@ -38,9 +39,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
+        android:src="@drawable/ic_action_done"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:id="@+id/imageview_save"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:src="@drawable/ic_action_name"
         android:layout_toLeftOf="@id/imageview_delete"
         android:id="@+id/imageview_edit"/>
+
     <EditText
         android:layout_width="100dp"
         android:layout_height="wrap_content"
@@ -51,6 +62,16 @@
         android:inputType="numberDecimal"
         android:id="@+id/edittext_paid_amount"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/edittext_paid_amount"
+        android:text="Sample"
+        android:layout_centerVertical="true"
+        android:gravity="center_horizontal"
+        android:textColor="#000000"
+        android:id="@+id/amount_tv_payer_list"
+        android:layout_alignRight="@id/edittext_paid_amount"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

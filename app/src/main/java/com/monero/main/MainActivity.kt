@@ -407,7 +407,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         }else{
 
             ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
-
+            ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid
           // Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
          //  Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())
 

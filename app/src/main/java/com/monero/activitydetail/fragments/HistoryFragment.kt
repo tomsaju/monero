@@ -46,16 +46,16 @@ class HistoryFragment:Fragment(),IHistoryView {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        var view:View = inflater?.inflate(R.layout.history_fragment,container,false)
+         var view:View = inflater?.inflate(R.layout.history_fragment,container,false)
 
          recyclerView =view.findViewById<RecyclerView>(R.id.history_list)
          recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayout.VERTICAL, false)
          mPresenter = HistoryPresenter(requireContext(),this)
 
-        mPresenter.getAllHistoryLogForActivity((activity as DetailActivity).activityId)
-        adapter = HistoryLogRecyclerAdapter(logList,requireContext())
-        recyclerView.adapter = adapter
-        return view
+         mPresenter.getAllHistoryLogForActivity((activity as DetailActivity).activityId)
+         adapter = HistoryLogRecyclerAdapter(logList,requireContext())
+         recyclerView.adapter = adapter
+         return view
 
     }
 
@@ -72,8 +72,11 @@ class HistoryFragment:Fragment(),IHistoryView {
         hLogList?.observe(this, object : Observer<List<HistoryLogItem>> {
             override fun onChanged(allList: List<HistoryLogItem>?) {
                 if(allList!=null) {
-                    logList = ArrayList(allList)
-                    adapter.notifyDataSetChanged()
+
+                    var sortedList = allList.sortedWith(compareBy({ it.Timestamp.toLong() }))
+                    logList = ArrayList(sortedList.reversed())
+                    adapter = HistoryLogRecyclerAdapter(logList,requireContext())
+                    recyclerView.adapter = adapter
                 }
             }
 

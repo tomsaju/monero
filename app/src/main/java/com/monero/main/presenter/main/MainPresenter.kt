@@ -32,8 +32,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-
-
+import com.google.firebase.auth.FirebaseAuth
 
 
 /**
@@ -81,15 +80,18 @@ class MainPresenter : IMainPresenter {
             }
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+
+
             //save the log to history
             var historyItem = HistoryLogItem(UUID.randomUUID().toString(),
-                                activity.author.user_id,
-                                DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_ACTIVITY,
-                                activity.createdDate.toString(),
-                                activity.title,
-                                "",
-                                activity.id,
-                                activity.id)
+                    activity.author.user_id,
+                    activity.author.user_name,
+                    DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_ACTIVITY,
+                    activity.createdDate.toString(),
+                    activity.title,
+                    "",
+                    activity.id,
+                    activity.id, false)
 
             saveLog(historyItem)
 
@@ -156,14 +158,15 @@ class MainPresenter : IMainPresenter {
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
             //save the log to history
-            var historyItem = HistoryLogItem(UUID.randomUUID().toString(),
+            var historyItem = HistoryLogItem(System.currentTimeMillis().toString(),
                     activity.author.user_id,
+                    activity.author.user_name,
                     DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_EDITTED_ACTIVITY,
                     activity.createdDate.toString(),
                     activity.title,
                     "",
                     activity.id,
-                    activity.id)
+                    activity.id, false)
 
             saveLog(historyItem)
 
@@ -222,11 +225,48 @@ class MainPresenter : IMainPresenter {
             db = getAppDatabase(context)
             db?.historyDao()?.insertIntoHistoryTable(historyItem) // .database?.personDao()?.insert(person)
         }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe({ orderItem ->
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ history ->
 
-           Log.d(TAG,"log saving complete")
+            saveHistorytoCloud(historyItem)
+            Log.d(TAG, "log saving complete")
         })
 
+    }
+
+    private fun saveHistorytoCloud(historyItem: HistoryLogItem) {
+
+        var historylog = HashMap<String, Any>()
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.LOG_ITEM_ID, historyItem.log_id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.AUTHOR_ID, historyItem.Author_Id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.AUTHOR_NAME, historyItem.Author_name)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.EVENT_TYPE, historyItem.Event_Type)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.TIMESTAMP, historyItem.Timestamp)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_NAME, historyItem.Subject_Name)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_URL, historyItem.Subject_Url)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_ID, historyItem.Subject_Id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID, historyItem.Activity_Id)
+        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SYNC_STATUS, historyItem.SyncStatus)
+
+        firestoreDb?.collection("HistoryLog")?.document(historyItem.log_id)?.set(historylog)
+
+                ?.addOnSuccessListener { DocumentReference ->
+
+                    historyItem.SyncStatus = true
+                    //success
+                    Observable.fromCallable {
+                        db = getAppDatabase(context)
+                        db?.historyDao()?.insertIntoHistoryTable(historyItem) // .database?.personDao()?.insert(person)
+                    }.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe({ history ->
+
+                        Log.d(TAG,"log saving complete")
+                    })
+                }
+
+                ?.addOnFailureListener { e ->
+                    //failure
+                    Log.d(TAG,e.toString())
+                }
     }
 
     override fun getAllActivitiesFromServer() {

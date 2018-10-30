@@ -10,13 +10,15 @@ import com.monero.Dao.DBContract
  */
 @Entity(tableName = DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME)
 data class HistoryLogItem( @ColumnInfo(name ="Log_Item_Id") @PrimaryKey var log_id:String,
-                          val Author_Id:String,
-                          val Event_Type:String,
-                          val Timestamp:String,
-                          val Subject_Name:String,
-                          val Subject_Url:String,
-                          val Subject_Id:String,
-                          val Activity_Id:String) {
+                           val Author_Id:String,
+                           val Author_name:String,
+                           val Event_Type:String,
+                           val Timestamp:String,
+                           val Subject_Name:String,
+                           val Subject_Url:String,
+                           val Subject_Id:String,
+                           val Activity_Id:String,
+                           var SyncStatus:Boolean) {
 }
 
 

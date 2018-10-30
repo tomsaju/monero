@@ -74,7 +74,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
         bannerItem = BannerItem("0.00","0.00","0.00","0.00")
         bannerAdapter = BannerViewPager(this,bannerItem)
         bannerViewPager.adapter = bannerAdapter
-        bannerViewPager.offscreenPageLimit = 3
+        //bannerViewPager.offscreenPageLimit = 3
         addExpenseFab = findViewById(R.id.addexpenseButton)
         mSectionsPagerAdapter = DetailViewPagerAdapter(supportFragmentManager,this)
         mDetailPresenter = DetailPresenter(this,this)

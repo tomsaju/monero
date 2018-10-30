@@ -16,7 +16,9 @@ import android.R.attr.y
 import android.graphics.Point
 import android.view.Display
 import android.view.WindowManager
-
+import java.util.*
+import android.text.format.DateUtils
+import com.monero.Application.ApplicationController
 
 
 /**
@@ -48,8 +50,22 @@ class HistoryLogRecyclerAdapter (var historyLogList:ArrayList<HistoryLogItem>, v
         }else if(historyLogList[position].Event_Type==DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_EDITTED_EXPENSE){
             action= "editted an expense"
         }
+        var text =""
 
-        var text = historyLogList[position].Author_Id +" "+action+" "+historyLogList[position].Subject_Name
+        if(ApplicationController.preferenceManager?.myUid==historyLogList[position].Author_Id){
+            text = "You"+" "+action+" "+historyLogList[position].Subject_Name
+        }else{
+            text = historyLogList[position].Author_name +" "+action+" "+historyLogList[position].Subject_Name
+        }
+
+
+        var timestamp =  historyLogList[position].Timestamp.toLong()
+        var date = Date(timestamp)
+
+        val niceDateStr = DateUtils.getRelativeTimeSpanString(date.time, Calendar.getInstance().timeInMillis, DateUtils.MINUTE_IN_MILLIS)
+
+        holder.timeTv.text = niceDateStr
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             holder.title.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
         } else {
@@ -81,4 +97,5 @@ class HistoryLogViewHolder (view: View) : RecyclerView.ViewHolder(view) {
     var title = view.findViewById<TextView>(R.id.pendingText)
     var timeLineTop = view.findViewById<View>(R.id.topPortion_history_line)
     var timeLineBottom = view.findViewById<View>(R.id.bottomPortion_history_line)
+    var timeTv = view.findViewById<TextView>(R.id.timeStamp)
 }

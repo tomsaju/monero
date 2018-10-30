@@ -116,12 +116,14 @@ class DBContract {
             const val TABLE_NAME = "History_Log_Table"
             const val LOG_ITEM_ID = "Log_Item_Id";
             const val AUTHOR_ID = "Author_Id"
+            const val AUTHOR_NAME = "Author_name"
             const val EVENT_TYPE = "Event_Type"
             const val TIMESTAMP ="Timestamp"
             const val SUBJECT_NAME ="Subject_Name"
             const val SUBJECT_URL = "Subject_Url"
             const val SUBJECT_ID ="Subject_Id"
             const val ACTIVITY_ID ="Activity_Id"
+            const val SYNC_STATUS ="SyncStatus"
 
 
             const val TYPE_ADDED_NEW_ACTIVITY = "new_activity"

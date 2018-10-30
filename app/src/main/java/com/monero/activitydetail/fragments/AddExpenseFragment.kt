@@ -107,10 +107,12 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
             var intent = Intent(context,PayerSelectorActivity::class.java)
             intent.putExtra("activity_id",activityId)
+            intent.putExtra("PayeeList",paidUsersList)
             if(amountEditText.text.isEmpty()){
                 intent.putExtra("entered_total", 0)
             }else {
-                intent.putExtra("entered_total", amountEditText.text.toString().toDouble())
+                var valueInHigherDenomination = amountEditText.text.toString().toDouble()*100
+                intent.putExtra("entered_total", valueInHigherDenomination.toInt())
             }
             startActivityForResult(intent,REQUEST_CODE_PAYER_SELECTION)
 
