@@ -13,6 +13,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.RelativeLayout
 
 import com.monero.R
 import com.monero.activitydetail.DetailActivity
@@ -22,6 +23,7 @@ import com.monero.activitydetail.presenter.expenselist.IExpenseListPresenter
 import com.monero.activitydetail.presenter.expenselist.IExpenseListView
 import com.monero.models.Activities
 import com.monero.models.Expense
+import kotlinx.android.synthetic.main.no_expenses_layout.*
 
 
 class ExpenseListFragment : Fragment(),IExpenseListView {
@@ -33,6 +35,7 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
     private lateinit var expenseAdapter: ExpenseListRecyclerAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var mPresenter:IExpenseListPresenter
+    lateinit var emptyLayout: RelativeLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,7 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
          var view:View = inflater!!.inflate(R.layout.fragment_expense_list, container, false)
         //fab = view.findViewById<FloatingActionButton>(R.id.addexpenseButton) as FloatingActionButton
         recyclerView = view.findViewById(R.id.expense_list)
+        emptyLayout = view?.findViewById(R.id.no_items_layout_parent)
         recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayout.VERTICAL, false)
         mPresenter=ExpenseListPresenter(requireContext(),this)
 
@@ -92,10 +96,17 @@ class ExpenseListFragment : Fragment(),IExpenseListView {
 
         setExpenseTotal(expenseList)
         this.expenseList = expenseList
+
         expenseAdapter = ExpenseListRecyclerAdapter(expenseList,requireActivity())
         if(recyclerView !=null){
             recyclerView.adapter = expenseAdapter
         }
+        if(expenseList==null||expenseList.isEmpty()){
+            emptyLayout.visibility = View.VISIBLE
+        }else{
+            emptyLayout.visibility = View.GONE
+        }
+
     }
 
     private fun setExpenseTotal(expenseList: ArrayList<Expense>) {

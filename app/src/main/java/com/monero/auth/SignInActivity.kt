@@ -11,9 +11,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.ErrorCodes
-import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
 import com.monero.BuildConfig
@@ -94,11 +91,11 @@ class SignInActivity : AppCompatActivity() {
                 this checks if the activity result we are getting is for the sign in
                 as we can have more than activity to be started in our Activity.
              */
-            val response = IdpResponse.fromResultIntent(data)
-            if(resultCode == Activity.RESULT_OK){
-                /*
+           // val response = IdpResponse.fromResultIntent(data)
+            /*if(resultCode == Activity.RESULT_OK){
+                *//*
                     Checks if the User sign in was successful
-                 */
+                 *//*
                 ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
                 ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid
 
@@ -125,7 +122,7 @@ class SignInActivity : AppCompatActivity() {
                     showSnackbar(R.string.unknown_error)
                     return
                 }
-            }
+            }*/
         }
         showSnackbar(R.string.unknown_sign_in_response) //if the sign in response was unknown
     }

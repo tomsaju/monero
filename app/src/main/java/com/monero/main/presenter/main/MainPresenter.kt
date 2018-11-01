@@ -299,18 +299,18 @@ class MainPresenter : IMainPresenter {
 
 
                 val tagType = object : TypeToken<List<Tag>>() {}.type
-                val tagsList = Gson().fromJson<List<Tag>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS).toString(), tagType)
+                val tagsList = Gson().fromJson<List<Tag>>(document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS).toString(), tagType)
 
                 val userListType = object : TypeToken<List<User>>() {}.type
-                val usersList = Gson().fromJson<List<User>>(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS).toString(), userListType)
+                val usersList = Gson().fromJson<List<User>>(document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS).toString(), userListType)
 
-                var activityAuthor = TagConverter().convertJsonToUserObject(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR).toString())
+                var activityAuthor = TagConverter().convertJsonToUserObject(document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR).toString())
 
                 var id: String = activityId
-                var title: String = document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE).toString()
-                var description: String = document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION).toString()
+                var title: String = document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE).toString()
+                var description: String = document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION).toString()
                 var tags: List<Tag> = tagsList
-                var mode: Int = Integer.parseInt(document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE).toString())
+                var mode: Int = Integer.parseInt(document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE).toString())
                 var members: List<User> = usersList
                 var author: User = activityAuthor
                 var syncStatus: Boolean = true //syncstatus is true
@@ -322,14 +322,14 @@ class MainPresenter : IMainPresenter {
                 } else {
 
 
-                    var dateObject = document.get("last_modified_time")
+                    var dateObject = document!!.get("last_modified_time")
                     lastModifiedTime = dateObject.toString();
                     timestampWithoutNanoseconds = lastModifiedTime.substringBefore(",")
                     timestampinSeconds = timestampWithoutNanoseconds.substringAfter("=")
                 }
                 var transactionIds = ""
                 var historyLogIds = ""
-                var expenseListId = document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_EXPENSE_LIST).toString()
+                var expenseListId = document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_EXPENSE_LIST).toString()
                 var downloadedActivity = Activities(id, title, description, tags, mode, members, author, syncStatus, createdDate, expenseListId, historyLogIds, transactionIds, timestampinSeconds)
 
 
@@ -448,15 +448,15 @@ class MainPresenter : IMainPresenter {
                 view.hideLoader()
                 val document = task.result
 
-                var title: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_TITLE).toString()
-                var Comments: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_COMMENTS).toString()
-                var activityId: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID).toString()
-                var creditList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS).toString()
-                var debitList: String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT).toString()
-                var createdDate :String = document.get(DBContract.EXPENSE_TABLE.EXPENSE_CREATED_DATE).toString()
+                var title: String = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_TITLE).toString()
+                var Comments: String = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_COMMENTS).toString()
+                var activityId: String = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_ACTIVITY_ID).toString()
+                var creditList: String = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_CREDITS).toString()
+                var debitList: String = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_DEBIT).toString()
+                var createdDate :String = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_CREATED_DATE).toString()
                 var splitType =0
                 try {
-                    splitType = document.get(DBContract.EXPENSE_TABLE.EXPENSE_SPLIT_TYPE) as Int
+                    splitType = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_SPLIT_TYPE) as Int
                 }catch (e:Exception){
 
                 }
@@ -464,7 +464,7 @@ class MainPresenter : IMainPresenter {
 
                 var amount: Int = 0
                 try {
-                    amount = document.get(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT).toString().toInt()
+                    amount = document!!.get(DBContract.EXPENSE_TABLE.EXPENSE_AMOUNT).toString().toInt()
                 }catch (e:Exception){
 
                 }
@@ -545,10 +545,10 @@ class MainPresenter : IMainPresenter {
                 try {
                     view.hideLoader()
                     val document = task.result
-                    if (document.exists()) {
+                    if (document!!.exists()) {
                         var finalList: HashMap<String, String> = HashMap();
 
-                        val activitiesData: Map<String, Any>? = document.data!!
+                        val activitiesData: Map<String, Any>? = document!!.data!!
                         val activityiesDetails = activitiesData?.get("activities_details") as HashMap<String, Any>;
                         for ((key, value) in activityiesDetails) {
                             println("$key = $value")

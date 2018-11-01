@@ -167,13 +167,13 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
            mListener?.closeFragment()
          }
 
-         if(auth!=null&&auth.currentUser!=null){
+      //   if(auth!=null&&auth.currentUser!=null){
              val uid = auth.currentUser?.uid
              if(uid!=null){
                   myuser = User(uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
              }
 
-         }
+        // }
 
        splitTypeTv.setOnClickListener {
 

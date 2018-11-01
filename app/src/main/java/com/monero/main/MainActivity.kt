@@ -47,6 +47,7 @@ import com.monero.models.Contact
 import com.monero.models.User
 import com.monero.network.RestService
 import com.monero.service.ContactsSyncService
+import com.monero.signup.SignUpActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
@@ -401,7 +402,7 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
         if(auth.currentUser==null){
             ApplicationController.preferenceManager!!.myCredential =""
             //go to login page
-            var loginIntent = Intent(this,SignInActivity::class.java)
+            var loginIntent = Intent(this,SignUpActivity::class.java)
             startActivity(loginIntent)
             finish()
         }else{

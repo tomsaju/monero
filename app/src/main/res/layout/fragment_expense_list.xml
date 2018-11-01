@@ -2,16 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="5dp"
     tools:context="com.monero.activitydetail.fragments.ExpenseListFragment">
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/expense_list"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         tools:listitem="@layout/expense_list_item_layout">
 
     </android.support.v7.widget.RecyclerView>
 
+    <include layout="@layout/no_expenses_layout"></include>
 
 </FrameLayout>

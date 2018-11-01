@@ -121,11 +121,11 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
             if (checkifInputValid()) {
 
-                if(auth!=null) {
+            //    if(auth!=null) {
                     //val author = User(auth.currentUser?.uid!!, auth.currentUser?.displayName!!, auth.currentUser?.phoneNumber!!, auth.currentUser?.email!!)
-                    if(auth==null){
+                   // if(auth==null){
                         auth = FirebaseAuth.getInstance()!!
-                    }
+                   // }
 
                     var author = User("dummy string", "dummy author", "dummy phone", "dummy mail")
                     /*if(auth.currentUser!=null) {
@@ -140,9 +140,9 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
                     val activity = Activities(currentActivityId, title?.text.toString(), description?.text.toString(), selectedTagList, SELECTED_MODE, selectedUserList, myUser, false, createdDate, expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
                     mListener.saveActivity(activity)
 
-                }else{
+              /*  }else{
                     Toast.makeText(context, "Error for user", Toast.LENGTH_SHORT).show()
-                }
+                }*/
             }
         }
 

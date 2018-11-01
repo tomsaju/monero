@@ -19,6 +19,8 @@ import com.monero.models.Activities
 import com.monero.models.Tag
 import android.widget.AdapterView.AdapterContextMenuInfo
 import android.view.ContextMenu.ContextMenuInfo
+import android.widget.RelativeLayout
+import kotlinx.android.synthetic.main.no_activities_layout.*
 
 
 /**
@@ -30,6 +32,7 @@ class ActivityFragment: Fragment() {
     var adapter:ActivityListAdapter?=null
     lateinit var progressBar: ProgressBar
     lateinit var fabAdd: FloatingActionButton
+    lateinit var emptyLayout:RelativeLayout
 
     companion object {
         fun newInstance(): ActivityFragment {
@@ -58,7 +61,7 @@ class ActivityFragment: Fragment() {
         activitiesList = rootView?.findViewById<ListView>(R.id.activity_listview) as ListView
         progressBar = rootView?.findViewById(R.id.progressBar)
         fabAdd = rootView?.findViewById(R.id.fabadd)
-
+        emptyLayout = rootView?.findViewById(R.id.no_items_layout_parent)
         /*val addActivityButton: FloatingActionButton = rootView?.findViewById<FloatingActionButton>(R.id.add_activity_button) as FloatingActionButton
         addActivityButton.setOnClickListener { _:View->
             var taglist:MutableList<Tag> = mutableListOf<Tag>()
@@ -84,9 +87,12 @@ class ActivityFragment: Fragment() {
     fun onAllActivitiesFetched(activities: List<Activities>?) {
         //  hideProgressBar()
         //pass result to fragment
-        if (activities != null) {
+        if (activities != null&& activities.isNotEmpty()) {
+            no_items_layout_parent.visibility = View.GONE
             adapter = ActivityListAdapter(requireContext(), activities)
             activitiesList?.adapter = adapter
+        }else{
+            no_items_layout_parent.visibility = View.VISIBLE
         }
 
         activitiesList?.setOnItemClickListener { _, view, position, _ ->
