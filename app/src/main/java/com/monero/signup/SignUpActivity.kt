@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.R
@@ -12,9 +13,14 @@ import kotlinx.android.synthetic.main.activity_sign_up2.*
 import android.widget.Toast
 import android.text.TextUtils
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthCredential
 import com.monero.addActivities.AddActivityFragment
+import com.monero.main.MainActivity
 import com.monero.signin.AddPhoneFragment
 import com.monero.signin.SignInActivity
+import kotlinx.android.synthetic.main.add_phone_number_layout.*
+import java.lang.Exception
 
 
 class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragment.OnAddPhoneFragmentInteractionListener {
@@ -33,12 +39,13 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
         progressDialog = ProgressDialog(this)
 
         //attaching listener to button
+        progressBarSignUp.visibility = View.INVISIBLE
         buttonSignup.setOnClickListener(this)
         sign_in_page_button.setOnClickListener(this)
     }
 
     private fun registerUser(email: String, password: String) {
-
+        progressBarSignUp.visibility = View.VISIBLE
         //creating a new user
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
@@ -46,7 +53,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                     if (task.isSuccessful) {
                         //display some message here
                         Log.d(TAG, "successfull creation")
-
+                        progressBarSignUp.visibility = View.INVISIBLE
                         showPhoneNumberFragment()
 
                     } else {
@@ -92,7 +99,86 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
     }
 }
 
-    override fun onFragmentInteraction(uri: Uri) {
+    override fun signInWithPhoneCredential(credential: PhoneAuthCredential?) {
+
+        /*firebaseAuth.signInWithCredential(credential!!)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithCredential:success")
+
+                        val user = task.result?.user
+                        linkUserPhoneNumber(user.phoneNumber)
+                        // ...
+                    } else {
+                        // Sign in failed, display a message and update the UI
+                        Log.d(TAG, "signInWithCredential:failure")
+                        Log.w(TAG, "signInWithCredential:failure", task.exception)
+                        if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                            // The verification code entered was invalid
+                        }
+                    }
+                }*/
+
+        firebaseAuth.currentUser?.linkWithCredential(credential!!)
+                ?.addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "linkWithCredential:success")
+                        val user = task.result?.user
+                        var mainIntent = Intent(this,MainActivity::class.java)
+                        startActivity(mainIntent)
+                        finish()
+                    } else {
+                        Log.w(TAG, "linkWithCredential:failure", task.exception)
+                        Toast.makeText(baseContext, "Authentication failed.",
+                                Toast.LENGTH_SHORT).show()
+                        progressBarSignUp.visibility = View.INVISIBLE
+                        showAlert(task.exception)
+                    }
+
+
+                }
+
+    }
+
+    private fun showAlert(exception: Exception?) {
+
+        // Initialize a new instance of
+        val builder = AlertDialog.Builder(this@SignUpActivity)
+
+        // Set the alert dialog title
+        builder.setTitle("Alert")
+
+        // Display a message on alert dialog
+        builder.setMessage(exception?.message)
+
+        // Set a positive button and its click listener on alert dialog
+        builder.setPositiveButton("OK"){dialog, which ->
+            // Do something when user press the positive button
+           dialog.dismiss()
+
+        }
+
+
+        // Display a negative button on alert dialog
+        builder.setNegativeButton("No"){dialog,which ->
+           dialog.dismiss()
+        }
+
+
+        // Display a neutral button on alert dialog
+        builder.setNeutralButton("Cancel"){dialog,_ ->
+           dialog.cancel()
+        }
+
+        // Finally, make the alert dialog using builder
+        val dialog: AlertDialog = builder.create()
+
+        // Display the alert dialog on app interface
+        dialog.show()
+    }
+
+    private fun linkUserPhoneNumber(phoneNumber: String?) {
 
     }
 }

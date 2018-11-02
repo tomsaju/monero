@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.R
@@ -17,7 +18,7 @@ class SignInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in2)
-
+        progressBarSignIn.visibility = View.INVISIBLE
         firebaseAuth = FirebaseAuth.getInstance()
 
         buttonSignin.setOnClickListener {
@@ -49,7 +50,7 @@ class SignInActivity : AppCompatActivity() {
 
 
     private fun signInUser(email:String,password:String) {
-
+        progressBarSignIn.visibility = View.VISIBLE
         //creating a new user
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
@@ -57,13 +58,16 @@ class SignInActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         //display some message here
                         Log.d(TAG,"sign in successfull")
+                        Toast.makeText(this,"Sign in successfull", Toast.LENGTH_SHORT)
                         startActivity(Intent(this@SignInActivity,MainActivity::class.java))
                     } else {
                         //display some message here
                         Log.d(TAG,"unsuccessfull"+task.exception?.message)
                         Toast.makeText(this,task.exception?.message, Toast.LENGTH_SHORT)
+                        progressBarSignIn.visibility = View.INVISIBLE
                     }
                 }
+
 
     }
 

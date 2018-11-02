@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/enter_otp_title"
+        android:text="Enter the code you received"
+        android:layout_margin="10dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/enter_otp_title"
+        android:layout_margin="10dp"
+        android:hint="Enter OTP"
+        android:id="@+id/enter_otp_edittext"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/enter_otp_edittext"
+        android:layout_centerHorizontal="true"
+        android:textSize="13sp"
+        android:id="@+id/resend_otp"
+        android:text="Resend OTP" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/resend_otp"
+        android:id="@+id/submit_otp_btn"
+        android:text="Submit"/>
+</RelativeLayout>
