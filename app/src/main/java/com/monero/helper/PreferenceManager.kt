@@ -15,6 +15,7 @@ class PreferenceManager(context: Context) {
     val PREFERRED_CURRENCY_SYMBOL = "mPreferredCurrencySymbol"
     val PREFERRED_CURRENCY_NAME = "mPreferredCurrencyName"
     val MY_UID="mUID"
+    val FCM_TOKEN="fcmToken"
 
     val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME,0)
 
@@ -42,6 +43,8 @@ class PreferenceManager(context: Context) {
         get() = prefs.getString(PREFERRED_CURRENCY_NAME,"United States Dollar")
         set(value) = prefs.edit().putString(PREFERRED_CURRENCY_NAME,value).apply()
 
-
+    var fcmToken:String
+        get() = prefs.getString(FCM_TOKEN,"")
+        set(value) = prefs.edit().putString(FCM_TOKEN,value).apply()
 
 }

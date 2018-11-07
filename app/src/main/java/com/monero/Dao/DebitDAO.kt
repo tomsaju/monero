@@ -24,4 +24,7 @@ import com.monero.models.Debit
 
     @Delete
     fun deleteDebit(debit: Debit)
+
+    @Query("DELETE FROM "+DBContract.DEBIT_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

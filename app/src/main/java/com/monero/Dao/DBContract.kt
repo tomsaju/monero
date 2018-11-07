@@ -136,4 +136,17 @@ class DBContract {
         }
     }
 
+    public class NOTIFICATION_ITEM_TABLE {
+
+        companion object {
+            const val TABLE_NAME = "Notification_Items_Table"
+            const val NOTIFICATION_ID = "notificationId";
+            const val MESSAGE = "message"
+            const val TITLE = "title"
+            const val TYPE = "type"
+            const val TARGET_ID = "targetId"
+
+        }
+    }
+
 }

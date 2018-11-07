@@ -72,14 +72,14 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         refreshButton = rootView?.findViewById(R.id.refresh_contact_list)
 
         myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
-        var myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone)
+        var myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone,myUser.user_email)
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
         selectedContactList = ArrayList<ContactMinimal>()
         var currentUserList = mListener?.getCurrentActivityUserList()
 
         for(user in currentUserList!!){
-            selectedContactList?.add(ContactMinimal(user.user_id,user.user_name,user.user_phone))
+            selectedContactList?.add(ContactMinimal(user.user_id,user.user_name,user.user_phone,user.user_email))
         }
      //   loadContacts(contacts)
         //dialog?.setTitle("Select participants")
@@ -100,7 +100,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
            // dialog?.dismiss()
         })
 
-        var myProfileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), "You", false, "my " + " id ")
+        var myProfileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), "You","","", false, "my " + " id ")
         horizontalList.addView(myProfileImage)
 
         return rootView
@@ -149,7 +149,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
                     .doAfterSuccess({ listFromDB: List<Contact> ->
                         var minimalContactList = ArrayList<ContactMinimal>()
                         for(contact in listFromDB){
-                            minimalContactList.add(ContactMinimal(contact.Contact_uuid,contact.Contact_name_local,contact.Contact_phone))
+                            minimalContactList.add(ContactMinimal(contact.Contact_uuid,contact.Contact_name_local,contact.Contact_phone,""))
                         }
                         loadContacts(minimalContactList)
                     })
@@ -168,8 +168,15 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     }
 
     override fun onContactSelected(contact: ContactMinimal) {
-         var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.pete), contact.name, true, contact.phoneNumber + " id ")
-         profileImage.setProfileImageListener { this@SelectContactsFragment as CircularProfileImage.ICircularProfileImageListener }
+        var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
+            if(contact.name.isNotEmpty()) {
+                 profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
+            }else if(contact.phoneNumber.isNotEmpty()){
+                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
+            }else if(contact.email.isNotEmpty()){
+                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
+            }
+         profileImage?.setProfileImageListener (this@SelectContactsFragment)
          selectedContactList?.add(contact)
          horizontalList.addView(profileImage)
          horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
@@ -199,16 +206,36 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         fun getCurrentActivityUserList(): java.util.ArrayList<User>
         fun syncContactsWithServer(contactList: ArrayList<Contact>)
     }
-    override fun onProfileClosed(name: String?) {
-        var selectedItem = selectedContactList?.filter { contactMinimal: ContactMinimal -> contactMinimal.name==name }
-        if(selectedItem!=null&&selectedContactList!=null) {
-            selectedContactList?.remove(selectedItem as ContactMinimal)
-            horizontalList.removeAllViews();
-            for(item in selectedContactList!!){
-                onContactSelected(item);
+    override fun onProfileClosed(name: String?, phone: String?, email: String?) {
 
+      /*  for(contact in selectedContactList!!){
+            if(contact.email==email&&contact.name==name&&contact.phoneNumber==phone){
+                selectedContactList!!.remove(contact)
+                break
+            }
+        }*/
+
+        var iter = selectedContactList!!.iterator()
+
+        while (iter.hasNext()) {
+            val contact = iter.next()
+
+            if(contact.email==email&&contact.name==name&&contact.phoneNumber==phone) {
+                iter.remove()
             }
         }
+
+        horizontalList.removeAllViews();
+        iter = selectedContactList!!.iterator()
+        while (iter.hasNext()) {
+            val contact = iter.next()
+            onContactSelected(contact);
+        }
+
+      /*  for(item in selectedContactList!!){
+            onContactSelected(item);
+        }*/
+
 
     }
 
@@ -222,7 +249,14 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         if (TextUtils.isEmpty(newText)) {
             contactsListView?.clearTextFilter()
         } else {
-            (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
+
+            if(newText!!.contains("@")){
+                var newUser = ContactMinimal("","","",newText)
+                (contactsListView?.adapter as ContactListAdapter).setNewItem(newUser)
+            }else {
+
+                (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
+            }
         }
         return true
     }

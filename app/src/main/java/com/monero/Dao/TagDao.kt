@@ -20,4 +20,7 @@ import com.monero.models.Tag
 
     @Delete
     fun deleteTag(tag: Tag)
+
+    @Query("DELETE FROM "+DBContract.TAG_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

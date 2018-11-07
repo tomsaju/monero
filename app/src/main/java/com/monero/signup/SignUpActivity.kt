@@ -2,7 +2,6 @@ package com.monero.signup
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -13,14 +12,15 @@ import kotlinx.android.synthetic.main.activity_sign_up2.*
 import android.widget.Toast
 import android.text.TextUtils
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
-import com.monero.addActivities.AddActivityFragment
 import com.monero.main.MainActivity
 import com.monero.signin.AddPhoneFragment
 import com.monero.signin.SignInActivity
-import kotlinx.android.synthetic.main.add_phone_number_layout.*
 import java.lang.Exception
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.FirebaseUser
+
+
 
 
 class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragment.OnAddPhoneFragmentInteractionListener {
@@ -44,7 +44,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
         sign_in_page_button.setOnClickListener(this)
     }
 
-    private fun registerUser(email: String, password: String) {
+    private fun registerUser(userName:String,email: String, password: String) {
         progressBarSignUp.visibility = View.VISIBLE
         //creating a new user
         firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -54,6 +54,14 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                         //display some message here
                         Log.d(TAG, "successfull creation")
                         progressBarSignUp.visibility = View.INVISIBLE
+
+                        val user = firebaseAuth.currentUser
+
+                        val profileUpdates = UserProfileChangeRequest.Builder()
+                                .setDisplayName(userName).build()
+
+                        user?.updateProfile(profileUpdates)
+
                         showPhoneNumberFragment()
 
                     } else {
@@ -77,12 +85,20 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
         if (view?.id == R.id.buttonSignup) {
             val email = editTextEmail.text.toString().trim()
             val password = editTextPassword.text.toString().trim()
+            val userName = editTextuserName.text.toString().trim()
 
             //checking if email and passwords are empty
+            if (TextUtils.isEmpty(userName)) {
+                Toast.makeText(this, "Please enter username", Toast.LENGTH_LONG).show()
+                return
+            }
+
+
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(this, "Please enter email", Toast.LENGTH_LONG).show()
                 return
             }
+
 
             if (TextUtils.isEmpty(password)) {
                 Toast.makeText(this, "Please enter password", Toast.LENGTH_LONG).show()
@@ -91,7 +107,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
 
             //if the email and password are not empty
             //displaying a progress dialog
-            registerUser(email, password)
+            registerUser(userName,email, password)
 
     }else if(view?.id == R.id.sign_in_page_button) {
 

@@ -45,4 +45,7 @@ import com.monero.models.Expense
 
     @Delete
     fun deleteExpense(expense: Expense)
+
+    @Query("DELETE FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

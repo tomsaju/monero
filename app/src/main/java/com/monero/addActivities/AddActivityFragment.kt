@@ -55,7 +55,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var progressBarContacts:ProgressBar
     lateinit var myUser:User
     var selectedUserList: ArrayList<User> = ArrayList()
-    var auth = FirebaseAuth.getInstance()!!
+    lateinit var auth:FirebaseAuth
     var REQUEST_CODE_TAG_SELECTION = 1
     private lateinit var currentActivityId: String
     private val MODE_PRIVATE = 1
@@ -67,7 +67,10 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
     private val createdDate: Long = System.currentTimeMillis()
 
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        auth = FirebaseAuth.getInstance()!!
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         var view = inflater!!.inflate(R.layout.new_activity_fragment, container, false);
@@ -112,7 +115,18 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
         selectedUserList = ArrayList(emptyList<User>())
         selectedTagList = ArrayList(emptyList<Tag>())
-        myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
+        if(auth.currentUser!=null){
+            var authorName = auth.currentUser?.displayName
+            var authorUid = auth.currentUser?.uid
+            var authorEmail = auth.currentUser?.email
+            var authorPhone = ""
+            if(auth.currentUser?.phoneNumber!=null){
+                authorPhone  = auth.currentUser?.phoneNumber!!
+            }
+
+            myUser = User(authorUid!!,authorName!!,authorPhone,authorEmail!!)
+
+        }
 
         selectedUserList.add(myUser)
         mListener.setCurrentActivityUserList(selectedUserList)
@@ -292,7 +306,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
           //  memberListParent.addView(getContactView(myContact))
 
             for(contact in contactList){
-                selectedUserList.add(User(contact.contact_id,contact.name,contact.phoneNumber,"sample@yopmail.com"))
+                selectedUserList.add(User(contact.contact_id,contact.name,contact.phoneNumber,contact.email))
                 memberListParent.addView(getContactView(contact))
             }
 
@@ -314,7 +328,13 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         }else {
             name.text = contact.name
         }
-        number.text = contact.phoneNumber
+        if(contact.phoneNumber.isNotEmpty()){
+            number.text = contact.phoneNumber
+        }else if(contact.email.isNotEmpty()){
+            name.text = contact.email
+        }
+
+
         return  view
     }
 
@@ -352,7 +372,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         if(activity.members!=null&&activity.members.isNotEmpty()){
             var memberlist = ArrayList<ContactMinimal>()
             for(user in activity.members!!){
-                memberlist?.add(ContactMinimal(user.user_id,user.user_name,user.user_phone))
+                memberlist?.add(ContactMinimal(user.user_id,user.user_name,user.user_phone,user.user_email))
             }
 
             setSelectedContacts(memberlist)

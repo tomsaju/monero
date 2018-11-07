@@ -17,7 +17,7 @@
         android:id="@+id/contacs_searchView"
         android:background="@android:color/white"
         app:queryBackground="@color/white_transparency"
-        app:queryHint="search" />
+        app:queryHint="Type name,number or email" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"

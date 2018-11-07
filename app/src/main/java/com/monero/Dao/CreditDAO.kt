@@ -28,4 +28,6 @@ import com.monero.models.Tag
     @Delete
     fun deleteCredit(credit: Credit)
 
+    @Query("DELETE FROM "+DBContract.CREDIT_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

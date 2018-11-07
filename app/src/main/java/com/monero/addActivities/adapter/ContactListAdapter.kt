@@ -30,16 +30,34 @@ class ContactListAdapter:BaseAdapter, Filterable {
 
     override fun getView(position: Int, parent: View?, rootView: ViewGroup?): View {
         var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var view:View = inflater?.inflate(R.layout.contact_list_item_layout,rootView,false)
-        var layoutParent:RelativeLayout = view.findViewById<RelativeLayout>(R.id.contact_item_parent) as RelativeLayout
-        var name:TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
-        var number:TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
+        var view: View
+        if(contactList.get(position)?.name.isEmpty()){
+            view = inflater?.inflate(R.layout.contact_list_add_new_item_layout, rootView, false)
+            var layoutParent: RelativeLayout = view.findViewById<RelativeLayout>(R.id.contact_item_parent) as RelativeLayout
 
-        name.text = contactList.get(position)?.name
-        number.text = contactList.get(position)?.phoneNumber
+            var number: TextView = view.findViewById<TextView>(R.id.contact_email_number) as TextView
+            if(contactList.get(position)?.phoneNumber.isNotEmpty()) {
+                number.text = contactList.get(position)?.phoneNumber
+            }else if(contactList.get(position)?.email.isNotEmpty()){
+                number.text = contactList.get(position)?.email
+            }
 
-        layoutParent.setOnClickListener { view:View ->
-            this.parent.onContactSelected(contactList[position])
+            layoutParent.setOnClickListener { view: View ->
+                this.parent.onContactSelected(contactList[position])
+            }
+        }else {
+
+            view = inflater?.inflate(R.layout.contact_list_item_layout, rootView, false)
+            var layoutParent: RelativeLayout = view.findViewById<RelativeLayout>(R.id.contact_item_parent) as RelativeLayout
+            var name: TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
+            var number: TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
+
+            name.text = contactList.get(position)?.name
+            number.text = contactList.get(position)?.phoneNumber
+
+            layoutParent.setOnClickListener { view: View ->
+                this.parent.onContactSelected(contactList[position])
+            }
         }
         return view
 
@@ -58,6 +76,12 @@ class ContactListAdapter:BaseAdapter, Filterable {
     }
 
 
+    fun setNewItem(contact:ContactMinimal){
+       var contactArrayList = ArrayList<ContactMinimal>()
+        contactArrayList.add(contact)
+        contactList = contactArrayList
+        notifyDataSetChanged()
+    }
 
    override fun getFilter(): Filter {
         return object : Filter() {
@@ -73,7 +97,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
                     if (constraint != null&&constraint.isNotEmpty()) {
                         if (orig != null && orig.isNotEmpty()) {
                             for (g in orig) {
-                                if (g.name.toLowerCase().contains(constraint.toString()))
+                                if (g.name.toLowerCase().contains(constraint.toString())||g.phoneNumber.contains(constraint.toString()))
                                     results.add(g)
                             }
                         }

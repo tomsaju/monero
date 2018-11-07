@@ -21,4 +21,7 @@ import com.monero.models.User
     @Delete
     fun deleteUser(user: User)
 
+    @Query("DELETE FROM "+DBContract.USER_TABLE.TABLE_NAME)
+    fun deleteTable()
+
 }

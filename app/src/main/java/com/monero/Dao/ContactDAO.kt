@@ -29,4 +29,7 @@ import io.reactivex.Single
 
     @Delete
     fun deleteContact(contact: Contact)
+
+    @Query("DELETE FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

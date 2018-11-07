@@ -21,6 +21,14 @@
         android:orientation="vertical">
 
         <EditText
+            android:id="@+id/editTextuserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:hint="Enter username"
+            android:inputType="textPersonName" />
+
+        <EditText
             android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

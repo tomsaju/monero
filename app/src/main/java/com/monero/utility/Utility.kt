@@ -1,5 +1,8 @@
 package com.monero.utility
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import com.monero.Application.ApplicationController
 import com.monero.activitydetail.banner.BannerViewPager
 
@@ -23,6 +26,14 @@ class Utility {
                 prefix = currencyCode+" "
             }
             return prefix
+        }
+
+         fun isNetworkAvailable(context: Context): Boolean {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
+            return if (connectivityManager is ConnectivityManager) {
+                val networkInfo: NetworkInfo? = connectivityManager.activeNetworkInfo
+                networkInfo?.isConnected ?: false
+            } else false
         }
     }
 }

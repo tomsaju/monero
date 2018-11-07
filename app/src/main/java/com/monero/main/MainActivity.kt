@@ -43,6 +43,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.Application.ApplicationController
+import com.monero.helper.AppDatabase
+import com.monero.helper.AppDatabase.Companion.db
 import com.monero.models.Contact
 import com.monero.models.User
 import com.monero.network.RestService
@@ -83,18 +85,15 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        FirebaseApp.initializeApp(applicationContext)
-        val firestore = FirebaseFirestore.getInstance()
+
+
         CalligraphyConfig.initDefault(CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/RobotoCondensed-Regular.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build())
 
 
-        val settings = FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build()
-        firestore.firestoreSettings = settings
+
          auth = FirebaseAuth.getInstance()!!
 
 //        Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
@@ -194,6 +193,8 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
 
     private fun signout() {
         FirebaseAuth.getInstance().signOut();
+        ApplicationController.instance?.deleteAllTables()
+        startActivity(Intent(this@MainActivity,com.monero.signin.SignInActivity::class.java))
     }
 
 
@@ -407,8 +408,8 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
             finish()
         }else{
 
-            ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
-            ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid
+          /*  ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
+            ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid*/
           // Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
          //  Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())
 

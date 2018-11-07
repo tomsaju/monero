@@ -175,7 +175,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
         val minimalContactList = ArrayList<ContactMinimal>()
         for(user in selecteduserList){
             if(!selectedUsersId.contains(user.user_id)) {
-                minimalContactList.add(ContactMinimal(user.user_id, user.user_name, user.user_phone))
+                minimalContactList.add(ContactMinimal(user.user_id, user.user_name, user.user_phone,user.user_email))
             }
         }
         var sortedList = minimalContactList.sortedWith(compareBy({ it.name }))

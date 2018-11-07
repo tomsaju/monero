@@ -13,15 +13,15 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
+        auth = FirebaseAuth.getInstance()!!
         if(auth.currentUser!=null){
             startActivity(Intent(this,MainActivity::class.java))
         }else{
-            loadSignUpActivity()
+            loadSignInActivity()
         }
     }
 
-    private fun loadSignUpActivity() {
-
+    private fun loadSignInActivity() {
+        startActivity(Intent(this@SplashActivity,com.monero.signin.SignInActivity::class.java))
     }
 }

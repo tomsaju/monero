@@ -46,4 +46,7 @@ import io.reactivex.Single
 
     @Query("UPDATE "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" SET "+DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME+" = :time  WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :activityId")
     fun updateActivityModifiedTime(activityId: String, time: String)
+
+    @Query("DELETE FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

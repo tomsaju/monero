@@ -35,6 +35,14 @@ public class CircularProfileImage extends ConstraintLayout {
     public String labelText;
     private int deviceWidth;
     private String id;
+    private TextView userId;
+    private TextView useremail;
+    private TextView userphone;
+    private TextView username;
+    private String email;
+    private String phone;
+
+
     public CircularProfileImage(Context context) {
         super(context);
         this.context = context;
@@ -42,12 +50,14 @@ public class CircularProfileImage extends ConstraintLayout {
         init();
     }
 
-    public CircularProfileImage(Context context, Drawable profileImage, String name, boolean cancelable, String id) {
+    public CircularProfileImage(Context context, Drawable profileImage, String name,String phone,String email,boolean cancelable, String id) {
         super(context);
         this.context = context;
         Log.d(TAG, "CircularProfileImage() returned: ");
         mDrawable = profileImage;
         labelText = name;
+        this.email = email;
+        this.phone = phone;
         this.cancelable = cancelable;
         this.id=id;
         init();
@@ -99,17 +109,45 @@ public class CircularProfileImage extends ConstraintLayout {
         rootView = inflate(context, R.layout.circular_profile_item, this);
         profileImage = (CircleImageView) rootView.findViewById(R.id.imageview);
         profileTextView = (TextView) rootView.findViewById(R.id.name_text);
+        useremail = (TextView) rootView.findViewById(R.id.user_email);
+        userphone = (TextView) rootView.findViewById(R.id.user_phone);
+        username = (TextView) rootView.findViewById(R.id.user_name);
         closeButton = (Button) rootView.findViewById(R.id.close_button);
         if(mDrawable !=null){
             profileImage.setImageDrawable(mDrawable);
         }
 
-        if(labelText!=null&&!labelText.isEmpty()){
-            profileTextView.setText(labelText);
+
+            if(labelText!=null&&!labelText.isEmpty()) {
+                profileTextView.setText(labelText);
+            }else if(phone!=null&&!phone.isEmpty()){
+                profileTextView.setText(phone);
+            }else if(email!=null&&!email.isEmpty()){
+                profileTextView.setText(email);
+            }
+
+
+        if(labelText!=null&&!labelText.isEmpty()) {
+            username.setText(labelText);
         }
+
         if(id!=null&&!id.isEmpty()){
             profileTextView.setTag(id);
         }
+
+        if(email!=null&&!email.isEmpty()){
+
+            if(useremail!=null){
+                useremail.setText(email);
+            }
+        }
+        if(phone!=null&&!phone.isEmpty()){
+
+            if(userphone!=null){
+                userphone.setText(phone);
+            }
+        }
+
         if(cancelable){
             closeButton.setVisibility(View.VISIBLE);
         }else{
@@ -120,7 +158,7 @@ public class CircularProfileImage extends ConstraintLayout {
             @Override
             public void onClick(View v) {
                 if(mCircularProfileImageListener!=null) {
-                    mCircularProfileImageListener.onProfileClosed(((String) profileTextView.getText()).toString());
+                    mCircularProfileImageListener.onProfileClosed(username.getText().toString(),userphone.getText().toString(),useremail.getText().toString());
                 }
             }
         });
@@ -235,6 +273,6 @@ public class CircularProfileImage extends ConstraintLayout {
 
 
     public interface ICircularProfileImageListener{
-        void onProfileClosed(String name);
+        void onProfileClosed(String name,String phone,String email);
     }
 }

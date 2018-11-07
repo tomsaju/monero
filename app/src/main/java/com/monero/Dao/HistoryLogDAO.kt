@@ -24,4 +24,7 @@ import com.monero.models.HistoryLogItem
 
     @Delete
     fun deleteLog(logItem: HistoryLogItem)
+
+    @Query("DELETE FROM "+DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME)
+    fun deleteTable()
 }

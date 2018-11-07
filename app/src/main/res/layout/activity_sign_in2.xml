@@ -60,6 +60,7 @@
                 android:layout_height="wrap_content"
                 android:text=" Sign up"
                 android:textSize="15sp"
+                android:id="@+id/goto_sign_up"
                 android:textColor="@android:color/holo_blue_dark"/>
         </LinearLayout>
         <TextView
