@@ -54,18 +54,17 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var addMembersLayout:FrameLayout
     lateinit var progressBarContacts:ProgressBar
     lateinit var myUser:User
-    var selectedUserList: ArrayList<User> = ArrayList()
     lateinit var auth:FirebaseAuth
-    var REQUEST_CODE_TAG_SELECTION = 1
-    private lateinit var currentActivityId: String
     private val MODE_PRIVATE = 1
     private val MODE_PUBLIC = 2
     private var expenseIdList = ""
     private var historyIdList = ""
     private var transactionIdList = ""
     private var SELECTED_MODE = 0
-
     private val createdDate: Long = System.currentTimeMillis()
+    var REQUEST_CODE_TAG_SELECTION = 1
+    var selectedUserList: ArrayList<User> = ArrayList()
+    private lateinit var currentActivityId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,6 +126,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
             myUser = User(authorUid!!,authorName!!,authorPhone,authorEmail!!)
 
         }
+
 
         selectedUserList.add(myUser)
         mListener.setCurrentActivityUserList(selectedUserList)
