@@ -1,6 +1,7 @@
 package com.monero.signin
 
 import android.content.Intent
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -8,21 +9,39 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.main.MainActivity
 import com.monero.signup.SignUpActivity
 import com.monero.utility.Utility
 import kotlinx.android.synthetic.main.activity_sign_in2.*
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+
+
 
 class SignInActivity : AppCompatActivity() {
     var TAG = "SignupActivity"
     private lateinit var firebaseAuth: FirebaseAuth
+    var storage: FirebaseStorage? = null
+    var storageReference: StorageReference? = null
+    var myImageReference: StorageReference? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in2)
         progressBarSignIn.visibility = View.INVISIBLE
         firebaseAuth = FirebaseAuth.getInstance()
+        storage = FirebaseStorage.getInstance();
+        if(storage!=null) {
+            val firebaseStorage = storage
+            storageReference = firebaseStorage?.getReference();
+        }
+
+
+
 
         buttonSignin.setOnClickListener {
 
@@ -74,7 +93,31 @@ class SignInActivity : AppCompatActivity() {
                         //register for fcm notifications
                         var notificationKey = HashMap<String, Any>()
                         notificationKey.put("Token", ApplicationController.preferenceManager!!.fcmToken)
+                        //save user id, phone number and email
+                        if(firebaseAuth.currentUser?.uid!=null) {
+                            ApplicationController.preferenceManager?.myUid = firebaseAuth.currentUser?.uid!!
+                        }
 
+                        if(firebaseAuth.currentUser?.phoneNumber!=null) {
+                            ApplicationController.preferenceManager?.myPhone = firebaseAuth.currentUser?.phoneNumber!!
+                        }
+
+                        if(firebaseAuth.currentUser?.email!=null){
+                            ApplicationController.preferenceManager?.myEmail = firebaseAuth.currentUser?.email!!
+                        }
+
+
+                        // Create a reference to 'images/mountains.jpg'
+                        myImageReference = storageReference?.child("displayImages/"+firebaseAuth.currentUser?.uid+".jpg")
+
+                        myImageReference?.downloadUrl?.addOnSuccessListener(OnSuccessListener<Any> { uri->
+
+                            ApplicationController.preferenceManager!!.myDisplayPicture = uri.toString()
+
+                            // Got the download URL for 'users/me/profile.png'
+                        })?.addOnFailureListener(OnFailureListener {
+                            // Handle any errors
+                        })
 
                         ApplicationController.firestore?.collection("NotificationTokens")?.document(firebaseAuth.currentUser!!.uid)?.set(notificationKey)
 

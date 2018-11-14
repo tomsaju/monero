@@ -1,5 +1,6 @@
 package com.monero.main.fragments
 
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,10 +12,8 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.PopupMenu
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -27,10 +26,13 @@ import kotlinx.android.synthetic.main.profile_fragment.*
 import java.io.IOException
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.Gson
 import com.monero.Application.ApplicationController
 import com.monero.helper.PreferenceManager
+import com.monero.models.User
 import com.mynameismidori.currencypicker.CurrencyPicker
 import com.mynameismidori.currencypicker.CurrencyPickerListener
+import net.glxn.qrgen.android.QRCode
 import java.io.ByteArrayOutputStream
 import java.util.*
 
@@ -52,6 +54,7 @@ class ProfileFragment:Fragment() {
     lateinit var userName:TextView
     lateinit var userEmail:TextView
     lateinit var userPhone:TextView
+    lateinit var seeQRcode:TextView
 
     var prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
         if(key == ApplicationController.preferenceManager?.PREFERRED_CURRENCY_CODE ||
@@ -90,6 +93,9 @@ class ProfileFragment:Fragment() {
          userName = rootView.findViewById(R.id.text_name)
          userEmail = rootView.findViewById(R.id.user_email_tv)
          userPhone = rootView.findViewById(R.id.user_phone_tv)
+         seeQRcode = rootView.findViewById(R.id.see_qr_code)
+
+
 
          var displayPhoto = ApplicationController.preferenceManager!!.myDisplayPicture
         if(displayPhoto!=null&&displayPhoto.isNotEmpty()) {
@@ -122,6 +128,23 @@ class ProfileFragment:Fragment() {
            // name.text = auth.currentUser?.displayName.toString()
         }else{
           //  name.text = "No users signed in"
+        }
+
+        seeQRcode.setOnClickListener {
+
+            var userId = auth?.currentUser?.uid
+            var userPhone = auth?.currentUser?.phoneNumber
+            var userEmail = auth?.currentUser?.email
+            var displayName = auth?.currentUser?.displayName
+
+            var myContact = User(userId!!,displayName!!,userPhone!!,userEmail!!)
+            var gson = Gson()
+
+            var userJson = gson.toJson(myContact)
+
+            showDialog(userJson)
+
+
         }
         return rootView
     }
@@ -277,7 +300,17 @@ class ProfileFragment:Fragment() {
 
     }
 
+    private fun showDialog(content: String) {
+        var dialogs = Dialog(activity)
+        dialogs.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialogs.setCancelable(true)
+        dialogs.setContentView(R.layout.show_qr_dialog)
+        val imageview = dialogs.findViewById<ImageView>(R.id.qr_container) as ImageView
+        var myBitmap = QRCode.from(content).bitmap()
+        imageview.setImageBitmap(myBitmap);
+        dialogs.show()
 
+    }
 
 
 }

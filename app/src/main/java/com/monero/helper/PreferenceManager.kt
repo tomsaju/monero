@@ -9,7 +9,8 @@ import android.content.SharedPreferences
 class PreferenceManager(context: Context) {
 
     val PREFS_FILENAME = "monero.preference"
-    val MY_CREDENTIAL = "mCredential" //stores the registered phone number
+    val MY_REGISTERED_NUMBER = "mRegisterdNumber" //stores the registered phone number
+    val MY_REGISTERED_EMAIL = "mRegisteredEmail" //stores the registered phone number
     val MY_PROFILE_IMAGE = "mDisplayImage"
     val PREFERRED_CURRENCY_CODE = "mPreferredCurrencyCode"
     val PREFERRED_CURRENCY_SYMBOL = "mPreferredCurrencySymbol"
@@ -19,9 +20,12 @@ class PreferenceManager(context: Context) {
 
     val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME,0)
 
-    var myCredential: String
-        get() = prefs.getString(MY_CREDENTIAL,"")
-        set(value) = prefs.edit().putString(MY_CREDENTIAL, value).apply()
+    var myPhone: String
+        get() = prefs.getString(MY_REGISTERED_NUMBER,"")
+        set(value) = prefs.edit().putString(MY_REGISTERED_NUMBER, value).apply()
+    var myEmail: String
+        get() = prefs.getString(MY_REGISTERED_EMAIL,"")
+        set(value) = prefs.edit().putString(MY_REGISTERED_EMAIL, value).apply()
 
     var myUid:String
         get() = prefs.getString(MY_UID,"")

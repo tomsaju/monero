@@ -1,6 +1,7 @@
 package com.monero.signin
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -16,6 +17,7 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 
 import com.monero.R
+import com.monero.main.MainActivity
 import net.rimoto.intlphoneinput.IntlPhoneInput
 import java.util.concurrent.TimeUnit
 
@@ -144,6 +146,10 @@ class AddPhoneFragment : Fragment() {
                 signInWithPhoneCredential(credential)
             }
 
+        }
+
+        skipBtn.setOnClickListener {
+            startActivity(Intent(requireActivity(),MainActivity::class.java))
         }
 
         return view

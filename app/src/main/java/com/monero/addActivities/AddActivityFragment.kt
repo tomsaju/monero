@@ -41,16 +41,17 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var memberListParent: LinearLayout
     lateinit var addTagText: TextView
     lateinit var addMemberBanner: TextView
-    lateinit var doneButton: TextView
-    lateinit var cancelButton: TextView
+    lateinit var doneButton: Button
+    lateinit var cancelButton: Button
     lateinit var selectedTagList: ArrayList<Tag>
     lateinit var mListener: IAddActivityFragmentListener
     lateinit var addMembersParent: LinearLayout
     lateinit var addActivityPresenter:IAddActivityPresenter
     lateinit var contactsList:List<ContactMinimal>
-    lateinit var myCredential:String
+    lateinit var myPhone:String
+    lateinit var myEmail:String
     lateinit var myContactName:TextView
-    lateinit var myContactPhone:TextView
+    //lateinit var myContactPhone:TextView
     lateinit var addMembersLayout:FrameLayout
     lateinit var progressBarContacts:ProgressBar
     lateinit var myUser:User
@@ -86,7 +87,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         cancelButton = view.findViewById(R.id.cancel_button_new_activity)  // cancel_button_new_activity
         addMembersParent = view.findViewById(R.id.add_members_parent)
         myContactName = view.findViewById(R.id.contact_name)
-        myContactPhone = view.findViewById(R.id.contact_number)
+//        myContactPhone = view.findViewById(R.id.contact_number)
         addMembersLayout = view.findViewById(R.id.add_member_layout)
         progressBarContacts = view.findViewById(R.id.contactLoadingProgressBar)
 
@@ -108,7 +109,8 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
             }
 
-        myCredential = ApplicationController.preferenceManager!!.myCredential
+        myPhone = ApplicationController.preferenceManager!!.myPhone
+        myEmail = ApplicationController.preferenceManager!!.myEmail
         addActivityPresenter = AddActivityPresenter(requireContext(),this)
         progressBarContacts.visibility = View.GONE
 
@@ -135,28 +137,12 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
             if (checkifInputValid()) {
 
-            //    if(auth!=null) {
-                    //val author = User(auth.currentUser?.uid!!, auth.currentUser?.displayName!!, auth.currentUser?.phoneNumber!!, auth.currentUser?.email!!)
-                   // if(auth==null){
-                        auth = FirebaseAuth.getInstance()!!
-                   // }
 
-                    var author = User("dummy string", "dummy author", "dummy phone", "dummy mail")
-                    /*if(auth.currentUser!=null) {
-                        var userId = auth.currentUser!!.uid
-                        var displayName =auth.currentUser!!.displayName
-                        var userPhone = auth.currentUser!!.phoneNumber
-                        var email  = auth.currentUser!!.email
-                        author = User(userId,displayName!!,userPhone!!,email!!)
-                    }*/
-                  //  val author = User(auth.currentUser!!.uid,auth.currentUser!!.displayName,auth.currentUser!!.phoneNumber,"")
+                auth = FirebaseAuth.getInstance()!!
 
-                    val activity = Activities(currentActivityId, title?.text.toString(), description?.text.toString(), selectedTagList, SELECTED_MODE, selectedUserList, myUser, false, createdDate, expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
-                    mListener.saveActivity(activity)
+                val activity = Activities(currentActivityId, title?.text.toString(), description?.text.toString(), selectedTagList, SELECTED_MODE, selectedUserList, myUser, false, createdDate, expenseIdList, historyIdList, transactionIdList, System.currentTimeMillis().toString())
+                mListener.saveActivity(activity)
 
-              /*  }else{
-                    Toast.makeText(context, "Error for user", Toast.LENGTH_SHORT).show()
-                }*/
             }
         }
 
@@ -205,20 +191,16 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     private fun checkifInputValid(): Boolean {
         var valid: Boolean = true
         if (title.text.isEmpty()) {
-            Toast.makeText(context, "Enter a valid title", Toast.LENGTH_SHORT)
+            Toast.makeText(context, "Enter a valid title", Toast.LENGTH_SHORT).show()
             valid = false
-        }
-        if (description.text.isEmpty()) {
-            Toast.makeText(context, "Enter a description", Toast.LENGTH_SHORT)
+        } else if (description.text.isEmpty()) {
+            Toast.makeText(context, "Enter a description", Toast.LENGTH_SHORT).show()
             valid = false
-        }
-
-        if(modeSelector.selectedItemPosition==0){
-            Toast.makeText(context, "Please select visibility", Toast.LENGTH_SHORT)
+        } else if(modeSelector.selectedItemPosition==0){
+            Toast.makeText(context, "Please select visibility", Toast.LENGTH_SHORT).show()
             valid = false
-        }
-        if(selectedUserList.size<2){
-            Toast.makeText(context, "Please select atleast 2 participants", Toast.LENGTH_SHORT)
+        } else if(selectedUserList.size<2){
+            Toast.makeText(context, "Please select atleast 2 participants", Toast.LENGTH_SHORT).show()
             valid = false
         }
 
@@ -246,7 +228,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         //populate my number in members listview
         if(auth.currentUser!!.phoneNumber!=null) {
             myContactName.text = "You"
-            myContactPhone.text = ApplicationController.preferenceManager!!.myCredential
+            //myContactPhone.text = ApplicationController.preferenceManager!!.myPhone
         }else{
             //go to sign in page
         }
@@ -297,12 +279,12 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     fun setSelectedContacts(contactList: List<ContactMinimal>){
 
         if(!contactList.isEmpty()){
-
+            addMembersParent.visibility = View.GONE
             memberListParent.removeAllViews()
             selectedUserList.clear()
             //add my contact
            /* var myContact = ContactMinimal("You",auth.currentUser!!.phoneNumber!!)
-            selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com"))*/
+            selectedUserList.add(User((System.currentTimeMillis()*(1 until 10).random()).toString(),auth.currentUser!!.displayName!!,ApplicationController.preferenceManager!!.myPhone,"sample@yopmail.com"))*/
           //  memberListParent.addView(getContactView(myContact))
 
             for(contact in contactList){
@@ -312,6 +294,8 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
             addMembersParent.visibility = View.GONE
 
+        }else{
+            addMembersParent.visibility = View.VISIBLE
         }
 
 
@@ -319,21 +303,21 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
     fun getContactView(contact: ContactMinimal):View{
         var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var view:View = inflater?.inflate(R.layout.contact_list_item_layout,null,false)
+        var view:View = inflater?.inflate(R.layout.contact_list_item_add_activity_fragment_layout,null,false)
         var name:TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
-        var number:TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
 
-        if(contact.phoneNumber==myCredential){
+
+        if((contact.phoneNumber.isNotEmpty()&&contact.phoneNumber== myPhone)||(contact.email.isNotEmpty()&&contact.email==myEmail)){
             name.text = "You"
         }else {
-            name.text = contact.name
+            if(contact.name.isNotEmpty()) {
+                name.text = contact.name
+            }else if(contact.email.isNotEmpty()) {
+                name.text = contact.email
+            }else if(contact.phoneNumber.isNotEmpty()){
+                name.text = contact.phoneNumber
+            }
         }
-        if(contact.phoneNumber.isNotEmpty()){
-            number.text = contact.phoneNumber
-        }else if(contact.email.isNotEmpty()){
-            name.text = contact.email
-        }
-
 
         return  view
     }

@@ -1,7 +1,6 @@
 package com.monero.addActivities.fragments
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
@@ -15,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
-import com.monero.Dao.ContactDAO
 import com.monero.R
 import com.monero.addActivities.adapter.ContactListAdapter
 import com.monero.models.ContactMinimal
@@ -24,13 +22,11 @@ import com.monero.Views.CircularProfileImage
 import com.monero.addActivities.adapter.IContactSelectedListener
 import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.getAppDatabase
-import com.monero.models.ActivitiesMinimal
 import com.monero.models.Contact
 import com.monero.models.User
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import org.json.JSONArray
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -71,7 +67,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         mSearchView = rootView?.findViewById(R.id.contacs_searchView)
         refreshButton = rootView?.findViewById(R.id.refresh_contact_list)
 
-        myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
+        myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myPhone,"sample@yopmail.com")
         var myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone,myUser.user_email)
         contactsListView?.isTextFilterEnabled = true
         setupSearchView()
@@ -251,7 +247,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         } else {
 
             if(newText!!.contains("@")){
-                var newUser = ContactMinimal("","","",newText)
+                var newUser = ContactMinimal(newText,"","",newText)
                 (contactsListView?.adapter as ContactListAdapter).setNewItem(newUser)
             }else {
 

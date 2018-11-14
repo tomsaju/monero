@@ -216,7 +216,7 @@ class AccountBookPresenter :IAccountBookPresenter {
     }
 
     private fun removeAllTransactionsWithoutme(pendingTransactions: ArrayList<PendingTransaction>):ArrayList<PendingTransaction> {
-        var myCredential = ApplicationController.preferenceManager!!.myCredential
+        var myCredential = ApplicationController.preferenceManager!!.myPhone
         var filteredList:ArrayList<PendingTransaction> = ArrayList()
         for(transaction in pendingTransactions){
             if(transaction.payer.user_phone==myCredential||transaction.reciepient.user_phone==myCredential){

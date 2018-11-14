@@ -121,7 +121,7 @@ class ApplicationController:Application(),SharedPreferences.OnSharedPreferenceCh
             mNotificationManager.createNotificationChannel(notificationChannel)
         }
 
-        mNotificationManager.notify(3, mBuilder.build())
+        mNotificationManager.notify(4, mBuilder.build())
     }
 
 

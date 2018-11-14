@@ -113,6 +113,9 @@ dependencies {
 
     //phone number validation and country code provider library
     compile 'net.rimoto:intlphoneinput:1.0.1'
+    //QR code generation
+    compile 'com.github.kenglxn.QRGen:android:2.5.0'
+
 
 }
 com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true

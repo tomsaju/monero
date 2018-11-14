@@ -170,7 +170,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
       //   if(auth!=null&&auth.currentUser!=null){
              val uid = auth.currentUser?.uid
              if(uid!=null){
-                  myuser = User(uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myCredential,"sample@yopmail.com")
+                  myuser = User(uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myPhone,"sample@yopmail.com")
              }
 
         // }

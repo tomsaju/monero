@@ -1,7 +1,6 @@
 package com.monero.main
 
 import android.Manifest
-import android.app.job.JobService
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -11,7 +10,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
-import android.support.design.widget.CoordinatorLayout.Behavior.setTag
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -21,14 +19,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.GooglePlayDriver
-import com.firebase.jobdispatcher.Job
-import com.google.firebase.FirebaseApp
 import com.monero.R
 import com.monero.addActivities.AddActivityFragment
 import com.monero.addActivities.fragments.SelectContactsFragment
-import com.monero.auth.SignInActivity
 import com.monero.main.fragments.AccountBookFragment
 import com.monero.main.fragments.Activities.ActivityFragment
 import com.monero.main.fragments.NotificationFragment
@@ -40,18 +33,11 @@ import com.monero.main.presenter.main.MainPresenter
 import com.monero.models.Activities
 import com.monero.models.ContactMinimal
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.Application.ApplicationController
-import com.monero.helper.AppDatabase
-import com.monero.helper.AppDatabase.Companion.db
 import com.monero.models.Contact
 import com.monero.models.User
 import com.monero.network.RestService
-import com.monero.service.ContactsSyncService
 import com.monero.signup.SignUpActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
@@ -401,14 +387,14 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
     override fun onResume() {
         super.onResume()
         if(auth.currentUser==null){
-            ApplicationController.preferenceManager!!.myCredential =""
+            ApplicationController.preferenceManager!!.myPhone =""
             //go to login page
             var loginIntent = Intent(this,SignUpActivity::class.java)
             startActivity(loginIntent)
             finish()
         }else{
 
-          /*  ApplicationController.preferenceManager!!.myCredential = auth.currentUser!!.phoneNumber!!
+          /*  ApplicationController.preferenceManager!!.myPhone = auth.currentUser!!.phoneNumber!!
             ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid*/
           // Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
          //  Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())

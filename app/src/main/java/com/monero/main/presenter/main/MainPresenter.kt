@@ -32,7 +32,6 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.firebase.auth.FirebaseAuth
 
 
 /**
@@ -106,7 +105,11 @@ class MainPresenter : IMainPresenter {
 
             var permittedUserArrayList = arrayListOf<String>()
             for (user in activity.members) {
-                permittedUserArrayList.add(user.user_phone)
+                if(user.user_email.isNotEmpty()){
+                    permittedUserArrayList.add(user.user_email)
+                }else if(user.user_phone.isNotEmpty()) {
+                    permittedUserArrayList.add(user.user_phone)
+                }
             }
 
 
@@ -536,7 +539,7 @@ class MainPresenter : IMainPresenter {
     fun getActivityIdList() {
 
         Log.d(TAG,"getActivityIdLIst")
-        var userId = ApplicationController.preferenceManager!!.myCredential
+        var userId = ApplicationController.preferenceManager!!.myPhone
         var myActivityIds: ArrayList<String> = ArrayList()
         var stringlist: String = ""
         FirebaseFirestore.getInstance()

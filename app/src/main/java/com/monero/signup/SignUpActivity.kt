@@ -19,8 +19,7 @@ import com.monero.signin.SignInActivity
 import java.lang.Exception
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.FirebaseUser
-
-
+import com.monero.Application.ApplicationController
 
 
 class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragment.OnAddPhoneFragmentInteractionListener {
@@ -56,7 +55,9 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                         progressBarSignUp.visibility = View.INVISIBLE
 
                         val user = firebaseAuth.currentUser
-
+                        if(firebaseAuth.currentUser?.uid!=null) {
+                            ApplicationController.preferenceManager?.myUid = firebaseAuth.currentUser?.uid!!
+                        }
                         val profileUpdates = UserProfileChangeRequest.Builder()
                                 .setDisplayName(userName).build()
 
@@ -117,30 +118,21 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
 
     override fun signInWithPhoneCredential(credential: PhoneAuthCredential?) {
 
-        /*firebaseAuth.signInWithCredential(credential!!)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithCredential:success")
-
-                        val user = task.result?.user
-                        linkUserPhoneNumber(user.phoneNumber)
-                        // ...
-                    } else {
-                        // Sign in failed, display a message and update the UI
-                        Log.d(TAG, "signInWithCredential:failure")
-                        Log.w(TAG, "signInWithCredential:failure", task.exception)
-                        if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                            // The verification code entered was invalid
-                        }
-                    }
-                }*/
-
         firebaseAuth.currentUser?.linkWithCredential(credential!!)
                 ?.addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "linkWithCredential:success")
                         val user = task.result?.user
+
+                        if(user?.email!=null) {
+                            ApplicationController.preferenceManager?.myEmail = firebaseAuth.currentUser?.email!!
+                        }
+
+                        if(user?.phoneNumber!=null) {
+                            ApplicationController.preferenceManager?.myPhone = firebaseAuth.currentUser?.phoneNumber!!
+                        }
+
+
                         var mainIntent = Intent(this,MainActivity::class.java)
                         startActivity(mainIntent)
                         finish()
