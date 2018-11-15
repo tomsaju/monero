@@ -110,6 +110,15 @@ class DBContract {
         }
     }
 
+    public class CONTACT_GROUP_TABLE {
+        companion object {
+            const val TABLE_NAME = "Contact_Group_Table"
+            const val GROUP_ID = "Group_id";
+            const val GROUP_NAME = "Group_name"
+            const val GROUP_ITEMS = "Group_items"
+        }
+    }
+
     public class HISTORY_LOG_ITEM_TABLE {
         companion object {
 

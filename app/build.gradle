@@ -116,6 +116,9 @@ dependencies {
     //QR code generation
     compile 'com.github.kenglxn.QRGen:android:2.5.0'
 
+    //QR code reader
+    compile 'com.journeyapps:zxing-android-embedded:3.4.0'
+
 
 }
 com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true

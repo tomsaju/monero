@@ -134,4 +134,70 @@ class TagConverter {
         return gson.fromJson<List<Debit>>(json, type)
     }
 
+    @TypeConverter
+    fun convertGroupListtoString(tagList:List<ContactGroup>):String{
+        val gson = Gson()
+        val type = object : TypeToken<List<ContactGroup>>() {}.type
+        return gson.toJson(tagList, type)
+    }
+
+    @TypeConverter
+    fun convertGroupJSONtoList(json:String):List<ContactGroup>{
+        val gson = Gson()
+        val type = object : TypeToken<List<ContactGroup>>() {
+
+        }.type
+        return gson.fromJson(json, type)
+    }
+
+    @TypeConverter
+    fun convertGrouptoString(tagList:ContactGroup):String{
+        val gson = Gson()
+        val type = object : TypeToken<ContactGroup>() {}.type
+        return gson.toJson(tagList, type)
+    }
+
+    @TypeConverter
+    fun convertJSONtoGroup(json:String):ContactGroup{
+        val gson = Gson()
+        val type = object : TypeToken<ContactGroup>() {
+
+        }.type
+        return gson.fromJson(json, type)
+    }
+
+    @TypeConverter
+    fun convertContactMinimaltoString(tagList:ContactMinimal):String{
+        val gson = Gson()
+        val type = object : TypeToken<ContactMinimal>() {}.type
+        return gson.toJson(tagList, type)
+    }
+
+    @TypeConverter
+    fun convertJSONtoContactMinimal(json:String):ContactMinimal{
+        val gson = Gson()
+        val type = object : TypeToken<ContactMinimal>() {
+
+        }.type
+        return gson.fromJson(json, type)
+    }
+
+
+    @TypeConverter
+    fun convertContactMinimalListtoString(tagList:List<ContactMinimal>):String{
+        val gson = Gson()
+        val type = object : TypeToken<List<ContactMinimal>>() {}.type
+        return gson.toJson(tagList, type)
+    }
+
+    @TypeConverter
+    fun convertContactMinimalJSONtoList(json:String):List<ContactMinimal>{
+        val gson = Gson()
+        val type = object : TypeToken<List<ContactMinimal>>() {
+
+        }.type
+        return gson.fromJson(json, type)
+    }
+
+
 }

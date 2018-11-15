@@ -15,11 +15,17 @@ import io.reactivex.Single
     @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME+" WHERE "+DBContract.CONTACTS_TABLE.CONTACT_ID+" = :id")
     fun getContactForId(id:Long): Contact
 
-    @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME+" ORDER BY "+DBContract.CONTACTS_TABLE.CONTACT_NAME_LOCAL+" ASC")
+    @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME+" WHERE "+DBContract.CONTACTS_TABLE.CONTACT_PHONE+" IS NOT NULL AND TRIM("+DBContract.CONTACTS_TABLE.CONTACT_PHONE+") <> ''"+" ORDER BY "+DBContract.CONTACTS_TABLE.CONTACT_NAME_LOCAL+" ASC")
     fun getAllContacts():List<Contact>
 
-    @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME)
+    @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME+" ORDER BY "+DBContract.CONTACTS_TABLE.CONTACT_NAME_LOCAL+" ASC")
+    fun getAllTypeContacts(): Single<List<Contact>>
+
+    @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME+" WHERE "+DBContract.CONTACTS_TABLE.CONTACT_PHONE+" IS NOT NULL AND TRIM("+DBContract.CONTACTS_TABLE.CONTACT_PHONE+") <> ''")
     fun getAllContactsMinimal(): Single<List<Contact>>
+
+    @Query("SELECT * FROM "+DBContract.CONTACTS_TABLE.TABLE_NAME+" WHERE "+DBContract.CONTACTS_TABLE.CONTACT_EMAIL+" IS NOT NULL AND TRIM("+DBContract.CONTACTS_TABLE.CONTACT_EMAIL+") <> ''")
+    fun getAllEmailContactsMinimal(): Single<List<Contact>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoContactTable(contact: Contact)

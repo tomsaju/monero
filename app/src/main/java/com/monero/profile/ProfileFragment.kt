@@ -67,7 +67,7 @@ class ProfileFragment : Fragment() {
         if (context is OnFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException(context!!.toString() + " must implement OnPhonebookContactsFragmentInteractionListener")
         }
     }
 

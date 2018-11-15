@@ -19,13 +19,14 @@ class ContactListAdapter:BaseAdapter, Filterable {
     var context:Context?=null;
     var parent:IContactSelectedListener
     lateinit var orig: List<ContactMinimal>
-
+    lateinit var selectedContactList:ArrayList<ContactMinimal>
 
     constructor(context: Context, contactList: List<ContactMinimal>, parent: IContactSelectedListener){
         this.context = context
         this.contactList = contactList
         this.parent = parent
         orig = contactList
+        selectedContactList = ArrayList()
     }
 
     override fun getView(position: Int, parent: View?, rootView: ViewGroup?): View {
@@ -43,21 +44,43 @@ class ContactListAdapter:BaseAdapter, Filterable {
             }
 
             layoutParent.setOnClickListener { view: View ->
-                this.parent.onContactSelected(contactList[position])
+                this.parent.onContactSelected(selectedContactList)
             }
         }else {
 
-            view = inflater?.inflate(R.layout.contact_list_item_layout, rootView, false)
+            view = inflater?.inflate(R.layout.contact_list_item_phone_layout, rootView, false)
             var layoutParent: RelativeLayout = view.findViewById<RelativeLayout>(R.id.contact_item_parent) as RelativeLayout
             var name: TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
             var number: TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
+            var check:CheckBox = view.findViewById<CheckBox>(R.id.check_status_box) as CheckBox
+
 
             name.text = contactList.get(position)?.name
-            number.text = contactList.get(position)?.phoneNumber
+            if(!contactList[position].phoneNumber.isNullOrEmpty()){
+                number.text = contactList.get(position)?.phoneNumber
+            }else if(!contactList[position].email.isNullOrEmpty()){
+                number.text = contactList.get(position)?.email
+            }
+
 
             layoutParent.setOnClickListener { view: View ->
-                this.parent.onContactSelected(contactList[position])
+              check.performClick()
+
             }
+
+            check.isChecked = selectedContactList.contains(contactList[position])
+
+            check.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener {
+                compoundButton: CompoundButton?, isChecked: Boolean ->
+                //  if(isChecked){
+                      if(selectedContactList.contains(contactList[position])){
+                          selectedContactList.remove(contactList[position])
+                      }else{
+                          selectedContactList.add(contactList[position])
+                      }
+               //   }
+                this.parent.onContactSelected(selectedContactList)
+            })
         }
         return view
 
@@ -75,6 +98,9 @@ class ContactListAdapter:BaseAdapter, Filterable {
         return contactList.size
     }
 
+    fun setSelectedContacts(contactList: ArrayList<ContactMinimal>){
+        this.selectedContactList = contactList
+    }
 
     fun setNewItem(contact:ContactMinimal){
        var contactArrayList = ArrayList<ContactMinimal>()
@@ -97,7 +123,9 @@ class ContactListAdapter:BaseAdapter, Filterable {
                     if (constraint != null&&constraint.isNotEmpty()) {
                         if (orig != null && orig.isNotEmpty()) {
                             for (g in orig) {
-                                if (g.name.toLowerCase().contains(constraint.toString())||g.phoneNumber.contains(constraint.toString()))
+                                if (g.name.toLowerCase().contains(constraint.toString())
+                                        ||g.phoneNumber.contains(constraint.toString())
+                                        ||g.email.contains(constraint.toString()))
                                     results.add(g)
                             }
                         }

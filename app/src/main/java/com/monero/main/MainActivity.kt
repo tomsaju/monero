@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.internal.BottomNavigationMenuView
@@ -34,6 +35,8 @@ import com.monero.models.Activities
 import com.monero.models.ContactMinimal
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
+import com.monero.addActivities.fragments.CreateGroupFragment
+import com.monero.addActivities.fragments.GroupContactsFragment
 import com.monero.models.Contact
 import com.monero.models.User
 import com.monero.network.RestService
@@ -44,7 +47,12 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper
 
 
 
-class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFragmentListener,AddActivityFragment.IAddActivityFragmentListener, SelectContactsFragment.OnCotactSelectedListener {
+class MainActivity : AppCompatActivity(),
+                        IMainView,
+                        ActivityFragment.ActivityFragmentListener,
+                        AddActivityFragment.IAddActivityFragmentListener,
+                        SelectContactsFragment.OnCotactSelectedListener,
+                        GroupContactsFragment.OnGroupContactsFragmentInteractionListener{
 
 
     private var content:FrameLayout? = null
@@ -242,6 +250,18 @@ class MainActivity : AppCompatActivity(), IMainView, ActivityFragment.ActivityFr
             true
             }
         }
+
+    }
+
+    override fun onFragmentInteraction(uri: Uri) {
+
+    }
+
+    override fun addGroup() {
+        var ft = supportFragmentManager.beginTransaction()
+        var frag =  CreateGroupFragment()
+        ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
+        ft.add(android.R.id.content, frag,"create_group").commit()
 
     }
 

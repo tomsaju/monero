@@ -181,8 +181,8 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
         var sortedList = minimalContactList.sortedWith(compareBy({ it.name }))
 
         val contactsAdapter: ContactListAdapter = ContactListAdapter(this,sortedList,object:IContactSelectedListener{
-            override fun onContactSelected(contact: ContactMinimal) {
-
+            override fun onContactSelected(contactList: ArrayList<ContactMinimal>) {
+            var contact = contactList[0]
                 mDialogView.user_name_autocomplete_tv.setText(contact.name)
                 selectedUserId = contact.contact_id
                 selectedUsersId.add(contact.contact_id)
@@ -267,6 +267,10 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
     }
 
 
+    override fun onContactSelected(contactList: ArrayList<ContactMinimal>) {
+
+    }
+
     override fun onAllusersFetched(userList: ArrayList<User>) {
         selecteduserList = userList
         if(SPLIT_TYPE==SPLIT_TYPE_EQUALLY){
@@ -275,9 +279,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
       //  setList()
     }
 
-    override fun onContactSelected(contact: ContactMinimal) {
 
-    }
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

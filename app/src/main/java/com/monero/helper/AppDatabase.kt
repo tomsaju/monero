@@ -22,7 +22,8 @@ import com.monero.models.*
                                 User::class,
                                 HistoryLogItem::class,
                                 Contact::class,
-                                NotificationItem::class),version = 4,exportSchema = false)
+                                NotificationItem::class,
+                                ContactGroup::class),version = 4,exportSchema = false)
 
 
 abstract class AppDatabase: RoomDatabase() {
@@ -51,4 +52,5 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun contactDao():ContactDAO
     abstract fun historyDao():HistoryLogDAO
     abstract fun notificationItemDao():NotiDAO
+    abstract fun contactGroupDao():ContactGroupDAO
 }

@@ -5,7 +5,10 @@ import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v7.widget.SearchView
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -29,6 +32,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import kotlin.collections.ArrayList
+import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager
 
 
 /**
@@ -37,9 +42,9 @@ import kotlin.collections.ArrayList
 class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener,IContactSelectedListener {
 
 
-    var contactsListView:ListView?=null
+  //  var contactsListView:ListView?=null
     var doneButton:Button?=null
-    var cancelButton:Button?=null
+    var cancelButton:ImageView?=null
     lateinit var contacts:List<ContactMinimal>
     lateinit var horizontalList:LinearLayout
     var mListener:OnCotactSelectedListener?=null
@@ -47,9 +52,12 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     lateinit var mSearchView:SearchView
     lateinit var mContext:Context
     lateinit var myContact: ContactMinimal
-    lateinit var refreshButton:TextView
+    lateinit var refreshButton:ImageView
     lateinit var myUser:User
     var auth = FirebaseAuth.getInstance()!!
+    lateinit var viewPager:ViewPager
+    lateinit var tabLayout:TabLayout
+    lateinit var doneFab:FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,16 +68,21 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater?.inflate(R.layout.select_contact_fragment_layout, container,
                 false)
-        contactsListView = rootView?.findViewById<ListView>(R.id.all_contacts_list) as ListView
+       // contactsListView = rootView?.findViewById<ListView>(R.id.all_contacts_list) as ListView
         horizontalList = rootView?.findViewById<LinearLayout>(R.id.horizontal_list) as LinearLayout
         doneButton = rootView?.findViewById<Button>(R.id.done_action_select_contacts) as Button
-        cancelButton = rootView?.findViewById<Button>(R.id.cancel_action_select_contacts) as Button
+        cancelButton = rootView?.findViewById<ImageView>(R.id.back_button_select_contacts) as ImageView
         mSearchView = rootView?.findViewById(R.id.contacs_searchView)
-        refreshButton = rootView?.findViewById(R.id.refresh_contact_list)
+        refreshButton = rootView?.findViewById(R.id.refresh_contact_button)
+        viewPager = rootView?.findViewById(R.id.viewpager)
+        tabLayout = rootView?.findViewById(R.id.tab_layout_select_contacts)
+        doneFab = rootView?.findViewById(R.id.done_button_fab)
+        tabLayout.tabGravity = TabLayout.GRAVITY_CENTER;
+        tabLayout.tabMode = TabLayout.MODE_SCROLLABLE;
 
         myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myPhone,"sample@yopmail.com")
-        var myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone,myUser.user_email)
-        contactsListView?.isTextFilterEnabled = true
+        myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone,myUser.user_email)
+      //  contactsListView?.isTextFilterEnabled = true
         setupSearchView()
         selectedContactList = ArrayList<ContactMinimal>()
         var currentUserList = mListener?.getCurrentActivityUserList()
@@ -83,14 +96,14 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
         refreshButton.setOnClickListener{
             _:View?->
-            refreshContacts()
+           // refreshContacts()
         }
 
         cancelButton?.setOnClickListener{v: View? ->
             mListener?.closeContactSelectFragment()
         }
 
-        doneButton?.setOnClickListener(View.OnClickListener {
+        doneFab?.setOnClickListener(View.OnClickListener {
             mListener?.onContactSelected(selectedContactList)
             mListener?.closeContactSelectFragment()
            // dialog?.dismiss()
@@ -98,7 +111,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
         var myProfileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), "You","","", false, "my " + " id ")
         horizontalList.addView(myProfileImage)
-
+        setupViewPager(viewPager)
         return rootView
     }
 
@@ -106,77 +119,25 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         mSearchView.setIconifiedByDefault(false)
         mSearchView.setOnQueryTextListener(this)
         mSearchView.isSubmitButtonEnabled = true
-        mSearchView.queryHint = "Search Here"
+        mSearchView.queryHint = "Search By name or number"
     }
 
-    fun refreshContacts(){
-        var contactList =  getContacts()
-
-        syncContactsWithServer(contactList);
-
-        var db = getAppDatabase(requireContext())
 
 
-        Single.fromCallable({
-            db?.contactDao()?.insertAllContactIntoContactTable(contactList)
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess {
-                    loadAllContacts();
-                }
-                .subscribe()
-    }
 
-    private fun syncContactsWithServer(contactList: ArrayList<Contact>) {
-        mListener?.syncContactsWithServer(contactList)
-    }
 
     override fun onResume() {
         super.onResume()
-        loadAllContacts()
-    }
-
-    private fun loadAllContacts() {
-
-        var single: Single<List<Contact>>? = AppDatabase.db?.contactDao()?.getAllContactsMinimal()
-        if (single != null) {
-            single.subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doAfterSuccess({ listFromDB: List<Contact> ->
-                        var minimalContactList = ArrayList<ContactMinimal>()
-                        for(contact in listFromDB){
-                            minimalContactList.add(ContactMinimal(contact.Contact_uuid,contact.Contact_name_local,contact.Contact_phone,""))
-                        }
-                        loadContacts(minimalContactList)
-                    })
-                    .subscribe()
-
+        val selection = selectedContactList
+        if(selection!=null&&selection.size>1){
+            doneFab.show()
+        }else{
+            doneFab.hide()
         }
+
     }
 
 
-     fun loadContacts(contactsList:List<ContactMinimal>){
-
-        var sortedList = contactsList.sortedWith(compareBy({ it.name }))
-
-        val contactsAdapter = ContactListAdapter(requireContext(),sortedList,this)
-        contactsListView?.adapter = contactsAdapter
-    }
-
-    override fun onContactSelected(contact: ContactMinimal) {
-        var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
-            if(contact.name.isNotEmpty()) {
-                 profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
-            }else if(contact.phoneNumber.isNotEmpty()){
-                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
-            }else if(contact.email.isNotEmpty()){
-                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name,contact.phoneNumber,contact.email, true, contact.phoneNumber + " id ")
-            }
-         profileImage?.setProfileImageListener (this@SelectContactsFragment)
-         selectedContactList?.add(contact)
-         horizontalList.addView(profileImage)
-         horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
-     }
 
 
     override fun onAttach(context: Context?) {
@@ -211,7 +172,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
             }
         }*/
 
-        var iter = selectedContactList!!.iterator()
+      /*  var iter = selectedContactList!!.iterator()
 
         while (iter.hasNext()) {
             val contact = iter.next()
@@ -226,7 +187,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         while (iter.hasNext()) {
             val contact = iter.next()
             onContactSelected(contact);
-        }
+        }*/
 
       /*  for(item in selectedContactList!!){
             onContactSelected(item);
@@ -243,15 +204,15 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
     override fun onQueryTextChange(newText: String?): Boolean {
         if (TextUtils.isEmpty(newText)) {
-            contactsListView?.clearTextFilter()
+      //      contactsListView?.clearTextFilter()
         } else {
 
             if(newText!!.contains("@")){
                 var newUser = ContactMinimal(newText,"","",newText)
-                (contactsListView?.adapter as ContactListAdapter).setNewItem(newUser)
+      //          (contactsListView?.adapter as ContactListAdapter).setNewItem(newUser)
             }else {
 
-                (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
+         //       (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
             }
         }
         return true
@@ -259,50 +220,85 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
 
 
-    fun getContacts(): ArrayList<Contact> {
-        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)//plus any other properties you wish to query
-        var contactsList = ArrayList<Contact>()
-        var cursor: Cursor? = null
-        try {
-            cursor = context?.getContentResolver()?.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, projection, null, null, null)
-        } catch (e: SecurityException) {
-            //SecurityException can be thrown if we don't have the right permissions
+    override fun onContactSelected(contactList: ArrayList<ContactMinimal>) {
+
+        selectedContactList?.clear()
+        horizontalList.removeAllViews()
+        if(!contactList.contains(myContact)) {
+            contactList?.add(0,myContact)
+        }
+        if(contactList.size>1){
+            doneFab.show()
+        }else{
+            doneFab.hide()
         }
 
+        for(contact in contactList) {
 
-        if (cursor != null) {
-            try {
-                val normalizedNumbersAlreadyFound = HashSet<Any?>()
-                val indexOfNormalizedNumber = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)
-                val indexOfDisplayName = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-                val indexOfDisplayNumber = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-
-                while (cursor!!.moveToNext()) {
-                    val normalizedNumber = cursor!!.getString(indexOfNormalizedNumber)
-                    if (normalizedNumbersAlreadyFound.add(normalizedNumber)) {
-                        val displayName = cursor!!.getString(indexOfDisplayName)
-                        val displayNumber = cursor!!.getString(indexOfDisplayNumber)
-                        //haven't seen this number yet: do something with this contact!
-                        var defaultId = displayNumber.replace("+","")
-                       var trimmed  = defaultId.replace("\\s".toRegex(), "")
-                        try {
-                            var intId = trimmed.toLong()
-                            var contact  = Contact(intId,displayName,"unknown",displayNumber,"unknoen",intId.toString(),"unknown")
-
-                            contactsList.add(contact)
-                        } catch (e: Exception) {
-                        e.printStackTrace()
-                        }
-                    } else {
-                        //don't do anything with this contact because we've already found this number
-                    }
-                }
-            } finally {
-                cursor!!.close()
+            var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+            if(contact.contact_id==myContact.contact_id){
+                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), "You", contact.phoneNumber, contact.email, false, contact.phoneNumber + " id ")
+            }else if (contact.name.isNotEmpty()) {
+                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+            } else if (contact.phoneNumber.isNotEmpty()) {
+                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+            } else if (contact.email.isNotEmpty()) {
+                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
             }
+            profileImage?.setProfileImageListener(this@SelectContactsFragment)
+            selectedContactList?.add(contact)
+            horizontalList.addView(profileImage)
+            horizontal_scrollview.post(Runnable { horizontal_scrollview.fullScroll(HorizontalScrollView.FOCUS_RIGHT) })
         }
-        return contactsList
     }
 
+
+    internal class Adapter(manager: FragmentManager) : FragmentPagerAdapter(manager) {
+        private val mFragmentList:ArrayList<Fragment> = ArrayList(emptyList<Fragment>())
+        private val mFragmentTitleList:ArrayList<String> = ArrayList(emptyList())
+
+        override fun getItem(position: Int): Fragment {
+            return mFragmentList.get(position)
+        }
+
+        override fun getCount(): Int {
+            return mFragmentList.size
+        }
+
+        fun addFragment(fragment: Fragment, title: String) {
+            mFragmentList.add(fragment)
+            mFragmentTitleList.add(title)
+        }
+
+        override fun getPageTitle(position: Int): CharSequence? {
+            return mFragmentTitleList.get(position)
+        }
+    }
+
+
+    // Add Fragments to Tabs
+    private fun setupViewPager(viewPager: ViewPager) {
+
+
+        var phoneContactFragment = PhoneBookContactsFragment()
+        var phoneArgument = Bundle()
+        phoneArgument.putString("listType","phone")
+        phoneContactFragment.arguments = phoneArgument
+
+        var emailContactsFragment = PhoneBookContactsFragment()
+        var emailArgument = Bundle()
+        emailArgument.putString("listType","email")
+        emailContactsFragment.arguments = emailArgument
+
+        val adapter = Adapter(childFragmentManager)
+
+        adapter.addFragment(phoneContactFragment, "Contacts")
+        adapter.addFragment(emailContactsFragment, "Emails")
+        adapter.addFragment(GroupContactsFragment(), "Groups")
+        adapter.addFragment(QRScannerFragment(), "Scan QR code")
+        viewPager.adapter = adapter
+        tabLayout.setupWithViewPager(viewPager)
+
+    }
 }
 
