@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:background="#ffffff"
     android:orientation="vertical">
 
@@ -153,8 +154,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/refresh_contact_list"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <LinearLayout

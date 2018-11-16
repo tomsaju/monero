@@ -443,6 +443,13 @@ class MainPresenter : IMainPresenter {
 
     }
 
+
+    override fun getAllNotificationsFromDB() {
+        db = getAppDatabase(context)
+        var allActivities = db?.notificationItemDao()?.getAllNotifications()
+        view.onNotificationsFetched(allActivities)
+    }
+
     private fun downloadExpense(expenseId: String) {
         Log.d(TAG,"downloadExpense")
         FirebaseFirestore.getInstance()

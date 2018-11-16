@@ -5,11 +5,28 @@
     tools:context="com.monero.addActivities.fragments.QRScannerFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <Button
+
+
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/barcode_scanner"/>
+
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Scan QR code here"
+        android:layout_centerHorizontal="true"
+        android:text="Scan QR code of members you would like to add.\nQR code can be found from View QR button in profile screen"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        android:background="#80000000"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:id="@+id/scan_qr_code"/>
 
 </RelativeLayout>

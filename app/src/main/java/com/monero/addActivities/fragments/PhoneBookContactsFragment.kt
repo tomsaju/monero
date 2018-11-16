@@ -25,13 +25,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class PhoneBookContactsFragment : Fragment(),IContactSelectedListener {
+class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectContactsFragment.searchChangeListener {
 
     private var mListenerPhonebookContacts: OnPhonebookContactsFragmentInteractionListener? = null
     lateinit var listView:ListView
     var listType = "phone";
+    var selectedContactsList: ArrayList<ContactMinimal> = ArrayList()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -84,10 +87,17 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener {
     }
 
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        val SelectContactsFragment = this@PhoneBookContactsFragment.getParentFragment() as SelectContactsFragment
+        SelectContactsFragment.registerSearchListener(this@PhoneBookContactsFragment)
+    }
 
     override fun onDetach() {
         super.onDetach()
         mListenerPhonebookContacts = null
+        val SelectContactsFragment = this@PhoneBookContactsFragment.getParentFragment() as SelectContactsFragment
+        SelectContactsFragment.unregisterSearchListener(this@PhoneBookContactsFragment)
     }
 
     /**
@@ -210,6 +220,26 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener {
     }
 
     override fun onContactSelected(contactsList: ArrayList<ContactMinimal>) {
+        selectedContactsList = contactsList
         (parentFragment as IContactSelectedListener).onContactSelected(contactsList)
     }
+
+
+    override fun onSearchQueryChanged(query: String) {
+        (listView.adapter as ContactListAdapter).filter.filter(query)
+    }
+
+    fun deleteSelectedContact(name: String?, phone: String?, email: String?) {
+        selectedContactsList = ArrayList((parentFragment as SelectContactsFragment).selectedContactList)
+        for(contact in selectedContactsList){
+            if(contact.name==name&&contact.phoneNumber==phone&&contact.email==email){
+                selectedContactsList.remove(contact)
+                break
+            }
+        }
+        onContactSelected(selectedContactsList)
+        (listView.adapter as ContactListAdapter).setSelectedContacts(selectedContactsList)
+    }
+
+
 }// Required empty public constructor

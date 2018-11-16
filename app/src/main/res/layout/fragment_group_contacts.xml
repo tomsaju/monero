@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
     tools:context="com.monero.addActivities.fragments.GroupContactsFragment">
 
  <Button
@@ -14,8 +16,9 @@
      android:id="@+id/add_group_button"/>
 
 
-  <ListView
+  <ExpandableListView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      tools:listitem="@layout/contact_list_item_phone_layout"></ListView>
+      tools:listitem="@layout/contact_list_item_phone_layout"
+      android:id="@+id/expandable_groups_list"></ExpandableListView>
 </LinearLayout>

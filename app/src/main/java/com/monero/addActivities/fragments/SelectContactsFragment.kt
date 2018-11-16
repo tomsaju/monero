@@ -39,7 +39,7 @@ import android.support.v4.view.ViewPager
 /**
  * Created by tom.saju on 3/13/2018.
  */
-class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener,IContactSelectedListener {
+class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener,IContactSelectedListener,ViewPager.OnPageChangeListener {
 
 
   //  var contactsListView:ListView?=null
@@ -48,7 +48,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     lateinit var contacts:List<ContactMinimal>
     lateinit var horizontalList:LinearLayout
     var mListener:OnCotactSelectedListener?=null
-    var selectedContactList:MutableList<ContactMinimal>?= null
+    public var selectedContactList:MutableList<ContactMinimal>?= null
     lateinit var mSearchView:SearchView
     lateinit var mContext:Context
     lateinit var myContact: ContactMinimal
@@ -58,10 +58,14 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     lateinit var viewPager:ViewPager
     lateinit var tabLayout:TabLayout
     lateinit var doneFab:FloatingActionButton
-
+    lateinit var mListeners:ArrayList<searchChangeListener> ;
+    lateinit var phoneContactFragment:PhoneBookContactsFragment
+    lateinit var emailContactsFragment:PhoneBookContactsFragment
+    lateinit var qrScannerFragment:QRScannerFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
        // contacts = getContacts()
+        mListeners = ArrayList()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -123,7 +127,15 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     }
 
 
+    @Synchronized
+    fun registerSearchListener(listener: searchChangeListener) {
+        mListeners.add(listener)
+    }
 
+    @Synchronized
+    fun unregisterSearchListener(listener: searchChangeListener) {
+        mListeners.remove(listener)
+    }
 
 
     override fun onResume() {
@@ -164,36 +176,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         fun syncContactsWithServer(contactList: ArrayList<Contact>)
     }
     override fun onProfileClosed(name: String?, phone: String?, email: String?) {
-
-      /*  for(contact in selectedContactList!!){
-            if(contact.email==email&&contact.name==name&&contact.phoneNumber==phone){
-                selectedContactList!!.remove(contact)
-                break
-            }
-        }*/
-
-      /*  var iter = selectedContactList!!.iterator()
-
-        while (iter.hasNext()) {
-            val contact = iter.next()
-
-            if(contact.email==email&&contact.name==name&&contact.phoneNumber==phone) {
-                iter.remove()
-            }
-        }
-
-        horizontalList.removeAllViews();
-        iter = selectedContactList!!.iterator()
-        while (iter.hasNext()) {
-            val contact = iter.next()
-            onContactSelected(contact);
-        }*/
-
-      /*  for(item in selectedContactList!!){
-            onContactSelected(item);
-        }*/
-
-
+        phoneContactFragment.deleteSelectedContact(name,phone,email)
     }
 
 
@@ -204,16 +187,27 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
     override fun onQueryTextChange(newText: String?): Boolean {
         if (TextUtils.isEmpty(newText)) {
-      //      contactsListView?.clearTextFilter()
+
+            for (listener in mListeners) {
+                listener.onSearchQueryChanged("")
+            }
+
         } else {
 
-            if(newText!!.contains("@")){
+
+
+            if(newText!=null) {
+                for (listener in mListeners) {
+                    listener.onSearchQueryChanged(newText)
+                }
+            }
+           /* if(newText!!.contains("@")){
                 var newUser = ContactMinimal(newText,"","",newText)
-      //          (contactsListView?.adapter as ContactListAdapter).setNewItem(newUser)
+                (contactsListView?.adapter as ContactListAdapter).setNewItem(newUser)
             }else {
 
-         //       (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
-            }
+                (contactsListView?.adapter as ContactListAdapter).filter.filter(newText)
+            }*/
         }
         return true
     }
@@ -280,25 +274,54 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     private fun setupViewPager(viewPager: ViewPager) {
 
 
-        var phoneContactFragment = PhoneBookContactsFragment()
+        phoneContactFragment = PhoneBookContactsFragment()
         var phoneArgument = Bundle()
         phoneArgument.putString("listType","phone")
         phoneContactFragment.arguments = phoneArgument
 
-        var emailContactsFragment = PhoneBookContactsFragment()
+        emailContactsFragment = PhoneBookContactsFragment()
         var emailArgument = Bundle()
         emailArgument.putString("listType","email")
         emailContactsFragment.arguments = emailArgument
+
+
+        qrScannerFragment = QRScannerFragment()
 
         val adapter = Adapter(childFragmentManager)
 
         adapter.addFragment(phoneContactFragment, "Contacts")
         adapter.addFragment(emailContactsFragment, "Emails")
+
+
         adapter.addFragment(GroupContactsFragment(), "Groups")
-        adapter.addFragment(QRScannerFragment(), "Scan QR code")
+        adapter.addFragment(qrScannerFragment, "Scan QR code")
         viewPager.adapter = adapter
+        viewPager.setOnPageChangeListener(this)
         tabLayout.setupWithViewPager(viewPager)
 
+    }
+
+
+    interface searchChangeListener {
+        fun onSearchQueryChanged(query:String)
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {
+
+    }
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+    }
+
+    override fun onPageSelected(position: Int) {
+       if(position==3){
+           mSearchView.visibility = View.GONE
+           qrScannerFragment.resume()
+       }else{
+           mSearchView.visibility = View.VISIBLE
+           qrScannerFragment.pause()
+       }
     }
 }
 

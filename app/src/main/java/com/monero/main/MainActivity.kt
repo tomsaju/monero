@@ -31,14 +31,11 @@ import com.monero.helper.BottomNavigationViewHelper
 import com.monero.main.presenter.main.IMainPresenter
 import com.monero.main.presenter.main.IMainView
 import com.monero.main.presenter.main.MainPresenter
-import com.monero.models.Activities
-import com.monero.models.ContactMinimal
 import com.google.firebase.auth.FirebaseAuth
 import com.monero.Application.ApplicationController
 import com.monero.addActivities.fragments.CreateGroupFragment
 import com.monero.addActivities.fragments.GroupContactsFragment
-import com.monero.models.Contact
-import com.monero.models.User
+import com.monero.models.*
 import com.monero.network.RestService
 import com.monero.signup.SignUpActivity
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig
@@ -52,7 +49,8 @@ class MainActivity : AppCompatActivity(),
                         ActivityFragment.ActivityFragmentListener,
                         AddActivityFragment.IAddActivityFragmentListener,
                         SelectContactsFragment.OnCotactSelectedListener,
-                        GroupContactsFragment.OnGroupContactsFragmentInteractionListener{
+                        GroupContactsFragment.OnGroupContactsFragmentInteractionListener,
+                        NotificationFragment.NotificationFragmentListener{
 
 
     private var content:FrameLayout? = null
@@ -374,8 +372,11 @@ class MainActivity : AppCompatActivity(),
     }
 
 
+    override fun getAllNotificationFromDb() {
 
-     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             READ_CONTACTS_REQUEST_CODE -> {
 
@@ -497,6 +498,24 @@ class MainActivity : AppCompatActivity(),
         frag.arguments = args
         ft.setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)
         ft.add(android.R.id.content, frag,"activity_add_fragment").commit()
+    }
+
+    override fun onNotificationsFetched(notifications: LiveData<List<NotificationItem>>?) {
+        //  hideProgressBar()
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+
+        notifications?.observe(this, object : Observer<List<NotificationItem>> {
+            override fun onChanged(allList: List<NotificationItem>?) {
+
+                if(currentFragment is NotificationFragment){
+                    if(allList!=null) {
+                        currentFragment.onAllNotificationsFetched(allList)
+                    }
+                }
+
+            }
+
+        });
     }
 }
 

@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import com.monero.R
 
 
-class EmailContactsFragment : Fragment() {
+class EmailContactsFragment : Fragment(),SelectContactsFragment.searchChangeListener {
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -34,6 +34,8 @@ class EmailContactsFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         mListener = null
+        val SelectContactsFragment = this@EmailContactsFragment.getParentFragment() as SelectContactsFragment
+        SelectContactsFragment.unregisterSearchListener(this@EmailContactsFragment)
     }
 
     /**
@@ -48,5 +50,18 @@ class EmailContactsFragment : Fragment() {
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
+    }
+
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        val SelectContactsFragment = this@EmailContactsFragment.getParentFragment() as SelectContactsFragment
+        SelectContactsFragment.registerSearchListener(this@EmailContactsFragment)
+    }
+
+
+
+    override fun onSearchQueryChanged(query: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }// Required empty public constructor
