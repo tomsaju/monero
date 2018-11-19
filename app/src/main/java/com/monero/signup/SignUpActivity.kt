@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.NonNull
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
@@ -20,6 +21,12 @@ import java.lang.Exception
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.FirebaseUser
 import com.monero.Application.ApplicationController
+import com.monero.network.ServiceRest
+import com.google.firebase.internal.FirebaseAppHelper.getToken
+import com.google.firebase.auth.GetTokenResult
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.OnCompleteListener
+import io.reactivex.internal.util.HalfSerializer.onComplete
 
 
 class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragment.OnAddPhoneFragmentInteractionListener {
@@ -50,11 +57,16 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                 .addOnCompleteListener(this) { task ->
                     //checking if success
                     if (task.isSuccessful) {
+
+                        //send registration success to backend
+                        var user = firebaseAuth.currentUser
+
+
                         //display some message here
                         Log.d(TAG, "successfull creation")
                         progressBarSignUp.visibility = View.INVISIBLE
 
-                        val user = firebaseAuth.currentUser
+
                         if(firebaseAuth.currentUser?.uid!=null) {
                             ApplicationController.preferenceManager?.myUid = firebaseAuth.currentUser?.uid!!
                         }
@@ -62,6 +74,39 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                                 .setDisplayName(userName).build()
 
                         user?.updateProfile(profileUpdates)
+
+                                ?.addOnCompleteListener(this) {task->
+
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "User profile updated")
+
+                                        user = firebaseAuth.currentUser
+                                        user?.getIdToken(true)
+                                                ?.addOnCompleteListener(OnCompleteListener<GetTokenResult> { task ->
+                                                    if (task.isSuccessful) {
+                                                        val idToken = task.result!!.token
+                                                        var service = ServiceRest()
+
+                                                        var params = HashMap<String,String>()
+                                                        params.put("token",idToken!!)
+                                                        params.put("userid",user?.uid!!)
+                                                        params.put("useremail",user?.email!!)
+                                                        params.put("displayName",user?.displayName!!)
+                                                        params.put("phoneNumber","")
+
+                                                        service.onUserRegistrationSuccess(this,"onRegistrationSuccess",params,{response ->
+                                                            Log.d("backend response",response)
+                                                        })
+
+                                                    } else {
+                                                        // Handle error -> task.getException();
+                                                    }
+                                                })
+
+
+                                    }
+
+                                }
 
                         showPhoneNumberFragment()
 
@@ -132,6 +177,28 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                             ApplicationController.preferenceManager?.myPhone = firebaseAuth.currentUser?.phoneNumber!!
                         }
 
+                        //edit user data in backend
+                        user?.getIdToken(true)
+                                ?.addOnCompleteListener(OnCompleteListener<GetTokenResult> { task ->
+                                    if (task.isSuccessful) {
+                                        val idToken = task.result!!.token
+                                        var service = ServiceRest()
+
+                                        var params = HashMap<String,String>()
+                                        params.put("token",idToken!!)
+                                        params.put("userid",user?.uid!!)
+                                        params.put("useremail",user?.email!!)
+                                        params.put("displayName",user?.displayName!!)
+                                        params.put("phoneNumber",user?.phoneNumber!!)
+
+                                        service.onUserRegistrationSuccess(this,"onRegistrationSuccess",params,{response ->
+                                            Log.d("backend response",response)
+                                        })
+
+                                    } else {
+                                        // Handle error -> task.getException();
+                                    }
+                                })
 
                         var mainIntent = Intent(this,MainActivity::class.java)
                         startActivity(mainIntent)
