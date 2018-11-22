@@ -11,7 +11,7 @@ interface IMainPresenter {
     fun getAllActivitiesList()
     fun saveActivity(activity:Activities)
     fun getAllActivitiesFromServer();
-    fun syncContactsWithServer(contactList: ArrayList<Contact>)
+    fun syncContactsWithServer()
     fun updateActivity(activity:Activities)
     fun getAllNotificationsFromDB()
 

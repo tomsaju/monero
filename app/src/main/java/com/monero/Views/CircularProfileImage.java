@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,7 +15,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.StorageReference;
+import com.monero.Application.ApplicationController;
 import com.monero.R;
+
+import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -41,7 +53,9 @@ public class CircularProfileImage extends ConstraintLayout {
     private TextView username;
     private String email;
     private String phone;
-
+    private StorageReference downloadReference;
+    private File file;
+    private RequestOptions options;
 
     public CircularProfileImage(Context context) {
         super(context);
@@ -55,6 +69,20 @@ public class CircularProfileImage extends ConstraintLayout {
         this.context = context;
         Log.d(TAG, "CircularProfileImage() returned: ");
         mDrawable = profileImage;
+        labelText = name;
+        this.email = email;
+        this.phone = phone;
+        this.cancelable = cancelable;
+        this.id=id;
+        init();
+    }
+
+    public CircularProfileImage(Context context, @NonNull StorageReference profileImageUrl, String name,String phone,String email,boolean cancelable, String id) {
+        super(context);
+        this.context = context;
+        Log.d(TAG, "CircularProfileImage() returned: ");
+        mDrawable = null;
+        this.downloadReference = profileImageUrl;
         labelText = name;
         this.email = email;
         this.phone = phone;
@@ -113,8 +141,46 @@ public class CircularProfileImage extends ConstraintLayout {
         userphone = (TextView) rootView.findViewById(R.id.user_phone);
         username = (TextView) rootView.findViewById(R.id.user_name);
         closeButton = (Button) rootView.findViewById(R.id.close_button);
+        options = new RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH);
+
         if(mDrawable !=null){
-            profileImage.setImageDrawable(mDrawable);
+
+            Glide.with(context).load(mDrawable).into(profileImage);
+        }else{
+            if(downloadReference!=null){
+                downloadReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        if(task.isSuccessful()) {
+                            String downloadUri = task.getResult().toString();
+                            Glide.with(context).load(downloadUri).into(profileImage);
+                        }else{
+                            Glide.with(context).load(context.getResources().getDrawable(R.drawable.default_profile)).into(profileImage);
+                        }
+                    }
+                });
+            }else{
+
+
+
+
+                try {
+                    String path = context.getFilesDir().getAbsolutePath() + "/profile";
+                    file = new  File(path + "/" +id + ".jpg");
+                    Uri uri = Uri.fromFile(file);
+                    Glide.with(context).load(uri).apply(options).into(profileImage);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Glide.with(context).load(context.getResources().getDrawable(R.drawable.default_profile)).into(profileImage);
+                }
+            }
+
+
         }
 
 

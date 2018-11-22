@@ -30,6 +30,7 @@ import io.reactivex.Single
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoContactTable(contact: Contact)
 
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllContactIntoContactTable(contacts: List<Contact>)
 

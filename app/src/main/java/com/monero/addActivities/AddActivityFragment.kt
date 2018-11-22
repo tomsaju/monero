@@ -3,6 +3,7 @@ package com.monero.addActivities
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -23,8 +24,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
-
-
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import java.io.File
 
 
 /**
@@ -56,6 +60,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     lateinit var progressBarContacts:ProgressBar
     lateinit var myUser:User
     lateinit var auth:FirebaseAuth
+    lateinit var myProfile:ImageView
     private val MODE_PRIVATE = 1
     private val MODE_PUBLIC = 2
     private var expenseIdList = ""
@@ -67,9 +72,20 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     var selectedUserList: ArrayList<User> = ArrayList()
     private lateinit var currentActivityId: String
 
+    private lateinit var options: RequestOptions
+
+    private lateinit var path: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = FirebaseAuth.getInstance()!!
+        options = RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH)
+
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -91,6 +107,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         addMembersLayout = view.findViewById(R.id.add_member_layout)
         progressBarContacts = view.findViewById(R.id.contactLoadingProgressBar)
 
+        myProfile = view.findViewById(R.id.profileImage)
 
         modeSelector.onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
@@ -228,6 +245,18 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
         //populate my number in members listview
         if(auth.currentUser!!.phoneNumber!=null) {
             myContactName.text = "You"
+            path = requireContext().getFilesDir().absolutePath + "/profile"
+
+            try {
+
+                file = File("$path/${myUser.user_id}.jpg")
+                val uri = Uri.fromFile(file)
+                Glide.with(requireContext()).load(uri).apply(options).into(myProfile)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Glide.with(requireContext()).load(requireContext().resources.getDrawable(R.drawable.default_profile)).into(myProfile)
+            }
+
             //myContactPhone.text = ApplicationController.preferenceManager!!.myPhone
         }else{
             //go to sign in page
@@ -279,6 +308,7 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
     fun setSelectedContacts(contactList: List<ContactMinimal>){
 
         if(!contactList.isEmpty()){
+            path = requireContext().getFilesDir().absolutePath + "/profile"
             addMembersParent.visibility = View.GONE
             memberListParent.removeAllViews()
             selectedUserList.clear()
@@ -301,10 +331,14 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
 
     }
 
+    private lateinit var file: File
+
     fun getContactView(contact: ContactMinimal):View{
         var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         var view:View = inflater?.inflate(R.layout.contact_list_item_add_activity_fragment_layout,null,false)
         var name:TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
+        var image:ImageView = view.findViewById<ImageView>(R.id.profileImage) as ImageView
+
 
 
         if((contact.phoneNumber.isNotEmpty()&&contact.phoneNumber== myPhone)||(contact.email.isNotEmpty()&&contact.email==myEmail)){
@@ -318,6 +352,16 @@ public class AddActivityFragment : Fragment(),IAddActivityView {
                 name.text = contact.phoneNumber
             }
         }
+        try {
+
+             file = File("$path/${contact.contact_id}.jpg")
+            val uri = Uri.fromFile(file)
+            Glide.with(requireContext()).load(uri).apply(options).into(image)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Glide.with(requireContext()).load(requireContext().resources.getDrawable(R.drawable.default_profile)).into(image)
+        }
+
 
         return  view
     }

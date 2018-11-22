@@ -170,7 +170,7 @@ class CreateGroupFragment : Fragment(),IContactSelectedListener {
     fun refreshContacts(){
         var contactList =  getContacts()
 
-        //syncContactsWithServer(contactList);
+        //sendContactsToServer(contactList);
 
         var db = AppDatabase.getAppDatabase(requireContext())
 

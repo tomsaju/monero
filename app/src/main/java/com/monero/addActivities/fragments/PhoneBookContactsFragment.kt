@@ -2,28 +2,39 @@ package com.monero.addActivities.fragments
 
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.support.v4.app.Fragment
+import android.telephony.TelephonyManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.HorizontalScrollView
 import android.widget.ListView
-import android.widget.Toast
+import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GetTokenResult
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.i18n.phonenumbers.PhoneNumberUtil
+import com.monero.Application.ApplicationController
 
 import com.monero.R
-import com.monero.Views.CircularProfileImage
 import com.monero.addActivities.adapter.ContactListAdapter
 import com.monero.addActivities.adapter.IContactSelectedListener
 import com.monero.helper.AppDatabase
+import com.monero.helper.ImageSaver
 import com.monero.models.Contact
 import com.monero.models.ContactMinimal
+import com.monero.network.ServiceRest
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.select_contact_fragment_layout.*
+import org.json.JSONArray
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -34,6 +45,19 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
     lateinit var listView:ListView
     var listType = "phone";
     var selectedContactsList: ArrayList<ContactMinimal> = ArrayList()
+    var auth = FirebaseAuth.getInstance()!!
+    private lateinit var storageReference: StorageReference
+    private lateinit var firebaseStorage: FirebaseStorage
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        var storage = FirebaseStorage.getInstance();
+        if(storage!=null) {
+            firebaseStorage = storage
+            storageReference = firebaseStorage?.getReference();
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -53,7 +77,8 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
         }
 
         if(listType=="phone"){
-            refreshContacts()
+            loadAllContacts()
+          //  refreshContacts()
         }else{
             loadEmailIds()
         }
@@ -115,29 +140,6 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
     }
 
 
-    fun refreshContacts(){
-        var contactList =  getContacts()
-
-        //syncContactsWithServer(contactList);
-
-        var db = AppDatabase.getAppDatabase(requireContext())
-
-
-        Single.fromCallable({
-            db?.contactDao()?.insertAllContactIntoContactTable(contactList)
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doAfterSuccess {
-                    loadAllContacts();
-                }
-                .subscribe()
-    }
-
-    private fun syncContactsWithServer(contactList: ArrayList<Contact>) {
-      //  mListener?.syncContactsWithServer(contactList)
-        Toast.makeText(requireContext(),"Not implemented",Toast.LENGTH_SHORT).show()
-    }
-
 
     private fun loadAllContacts() {
 
@@ -174,7 +176,7 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
 
 
 
-    fun getContacts(): ArrayList<Contact> {
+    fun getContactsFromPhoneBook(): ArrayList<Contact> {
         val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)//plus any other properties you wish to query
         var contactsList = ArrayList<Contact>()
         var cursor: Cursor? = null
@@ -241,5 +243,191 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
         (listView.adapter as ContactListAdapter).setSelectedContacts(selectedContactsList)
     }
 
+    fun refreshContactsWithServer(){
+
+        var contactListFromPhoneBook = getContactsFromPhoneBook()
+        sendContactsToServer(contactListFromPhoneBook)
+    }
+
+
+
+    private fun sendContactsToServer(contactList: ArrayList<Contact>) {
+        var numberLIst:ArrayList<String> = ArrayList()
+        for(contact in contactList){
+            //  var number:String=contact.Contact_phone.replace("+","");
+            var  number = contact.Contact_phone.replace("\\s".toRegex(), "")
+            numberLIst.add(number)
+        }
+
+
+        normalizePhoneNumbers(numberLIst)
+
+
+        var contactsJSON = "["
+        for(i in 0 until numberLIst.size){
+            contactsJSON+="\""+ numberLIst[i]+"\""
+            if(i==numberLIst.size-1){
+
+            }else{
+                contactsJSON+=","
+            }
+        }
+
+        contactsJSON+="]"
+
+
+
+        var user  = auth!!.currentUser
+        user?.getIdToken(true)
+                ?.addOnCompleteListener(OnCompleteListener<GetTokenResult> { task ->
+                    if (task.isSuccessful) {
+                        val idToken = task.result!!.token
+                        var service = ServiceRest()
+
+                        var params = java.util.HashMap<String, String>()
+                        params.put("token",idToken!!)
+                        params.put("contactList",contactsJSON)
+
+                        service.getRegisteredContacts(requireContext(),"getRegisteredUsers",params,{response ->
+                            //   Log.d("backend response",response)
+                            if(response!=null&&response.length>0){
+
+                                //find a way to distinguish success and error response
+                                //incase of success only ,proceed
+                                //compare results and save to db
+                                saveToDB(response,contactList)
+
+                            }else{
+
+                            }
+                        })
+
+                    } else {
+                        // Handle error -> task.getException();
+                    }
+                })
+
+        /*if(contactArray!=null&&contactArray.length()>0){
+            sendContactsJSON(contactArray)
+        }*/
+    }
+
+    private fun saveToDB(response: String,localCOntacts:ArrayList<Contact>) {
+        var registeredList = JSONArray(response)
+        if(registeredList!=null&&registeredList.length()>0){
+
+            for(i in 0 until registeredList.length()){
+                for(phoneContact in localCOntacts){
+
+                    var  number = phoneContact.Contact_phone.replace("\\s".toRegex(), "")
+                    if(registeredList.getJSONObject(i).getString("phoneNumber").contains(number)){
+                        phoneContact.Contact_uuid = registeredList.getJSONObject(i).getString("uid")
+                        phoneContact.Contact_email = registeredList.getJSONObject(i).getString("email")
+                        phoneContact.Contact_name_public = registeredList.getJSONObject(i).getString("name")
+                        phoneContact.Contact_phone = registeredList.getJSONObject(i).getString("phoneNumber")
+                        var profileImageUrl =  storageReference?.child("displayImages/"+phoneContact.Contact_uuid+".jpg")
+
+
+                        val ONE_MEGABYTE: Long = 1024 * 1024
+                        profileImageUrl.getBytes(ONE_MEGABYTE).addOnSuccessListener {bytes ->
+                            // Data for "images/island.jpg" is returned, use this as needed
+
+                            var options =  BitmapFactory.Options()
+                            options.inMutable = true
+                            var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
+
+
+                             ImageSaver(requireContext())
+                                    .setFileName(phoneContact.Contact_uuid+".jpg")
+                                    .setExternal(false)//image save in external directory or app folder default value is false
+                                    .setDirectory("profile")
+                                    .save(bmp); //Bitmap from your code
+
+
+                        }.addOnFailureListener {
+                            // Handle any errors
+                        }
+                    }
+                }
+            }
+
+        }
+
+        //insert in DB
+        var db = AppDatabase.getAppDatabase(requireContext())
+
+
+        Single.fromCallable({
+            db?.contactDao()?.insertAllContactIntoContactTable(localCOntacts)
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doAfterSuccess {
+                    ApplicationController.preferenceManager?.contactSyncDate = System.currentTimeMillis()
+                    Log.d("PhoneBook","saved contacts to DB after syncing")
+                    loadAllContacts()
+                }
+                .subscribe()
+
+    }
+
+
+     fun normalizePhoneNumbers(numberLIst: ArrayList<String>) {
+        //check if first 1 to 3 characters match any country code . if false--> append the user's country code to the number
+        //if true, check if string contains "+" if true, return .else --> add "+"
+        //make use of phonenumberUtils class
+
+        var myphoneNumberUtil = PhoneNumberUtil.getInstance()
+        for(i in 0 until numberLIst.size){
+
+            var number = numberLIst[i]
+
+            try {
+                var phoneNumber = myphoneNumberUtil.parse(number,null)
+
+                val isValid = myphoneNumberUtil.isValidNumber(phoneNumber)&&number.length>=5 // returns true if valid
+                if (isValid) {
+                    // Actions to perform if the number is valid
+
+
+                } else {
+                    // Do necessary actions if its not valid
+
+                    numberLIst[i]=""
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                /* if(e.message?.trim()==="INVALID_COUNTRY_CODE. Missing or invalid default region.")
+                 {*/
+                var tm = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                var countryCode = tm.simCountryIso;
+                var daillingCodeForCountry = getCountryDiallingCode(countryCode)
+                number=daillingCodeForCountry+number
+                numberLIst[i] = number
+
+                //   }
+            }
+
+            if(!numberLIst[i].startsWith("+")){
+                numberLIst[i]="+"+numberLIst[i]
+            }
+
+        }
+
+    }
+
+
+    fun getCountryDiallingCode(countryCode:String):String{
+        var contryDialCode=""
+        var countryId = countryCode.toUpperCase()
+        val arrContryCode = context?.resources?.getStringArray(R.array.DialingCountryCode)
+        for (i in arrContryCode!!.indices) {
+            val arrDial = arrContryCode[i].split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (arrDial[1].trim { it <= ' ' } == countryId.trim()) {
+                contryDialCode = arrDial[0]
+                break
+            }
+        }
+        return contryDialCode
+    }
 
 }// Required empty public constructor

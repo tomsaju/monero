@@ -5,6 +5,7 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.preference.PreferenceFragment
 import android.provider.MediaStore
@@ -28,6 +29,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.monero.Application.ApplicationController
+import com.monero.helper.ImageSaver
 import com.monero.helper.PreferenceManager
 import com.monero.models.User
 import com.mynameismidori.currencypicker.CurrencyPicker
@@ -181,6 +183,26 @@ class ProfileFragment:Fragment() {
         }?.addOnSuccessListener { taskSnapshot ->
             // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
             // ...
+
+            val ONE_MEGABYTE: Long = 1024 * 1024
+            myImageReference?.getBytes(ONE_MEGABYTE)?.addOnSuccessListener {bytes ->
+                // Data for "images/island.jpg" is returned, use this as needed
+
+                var options =  BitmapFactory.Options()
+                options.inMutable = true
+                var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
+
+
+                ImageSaver(requireContext())
+                        .setFileName(ApplicationController.preferenceManager!!.myUid+".jpg")
+                        .setExternal(false)//image save in external directory or app folder default value is false
+                        .setDirectory("profile")
+                        .save(bmp); //Bitmap from your code
+
+
+            }?.addOnFailureListener {
+                // Handle any errors
+            }
 
 
             myImageReference?.downloadUrl?.addOnCompleteListener { task ->

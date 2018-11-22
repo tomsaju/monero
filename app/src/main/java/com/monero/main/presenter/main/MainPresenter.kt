@@ -1,6 +1,9 @@
 package com.monero.main.presenter.main
 
 import android.content.Context
+import android.database.Cursor
+import android.provider.ContactsContract
+import android.telephony.TelephonyManager
 import android.util.Log
 import com.google.gson.Gson
 import com.monero.Dao.DBContract
@@ -27,11 +30,10 @@ import kotlin.collections.HashMap
 import io.reactivex.disposables.Disposable
 import io.reactivex.SingleObserver
 import org.json.JSONArray
-import com.android.volley.AuthFailureError
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GetTokenResult
+import com.google.i18n.phonenumbers.PhoneNumberUtil
+import com.monero.R
 
 
 /**
@@ -43,7 +45,7 @@ class MainPresenter : IMainPresenter {
     var context: Context
     var view: IMainView
     var firestoreDb: FirebaseFirestore? = null
-
+    var auth = FirebaseAuth.getInstance()!!
     constructor(context: Context, view: IMainView) {
         this.context = context
         this.view = view
@@ -672,104 +674,168 @@ class MainPresenter : IMainPresenter {
     }
 
 
-    override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
+   override fun syncContactsWithServer() {
 
-      /*  var params="[";
-        for( i in 0 .. contactList.size-1){
-            var number:String=contactList[i].Contact_phone.replace("+","");
-            number = number.replace("\\s".toRegex(), "")
-            params+=number
-          if(i!=contactList.size-1){
-              params+=","
-          }
-        }
-        params+="]"
+        var contactListFromPhoneBook = getContactsFromPhoneBook()
+        sendContactsToServer(contactListFromPhoneBook)
+    }
 
 
-*/
-       // var array=Array<String>(contactList.size){"it = $it"}
+    private fun sendContactsToServer(contactList: ArrayList<Contact>) {
         var numberLIst:ArrayList<String> = ArrayList()
         for(contact in contactList){
-            var number:String=contact.Contact_phone.replace("+","");
-            number = number.replace("\\s".toRegex(), "")
+            //  var number:String=contact.Contact_phone.replace("+","");
+            var  number = contact.Contact_phone.replace("\\s".toRegex(), "")
             numberLIst.add(number)
         }
-        val array = arrayOfNulls<String>(numberLIst.size)
-        numberLIst.toArray(array)
 
-      //  println(Arrays.toString(array))
 
-      //  var params = Array
+        normalizePhoneNumbers(numberLIst)
 
-        syncContactWithServer(Arrays.toString(array))
+
+        var contactsJSON = "["
+        for(i in 0 until numberLIst.size){
+            contactsJSON+="\""+ numberLIst[i]+"\""
+            if(i==numberLIst.size-1){
+
+            }else{
+                contactsJSON+=","
+            }
+        }
+
+        contactsJSON+="]"
+
+
+
+        var user  = auth!!.currentUser
+        user?.getIdToken(true)
+                ?.addOnCompleteListener(OnCompleteListener<GetTokenResult> { task ->
+                    if (task.isSuccessful) {
+                        val idToken = task.result!!.token
+                        var service = ServiceRest()
+
+                        var params = java.util.HashMap<String, String>()
+                        params.put("token",idToken!!)
+                        params.put("contactList",contactsJSON)
+
+                        service.getRegisteredContacts(context,"getRegisteredUsers",params,{response ->
+                         //   Log.d("backend response",response)
+                            if(response!=null&&response.length>0){
+
+                                //find a way to distinguish success and error response
+                                //incase of success only ,proceed
+                                //compare results and save to db
+                                saveToDB(response,contactList)
+
+                            }else{
+
+                            }
+                        })
+
+                    } else {
+                        // Handle error -> task.getException();
+                    }
+                })
 
         /*if(contactArray!=null&&contactArray.length()>0){
             sendContactsJSON(contactArray)
         }*/
     }
 
+    private fun saveToDB(response: String,localCOntacts:ArrayList<Contact>) {
+        var registeredList = JSONArray(response)
+        if(registeredList!=null&&registeredList.length()>0){
 
-    private fun sendAndRequestResponse(localContacts: String) {
+            for(i in 0 until registeredList.length()){
+                for(phoneContact in localCOntacts){
 
-        //RequestQueue initialized
-        var mRequestQueue = Volley.newRequestQueue(context)
-
-        var url ="https://us-central1-monero-efbcb.cloudfunctions.net/webApi/api/v1/getRegisteredUsers";
-
-        //String Request initialized
-        var mStringRequest = object : StringRequest(Request.Method.POST, url,  Response.Listener<String> {
-            response ->
-            Log.d("Vol Tag",response)
-
-        },  Response.ErrorListener { error ->
-            Log.d("Vol Tag",error.toString())
-
-        }) {
-            override fun getParams(): Map<String, String> {
-                val params = HashMap<String, String>()
-                var gson = Gson()
-                val objectList = gson.fromJson(localContacts, Array<String>::class.java).asList()
-                params.put("localContacts", "[]")
-                return params
+                    var  number = phoneContact.Contact_phone.replace("\\s".toRegex(), "")
+                    if(registeredList.getJSONObject(i).getString("phoneNumber").contains(number)){
+                        phoneContact.Contact_uuid = registeredList.getJSONObject(i).getString("uid")
+                        phoneContact.Contact_email = registeredList.getJSONObject(i).getString("email")
+                        phoneContact.Contact_name_public = registeredList.getJSONObject(i).getString("name")
+                        phoneContact.Contact_phone = registeredList.getJSONObject(i).getString("phoneNumber")
+                    }
+                }
             }
 
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                return HashMap()
-            }
         }
 
-        mRequestQueue.add(mStringRequest)
-    }
+        //insert in DB
+        var db = AppDatabase.getAppDatabase(context)
 
 
-    fun syncContactWithServer(localContacts: String){
-
-      var restService = ServiceRest()
-        var params = HashMap<String,String>()
-        params.put("localContacts",localContacts)
-        sendAndRequestResponse(localContacts)
-        /*restService.getRegisteredContacts(context,"api/v1/getRegisteredUsers",params,{response ->
-          Log.d("result",response)
-      })*/
-
-     /* var map = HashMap<String,String>()
-        map.put("localContacts",localContacts)
-      disposable = RestAPIService.getRegisteredContactForNumber(map)
-                .subscribeOn(Schedulers.io())
+        Single.fromCallable({
+            db?.contactDao()?.insertAllContactIntoContactTable(localCOntacts)
+        }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {
-                            result ->
-                              showResult(result)
-                        },
-                        { error ->
-                            showError(error.message) }
-                )*/
-
+                .doAfterSuccess {
+                   ApplicationController.preferenceManager?.contactSyncDate = System.currentTimeMillis()
+                   Log.d(TAG,"saved contacts to DB after syncing")
+                }
+                .subscribe()
 
     }
 
+
+    private fun normalizePhoneNumbers(numberLIst: ArrayList<String>) {
+        //check if first 1 to 3 characters match any country code . if false--> append the user's country code to the number
+        //if true, check if string contains "+" if true, return .else --> add "+"
+        //make use of phonenumberUtils class
+
+        var myphoneNumberUtil = PhoneNumberUtil.getInstance()
+        for(i in 0 until numberLIst.size){
+
+            var number = numberLIst[i]
+
+            try {
+                var phoneNumber = myphoneNumberUtil.parse(number,null)
+
+                val isValid = myphoneNumberUtil.isValidNumber(phoneNumber)&&number.length>=5 // returns true if valid
+                if (isValid) {
+                    // Actions to perform if the number is valid
+
+
+                } else {
+                    // Do necessary actions if its not valid
+
+                    numberLIst[i]=""
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                /* if(e.message?.trim()==="INVALID_COUNTRY_CODE. Missing or invalid default region.")
+                 {*/
+                var tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                var countryCode = tm.simCountryIso;
+                var daillingCodeForCountry = getCountryDiallingCode(countryCode)
+                number=daillingCodeForCountry+number
+                numberLIst[i] = number
+
+                //   }
+            }
+
+            if(!numberLIst[i].startsWith("+")){
+                numberLIst[i]="+"+numberLIst[i]
+            }
+
+        }
+
+    }
+
+
+    fun getCountryDiallingCode(countryCode:String):String{
+        var contryDialCode=""
+        var countryId = countryCode.toUpperCase()
+        val arrContryCode = context.resources.getStringArray(R.array.DialingCountryCode)
+        for (i in arrContryCode.indices) {
+            val arrDial = arrContryCode[i].split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (arrDial[1].trim { it <= ' ' } == countryId.trim()) {
+                contryDialCode = arrDial[0]
+                break
+            }
+        }
+        return contryDialCode
+    }
     private fun showError(message: String?) {
         //do nothing
         //set sync status false
@@ -782,14 +848,51 @@ class MainPresenter : IMainPresenter {
     }
 
 
-    private fun sendContactsJSON(contactArray: JSONArray) {
-       /* disposable = RestAPIService.getAllRegisteredContacts()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                { result -> showResult(result) },
-                                { error -> showError(error.message) }
-                        )*/
+
+
+    fun getContactsFromPhoneBook(): ArrayList<Contact> {
+        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)//plus any other properties you wish to query
+        var contactsList = ArrayList<Contact>()
+        var cursor: Cursor? = null
+        try {
+            cursor = context?.getContentResolver()?.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, projection, null, null, null)
+        } catch (e: SecurityException) {
+            //SecurityException can be thrown if we don't have the right permissions
+        }
+
+
+        if (cursor != null) {
+            try {
+                val normalizedNumbersAlreadyFound = HashSet<Any?>()
+                val indexOfNormalizedNumber = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)
+                val indexOfDisplayName = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val indexOfDisplayNumber = cursor!!.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+                while (cursor!!.moveToNext()) {
+                    val normalizedNumber = cursor!!.getString(indexOfNormalizedNumber)
+                    if (normalizedNumbersAlreadyFound.add(normalizedNumber)) {
+                        val displayName = cursor!!.getString(indexOfDisplayName)
+                        val displayNumber = cursor!!.getString(indexOfDisplayNumber)
+                        //haven't seen this number yet: do something with this contact!
+                        var defaultId = displayNumber.replace("+","")
+                        var trimmed  = defaultId.replace("\\s".toRegex(), "")
+                        try {
+                            var intId = trimmed.toLong()
+                            var contact  = Contact(intId,displayName,"",displayNumber,"",intId.toString(),"")
+
+                            contactsList.add(contact)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        //don't do anything with this contact because we've already found this number
+                    }
+                }
+            } finally {
+                cursor!!.close()
+            }
+        }
+        return contactsList
     }
 
 

@@ -3,6 +3,9 @@ package com.monero.addActivities.fragments
 import android.app.Activity
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.support.design.widget.FloatingActionButton
@@ -34,6 +37,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import java.io.File
+import java.io.FileInputStream
 
 
 /**
@@ -62,10 +69,22 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     lateinit var phoneContactFragment:PhoneBookContactsFragment
     lateinit var emailContactsFragment:PhoneBookContactsFragment
     lateinit var qrScannerFragment:QRScannerFragment
+    private lateinit var storageReference: StorageReference
+
+    private lateinit var firebaseStorage: FirebaseStorage
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       // contacts = getContacts()
+       // contacts = getContactsFromPhoneBook()
         mListeners = ArrayList()
+        var storage = FirebaseStorage.getInstance();
+        if(storage!=null) {
+            firebaseStorage = storage
+            storageReference = firebaseStorage?.getReference();
+        }
+
+
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -100,7 +119,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
         refreshButton.setOnClickListener{
             _:View?->
-           // refreshContacts()
+            phoneContactFragment.refreshContactsWithServer()
         }
 
         cancelButton?.setOnClickListener{v: View? ->
@@ -112,12 +131,14 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
             mListener?.closeContactSelectFragment()
            // dialog?.dismiss()
         })
-
-        var myProfileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), "You","","", false, "my " + " id ")
+      //  profileImageUrl =  storageReference?.child("displayImages/"+myUser.user_id+".jpg")
+        var myProfileImage = CircularProfileImage(getActivity(), null, "You",myContact.phoneNumber,myContact.email, false, myContact.contact_id)
         horizontalList.addView(myProfileImage)
         setupViewPager(viewPager)
         return rootView
     }
+
+
 
     private fun setupSearchView() {
         mSearchView.setIconifiedByDefault(false)
@@ -213,6 +234,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     }
 
 
+    private lateinit var profileImageUrl: StorageReference
 
     override fun onContactSelected(contactList: ArrayList<ContactMinimal>) {
 
@@ -229,16 +251,18 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
         for(contact in contactList) {
 
-            var profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+            var profileImage = CircularProfileImage(getActivity(), null, contact.name, contact.phoneNumber, contact.email, true, contact.contact_id)
             if(contact.contact_id==myContact.contact_id){
-                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), "You", contact.phoneNumber, contact.email, false, contact.phoneNumber + " id ")
+                profileImage = CircularProfileImage(getActivity(), null, "You", contact.phoneNumber, contact.email, false, contact.contact_id)
             }else if (contact.name.isNotEmpty()) {
-                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+                profileImage = CircularProfileImage(getActivity(), null, contact.name, contact.phoneNumber, contact.email, true, contact.contact_id)
             } else if (contact.phoneNumber.isNotEmpty()) {
-                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+                profileImage = CircularProfileImage(getActivity(), null, contact.name, contact.phoneNumber, contact.email, true, contact.contact_id)
             } else if (contact.email.isNotEmpty()) {
-                profileImage = CircularProfileImage(getActivity(), resources.getDrawable(R.drawable.default_profile), contact.name, contact.phoneNumber, contact.email, true, contact.phoneNumber + " id ")
+                profileImage = CircularProfileImage(getActivity(), null, contact.name, contact.phoneNumber, contact.email, true, contact.contact_id)
             }
+
+
             profileImage?.setProfileImageListener(this@SelectContactsFragment)
             selectedContactList?.add(contact)
             horizontalList.addView(profileImage)
@@ -304,6 +328,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
     interface searchChangeListener {
         fun onSearchQueryChanged(query:String)
+
     }
 
     override fun onPageScrollStateChanged(state: Int) {
@@ -323,5 +348,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
            qrScannerFragment.pause()
        }
     }
+
+
 }
 

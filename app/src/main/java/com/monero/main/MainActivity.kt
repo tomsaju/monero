@@ -399,6 +399,9 @@ class MainActivity : AppCompatActivity(),
 
     }
 
+
+
+
     override fun closeContactSelectFragment() {
         supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("select_contacts")).commit()
     }
@@ -414,25 +417,19 @@ class MainActivity : AppCompatActivity(),
             startActivity(loginIntent)
             finish()
         }else{
-
-          /*  ApplicationController.preferenceManager!!.myPhone = auth.currentUser!!.phoneNumber!!
-            ApplicationController.preferenceManager!!.myUid = auth.currentUser!!.uid*/
-          // Log.d("url full",RestAPIService.getRegisteredContactForNumber("+919048576020").request().url().toString())
-         //  Log.d("url body",RestAPIService.getRegisteredContactForNumber("+919048576020").request().body().toString())
-
-                  /*  .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            {
-                                result ->
-                                showResult(result)
-                            },
-                            { error ->
-                                showError(error.message) }
-                    )*/
-
+            //check if contacts were synced atleast once, else sync it now
+            var syncstatus = ApplicationController.preferenceManager?.contactSyncDate
+            if(syncstatus==null|| syncstatus == 0L){
+                //never synced
+                //ask for permission
+                syncContacts()
+            }
 
         }
+    }
+
+    private fun syncContacts() {
+        mMainPresenter.syncContactsWithServer()
     }
 
 
@@ -485,9 +482,9 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun syncContactsWithServer(contactList: ArrayList<Contact>) {
-        if(contactList!=null){
+       /* if(contactList!=null){
             mMainPresenter.syncContactsWithServer(contactList)
-        }
+        }*/
     }
 
     override fun editActivity(id: String) {

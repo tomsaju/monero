@@ -15,6 +15,7 @@ class PreferenceManager(context: Context) {
     val PREFERRED_CURRENCY_CODE = "mPreferredCurrencyCode"
     val PREFERRED_CURRENCY_SYMBOL = "mPreferredCurrencySymbol"
     val PREFERRED_CURRENCY_NAME = "mPreferredCurrencyName"
+    val CONTACT_SYNC_DATE = "mContactSyncDate"
     val MY_UID="mUID"
     val FCM_TOKEN="fcmToken"
 
@@ -50,5 +51,9 @@ class PreferenceManager(context: Context) {
     var fcmToken:String
         get() = prefs.getString(FCM_TOKEN,"")
         set(value) = prefs.edit().putString(FCM_TOKEN,value).apply()
+
+    var contactSyncDate:Long
+        get() = prefs.getLong(CONTACT_SYNC_DATE,0)
+        set(value) = prefs.edit().putLong(CONTACT_SYNC_DATE,value).apply()
 
 }

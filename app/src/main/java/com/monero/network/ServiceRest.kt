@@ -35,19 +35,15 @@ class ServiceRest {
                     completionHandler(null)
                 }) {
 
-            /*override fun getHeaders(): MutableMap<String, String> {
-                var header = HashMap<String,String>()
-                header.put("Content-Type", "application/x-www-form-urlencoded");
-                return header
-            }*/
+
 
             override fun getBodyContentType(): String {
                 return "application/x-www-form-urlencoded; charset=UTF-8"
             }
 
-            /*override fun getParams(): MutableMap<String, String> {
+            override fun getParams(): MutableMap<String, String> {
                 return params
-            }*/
+            }
         }
 
         mRequestQueue.add(stringRequest)
@@ -65,7 +61,7 @@ class ServiceRest {
                 },
                 Response.ErrorListener { error ->
                     VolleyLog.e(TAG, "/post request fail! Error: ${error.message}")
-                    completionHandler(error.toString())
+                    completionHandler(null)
                 }) {
 
             override fun getHeaders(): MutableMap<String, String> {
