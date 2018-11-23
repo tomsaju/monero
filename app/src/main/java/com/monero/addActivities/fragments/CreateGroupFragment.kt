@@ -40,6 +40,10 @@ import kotlin.collections.ArrayList
 class CreateGroupFragment : Fragment(),IContactSelectedListener {
 
 
+    override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
+
+    }
+
 
     private var mListener: OnFragmentInteractionListener? = null
     lateinit var contactList:ListView

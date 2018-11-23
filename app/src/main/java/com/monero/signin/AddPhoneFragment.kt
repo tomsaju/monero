@@ -179,7 +179,7 @@ class AddPhoneFragment : Fragment() {
         if (context is OnAddPhoneFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnPhonebookContactsFragmentInteractionListener")
+            throw RuntimeException(context!!.toString() + " must implement onContactSelectedListener")
         }
     }
 

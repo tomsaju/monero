@@ -2,7 +2,6 @@ package com.monero.addActivities.fragments
 
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -14,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
-import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
@@ -33,6 +31,7 @@ import com.monero.models.ContactMinimal
 import com.monero.network.ServiceRest
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import java.util.*
@@ -41,7 +40,7 @@ import kotlin.collections.ArrayList
 
 class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectContactsFragment.searchChangeListener {
 
-    private var mListenerPhonebookContacts: OnPhonebookContactsFragmentInteractionListener? = null
+    private var mListenerPhonebookContacts: onContactSelectedListener? = null
     lateinit var listView:ListView
     var listType = "phone";
     var selectedContactsList: ArrayList<ContactMinimal> = ArrayList()
@@ -106,15 +105,14 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
 
     // TODO: Rename method, update argument and hook method into UI event
     fun onButtonPressed(uri: Uri) {
-        if (mListenerPhonebookContacts != null) {
-            mListenerPhonebookContacts!!.onFragmentInteraction(uri)
-        }
+
     }
 
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         val SelectContactsFragment = this@PhoneBookContactsFragment.getParentFragment() as SelectContactsFragment
+
         SelectContactsFragment.registerSearchListener(this@PhoneBookContactsFragment)
     }
 
@@ -134,9 +132,9 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
      *
      * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
      */
-    interface OnPhonebookContactsFragmentInteractionListener {
+    interface onContactSelectedListener {
         // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+        fun onSingleContactSelected(contactMinimal:ContactMinimal)
     }
 
 
@@ -332,16 +330,26 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
                         profileImageUrl.getBytes(ONE_MEGABYTE).addOnSuccessListener {bytes ->
                             // Data for "images/island.jpg" is returned, use this as needed
 
-                            var options =  BitmapFactory.Options()
-                            options.inMutable = true
-                            var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
+                            Single.fromCallable {
+
+                                var options =  BitmapFactory.Options()
+                                options.inMutable = true
+                                var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
 
 
-                             ImageSaver(requireContext())
-                                    .setFileName(phoneContact.Contact_uuid+".jpg")
-                                    .setExternal(false)//image save in external directory or app folder default value is false
-                                    .setDirectory("profile")
-                                    .save(bmp); //Bitmap from your code
+                                ImageSaver(requireContext())
+                                        .setFileName(phoneContact.Contact_uuid+".jpg")
+                                        .setExternal(false)//image save in external directory or app folder default value is false
+                                        .setDirectory("profile")
+                                        .save(bmp); //Bitmap from your code
+
+                            }.subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(Consumer {
+
+                                    })
+
+
 
 
                         }.addOnFailureListener {
@@ -430,4 +438,8 @@ class PhoneBookContactsFragment : Fragment(),IContactSelectedListener, SelectCon
         return contryDialCode
     }
 
+    override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
+        val SelectContactsFragment = this@PhoneBookContactsFragment.getParentFragment() as SelectContactsFragment
+        SelectContactsFragment.onSingleUserSelected(contactMinimal)
+    }
 }// Required empty public constructor

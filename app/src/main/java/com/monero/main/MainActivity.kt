@@ -453,9 +453,9 @@ class MainActivity : AppCompatActivity(),
     }
 
 
-    override fun attachBaseContext(newBase: Context) {
+  /*  override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase))
-    }
+    }*/
 
     override fun showLoader() {
         var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")

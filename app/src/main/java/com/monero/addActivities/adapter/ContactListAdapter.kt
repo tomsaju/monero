@@ -1,25 +1,36 @@
 package com.monero.addActivities.adapter
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
 import com.monero.models.ContactMinimal
+import com.pchmn.materialchips.R2
+import de.hdodenhof.circleimageview.CircleImageView
+import java.io.File
 
 /**
  * Created by tom.saju on 3/14/2018.
  */
 class ContactListAdapter:BaseAdapter, Filterable {
 
-    var contactList:List<ContactMinimal>;
+    var contactList:List<ContactMinimal>
     var context:Context?=null;
     var parent:IContactSelectedListener
     lateinit var orig: List<ContactMinimal>
     lateinit var selectedContactList:ArrayList<ContactMinimal>
+
+    private lateinit var options: RequestOptions
 
     constructor(context: Context, contactList: List<ContactMinimal>, parent: IContactSelectedListener){
         this.context = context
@@ -27,7 +38,15 @@ class ContactListAdapter:BaseAdapter, Filterable {
         this.parent = parent
         orig = contactList
         selectedContactList = ArrayList()
+        options = RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.default_profile)
+                .error(R.drawable.default_profile)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .priority(Priority.HIGH)
     }
+
+    private lateinit var file: File
 
     override fun getView(position: Int, parent: View?, rootView: ViewGroup?): View {
         var inflater:LayoutInflater = context?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -53,7 +72,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
             var name: TextView = view.findViewById<TextView>(R.id.contact_name) as TextView
             var number: TextView = view.findViewById<TextView>(R.id.contact_number) as TextView
             var check:CheckBox = view.findViewById<CheckBox>(R.id.check_status_box) as CheckBox
-
+            var profileImage:CircleImageView = view.findViewById(R.id.user_image_thumb)
 
             name.text = contactList.get(position)?.name
             if(!contactList[position].phoneNumber.isNullOrEmpty()){
@@ -63,10 +82,25 @@ class ContactListAdapter:BaseAdapter, Filterable {
             }
 
 
+            if(context!=null) {
+                try {
+                    val path = context?.getFilesDir()?.absolutePath + "/profile"
+                    file = File("$path/${contactList.get(position).contact_id}.jpg")
+                    val uri = Uri.fromFile(file)
+                    Glide.with(context!!).load(uri).apply(options).into(profileImage)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Glide.with(context!!).load(context?.getResources()?.getDrawable(R.drawable.default_profile)).into(profileImage)
+                }
+            }
+
+
             layoutParent.setOnClickListener { view: View ->
               check.performClick()
 
             }
+
+            selectedContactList = ApplicationController.selectedContactList
 
             check.isChecked = selectedContactList.contains(contactList[position])
 
@@ -80,6 +114,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
                       }
                //   }
                 this.parent.onContactSelected(selectedContactList)
+               // this.parent.onSingleContactSelected(contactList[position])
             })
         }
         return view
@@ -115,12 +150,11 @@ class ContactListAdapter:BaseAdapter, Filterable {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val oReturn = FilterResults()
                 val results = ArrayList<ContactMinimal>()
-
                 if (orig == null) {
                     orig = contactList
                 }
                 synchronized (oReturn) {
-                    if (constraint != null&&constraint.isNotEmpty()) {
+                    if (constraint != null) {
                         if (orig != null && orig.isNotEmpty()) {
                             for (g in orig) {
                                 if (g.name.toLowerCase().contains(constraint.toString())
@@ -147,7 +181,7 @@ class ContactListAdapter:BaseAdapter, Filterable {
                     contactList = results!!.values as ArrayList<ContactMinimal>
                     notifyDataSetChanged()
                 }else{
-                    //contactList = emptyList()
+                    contactList = ArrayList()
                     notifyDataSetInvalidated()
                 }
             }

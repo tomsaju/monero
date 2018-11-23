@@ -16,8 +16,10 @@ class SplashActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()!!
         if(auth.currentUser!=null){
             startActivity(Intent(this,MainActivity::class.java))
+            finish()
         }else{
             loadSignInActivity()
+            finish()
         }
     }
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.models.ContactGroup
 
@@ -52,8 +53,28 @@ class GroupsExpandableAdapter:BaseExpandableListAdapter,Filterable {
         var selectButton: Button = view.findViewById(R.id.group_add_btn)
 
         titleTv.text = title
+
+
+
         selectButton.setOnClickListener {
-            mListener.onContactSelected(ArrayList(contactList[listPosition].Group_items))
+
+            var selection = contactList[listPosition].Group_items
+
+            var currentSelection = ApplicationController.selectedContactList
+
+            for(newContact in selection){
+
+                if(currentSelection.contains(newContact)){
+
+                }else {
+                    currentSelection.add(newContact)
+                }
+
+
+
+            }
+
+            mListener.onContactSelected(currentSelection)
         }
 
         return view

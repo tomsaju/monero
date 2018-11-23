@@ -4,7 +4,6 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.annotation.NonNull
 import android.support.v7.app.AlertDialog
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
@@ -19,14 +18,16 @@ import com.monero.signin.AddPhoneFragment
 import com.monero.signin.SignInActivity
 import java.lang.Exception
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.auth.FirebaseUser
 import com.monero.Application.ApplicationController
 import com.monero.network.ServiceRest
-import com.google.firebase.internal.FirebaseAppHelper.getToken
 import com.google.firebase.auth.GetTokenResult
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.OnCompleteListener
-import io.reactivex.internal.util.HalfSerializer.onComplete
+import com.google.firebase.firestore.FirebaseFirestore
+import com.monero.Dao.DBContract
+import com.monero.helper.AppDatabase
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 
 class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragment.OnAddPhoneFragmentInteractionListener {
@@ -34,7 +35,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
     private lateinit var firebaseAuth: FirebaseAuth
 
     private lateinit var progressDialog: Any
-
+    var firestoreDb: FirebaseFirestore? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up2)
@@ -48,6 +49,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
         progressBarSignUp.visibility = View.INVISIBLE
         buttonSignup.setOnClickListener(this)
         sign_in_page_button.setOnClickListener(this)
+        firestoreDb = FirebaseFirestore.getInstance()
     }
 
     private fun registerUser(userName:String,email: String, password: String) {
@@ -126,6 +128,36 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
         ft.add(android.R.id.content, frag,"add_phone_fragment").commit()
     }
 
+
+    private fun savePhoneRegistrationData(uid: String, phoneNumber: String?) {
+
+        //This function will write the newly linked numbers to  a document in the firestore
+        //a cloud function listens to this thing and do the linking
+
+        var linkLogs = HashMap<String, Any>()
+        linkLogs.put(DBContract.LINK_LOGS_ITEM.LINK_NUMBER,phoneNumber!!)
+        linkLogs.put(DBContract.LINK_LOGS_ITEM.LINK_UID, uid)
+
+        var auth = FirebaseAuth.getInstance()!!
+        auth.currentUser?.getIdToken(true)?.addOnCompleteListener {
+
+            firestoreDb?.collection("LinkedNumbers")?.document(phoneNumber)?.set(linkLogs)
+
+                    ?.addOnSuccessListener { DocumentReference ->
+
+                        Log.d(TAG,"Success")
+                    }
+
+                    ?.addOnFailureListener { e ->
+                        //failure
+                        Log.d(TAG,e.toString())
+                    }
+        }
+
+
+
+    }
+
     override fun onClick(view: View?) {
 
         if (view?.id == R.id.buttonSignup) {
@@ -195,6 +227,7 @@ class SignUpActivity : AppCompatActivity(), View.OnClickListener, AddPhoneFragme
                                             Log.d("backend response",response)
                                         })
 
+                                        savePhoneRegistrationData(user?.uid,user?.phoneNumber)
                                     } else {
                                         // Handle error -> task.getException();
                                     }

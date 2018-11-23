@@ -145,6 +145,14 @@ class DBContract {
         }
     }
 
+    class LINK_LOGS_ITEM{
+        companion object {
+            const val LINK_NUMBER = "phone"
+            const val LINK_UID = "uid"
+
+        }
+    }
+
     public class NOTIFICATION_ITEM_TABLE {
 
         companion object {

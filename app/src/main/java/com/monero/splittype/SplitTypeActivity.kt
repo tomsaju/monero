@@ -28,6 +28,11 @@ import kotlinx.android.synthetic.main.user_selection_list_item_layout.view.*
 
 class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedListener {
 
+
+    override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
+
+    }
+
     var SPLIT_TYPE_PERCENTAGE = 1
     var SPLIT_TYPE_MONEY = 2
     var SPLIT_TYPE_EQUALLY = 0
@@ -39,7 +44,7 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
     var totalAmount:Int = 0
     var splitList:ArrayList<SplitItem> = ArrayList()
     var selectedUsersId:ArrayList<String> = ArrayList()
-    lateinit var splitPaymentList:HashMap<User,Int>//<each user,amount owed>
+    var splitPaymentList:HashMap<User,Int>  = HashMap()//<each user,amount owed>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -188,6 +193,9 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
                 selectedUsersId.add(contact.contact_id)
             }
 
+            override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
         })
 
 

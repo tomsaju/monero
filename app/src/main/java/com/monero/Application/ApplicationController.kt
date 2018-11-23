@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.monero.main.MainActivity
+import com.monero.models.ContactMinimal
 
 
 /**
@@ -41,6 +42,7 @@ class ApplicationController:Application(),SharedPreferences.OnSharedPreferenceCh
 
         lateinit var auth:FirebaseAuth
         lateinit var firestore:FirebaseFirestore
+        var selectedContactList:ArrayList<ContactMinimal> = ArrayList()
     }
     //var db = Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
 
@@ -161,5 +163,13 @@ class ApplicationController:Application(),SharedPreferences.OnSharedPreferenceCh
       db?.tagDao()?.deleteTable()
       db?.userDao()?.deleteTable()
   }
+
+    public fun setSelectedList(contactList: ArrayList<ContactMinimal>){
+        selectedContactList = contactList
+    }
+
+    public fun getselectedContactList(): ArrayList<ContactMinimal>{
+        return selectedContactList
+    }
 
 }

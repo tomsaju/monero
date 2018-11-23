@@ -31,6 +31,7 @@ import java.util.*
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeCallback
+import com.monero.Application.ApplicationController
 import com.monero.addActivities.adapter.IContactSelectedListener
 import com.monero.helper.converters.TagConverter
 import com.monero.models.ContactMinimal
@@ -94,7 +95,16 @@ class QRScannerFragment : Fragment() {
 
                         var minimalContact = ContactMinimal(user.user_id,user.user_name,user.user_phone,user.user_email)
                         var alreadyAdded = false
-                        for(contact in selectedContacts){
+                        selectedContacts = ApplicationController.selectedContactList
+                        if(selectedContacts.contains(minimalContact)){
+                            Toast.makeText(requireContext(),"User Already Added",Toast.LENGTH_SHORT).show()
+                        }else{
+                            selectedContacts.add(minimalContact)
+                            (parentFragment as IContactSelectedListener).onContactSelected(selectedContacts)
+                            requireContext().vibrate(100)
+                        }
+
+                       /* for(contact in selectedContacts){
                             if(contact.contact_id==minimalContact.contact_id){
                                 alreadyAdded = true
                             }
@@ -105,7 +115,7 @@ class QRScannerFragment : Fragment() {
                             selectedContacts.add(minimalContact)
                             (parentFragment as IContactSelectedListener).onContactSelected(selectedContacts)
                             requireContext().vibrate(100)
-                        }
+                        }*/
 
                     }
                     previousResult = result.text

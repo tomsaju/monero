@@ -31,6 +31,10 @@ import com.monero.addActivities.adapter.ContactListAdapter
  */
 class GroupContactsFragment : Fragment(),SelectContactsFragment.searchChangeListener, IContactSelectedListener {
 
+    override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
+
+    }
+
     private var mListenerGroupContacts: OnGroupContactsFragmentInteractionListener? = null
     lateinit var addBtn:Button
     lateinit var groupListView:ExpandableListView

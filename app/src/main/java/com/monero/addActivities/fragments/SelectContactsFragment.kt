@@ -1,6 +1,7 @@
 package com.monero.addActivities.fragments
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -37,8 +38,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import android.text.InputType
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.android.synthetic.main.add_user_layout.view.*
 import java.io.File
 import java.io.FileInputStream
 
@@ -49,7 +52,12 @@ import java.io.FileInputStream
 class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileImageListener,SearchView.OnQueryTextListener,IContactSelectedListener,ViewPager.OnPageChangeListener {
 
 
-  //  var contactsListView:ListView?=null
+    override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
+
+    }
+
+
+    //  var contactsListView:ListView?=null
     var doneButton:Button?=null
     var cancelButton:ImageView?=null
     lateinit var contacts:List<ContactMinimal>
@@ -72,6 +80,9 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
     private lateinit var storageReference: StorageReference
 
     private lateinit var firebaseStorage: FirebaseStorage
+    private lateinit var addContactButton:ImageView
+    private val TYPE_PHONE=0
+    private val TYPE_EMAIL=1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +94,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
             storageReference = firebaseStorage?.getReference();
         }
 
+        ApplicationController.selectedContactList = ArrayList()
 
 
     }
@@ -102,6 +114,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         doneFab = rootView?.findViewById(R.id.done_button_fab)
         tabLayout.tabGravity = TabLayout.GRAVITY_CENTER;
         tabLayout.tabMode = TabLayout.MODE_SCROLLABLE;
+        addContactButton = rootView.findViewById(R.id.add_user_button_select_contacts)
 
         myUser = User(auth.currentUser!!.uid,auth.currentUser!!.displayName!!, ApplicationController.preferenceManager!!.myPhone,"sample@yopmail.com")
         myContact = ContactMinimal(myUser.user_id,myUser.user_name,myUser.user_phone,myUser.user_email)
@@ -131,13 +144,52 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
             mListener?.closeContactSelectFragment()
            // dialog?.dismiss()
         })
+
+
+        addContactButton.setOnClickListener {
+            when(lastPosition){
+                0->{
+                    //add user by phone
+                    showAddUserDialog(TYPE_PHONE)
+                }
+                1->{
+                    //add user by email
+                    showAddUserDialog(TYPE_EMAIL)
+
+                }
+                2->{
+                    // add group
+
+
+
+                }
+            }
+        }
       //  profileImageUrl =  storageReference?.child("displayImages/"+myUser.user_id+".jpg")
         var myProfileImage = CircularProfileImage(getActivity(), null, "You",myContact.phoneNumber,myContact.email, false, myContact.contact_id)
         horizontalList.addView(myProfileImage)
+        viewPager.offscreenPageLimit=4
         setupViewPager(viewPager)
         return rootView
     }
 
+
+    fun onNewContactAdded(user:User){
+
+        var minimalContact = ContactMinimal(user.user_id,user.user_name,user.user_phone,user.user_email)
+        var alreadyAdded = false
+        for(contact in selectedContactList!!){
+            if(contact.contact_id==minimalContact.contact_id){
+                alreadyAdded = true
+            }
+        }
+        if(alreadyAdded){
+            Toast.makeText(requireContext(),"User Already Added",Toast.LENGTH_SHORT).show()
+        }else{
+            selectedContactList?.add(minimalContact)
+            onContactSelected(ArrayList(selectedContactList))
+        }
+    }
 
 
     private fun setupSearchView() {
@@ -147,6 +199,20 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         mSearchView.queryHint = "Search By name or number"
     }
 
+
+   fun onSingleUserSelected(contact:ContactMinimal){
+       var currentlySelectedUsers = ApplicationController.selectedContactList
+       if(currentlySelectedUsers.contains(contact)){
+           currentlySelectedUsers.remove(contact)
+       }else{
+           currentlySelectedUsers.add(contact)
+       }
+
+       selectedContactList = currentlySelectedUsers
+       onContactSelected(ArrayList(selectedContactList))
+
+       //selectedContactList?.add(contact)
+   }
 
     @Synchronized
     fun registerSearchListener(listener: searchChangeListener) {
@@ -158,6 +224,62 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
         mListeners.remove(listener)
     }
 
+    fun showAddUserDialog(type:Int){
+        //Inflate the dialog with custom view
+        val mDialogView = LayoutInflater.from(requireContext()).inflate(R.layout.add_user_layout, null)
+        //AlertDialogBuilder
+        val mBuilder = AlertDialog.Builder(requireContext())
+                .setView(mDialogView)
+                .setCancelable(false)
+        //show dialog
+        val  mAlertDialog = mBuilder.show()
+
+        if(type==TYPE_EMAIL){
+            mDialogView.text_input_layout_email.hint = "Email"
+            mDialogView.add_user_phone_autotextview.inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        }else{
+            mDialogView.text_input_layout_email.hint ="Phone"
+            mDialogView.add_user_phone_autotextview.inputType = InputType.TYPE_CLASS_PHONE
+        }
+        //login button click of custom layout
+        mDialogView.add_user_btn.setOnClickListener {
+            //dismiss dialog
+            mAlertDialog.dismiss()
+            //get text from EditTexts of custom layout
+            val name = mDialogView.add_user_name_autotextview.text.toString()
+            val credential = mDialogView.add_user_phone_autotextview.text.toString()
+            if(type==TYPE_EMAIL){
+                if(name.isNotEmpty()){
+                    if(credential.isNotEmpty()){
+                        var user  = User(credential,name,"",credential)
+                        onNewContactAdded(user)
+                    }else{
+                        Toast.makeText(requireContext(),"Please Enter email",Toast.LENGTH_SHORT).show()
+                    }
+                }else{
+                    Toast.makeText(requireContext(),"Please Enter name",Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                if(name.isNotEmpty()){
+                    if(credential.isNotEmpty()){
+                        var user  = User(credential,name,credential,"")
+                        onNewContactAdded(user)
+                    }else{
+                        Toast.makeText(requireContext(),"Please Enter phone",Toast.LENGTH_SHORT).show()
+                    }
+                }else{
+                    Toast.makeText(requireContext(),"Please Enter name",Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            //set the input text in TextView
+        }
+        //cancel button click of custom layout
+        mDialogView.add_user_cancel.setOnClickListener {
+            //dismiss dialog
+            mAlertDialog.dismiss()
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -221,6 +343,10 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
                 for (listener in mListeners) {
                     listener.onSearchQueryChanged(newText)
                 }
+            }else{
+                for (listener in mListeners) {
+                    listener.onSearchQueryChanged("")
+                }
             }
            /* if(newText!!.contains("@")){
                 var newUser = ContactMinimal(newText,"","",newText)
@@ -238,6 +364,7 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
     override fun onContactSelected(contactList: ArrayList<ContactMinimal>) {
 
+        ApplicationController.selectedContactList = contactList
         selectedContactList?.clear()
         horizontalList.removeAllViews()
         if(!contactList.contains(myContact)) {
@@ -339,7 +466,11 @@ class SelectContactsFragment : Fragment(),CircularProfileImage.ICircularProfileI
 
     }
 
+    private var lastPosition: Int = 0
+
     override fun onPageSelected(position: Int) {
+
+        lastPosition = position
        if(position==3){
            mSearchView.visibility = View.GONE
            qrScannerFragment.resume()

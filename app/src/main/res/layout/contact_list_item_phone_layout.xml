@@ -20,10 +20,11 @@
         android:id="@+id/check_status_box"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_toRightOf="@+id/check_status_box"
-        android:visibility="gone"
+        android:visibility="visible"
+        android:src="@drawable/default_profile"
         android:id="@+id/user_image_thumb"/>
 
     <LinearLayout
@@ -39,14 +40,13 @@
         android:layout_height="wrap_content"
         tools:text="Name"
         android:textColor="#000000"
-        android:textStyle="bold"
         android:textSize="18sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Number"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:layout_toRightOf="@+id/user_image_thumb"
         android:layout_below="@id/contact_name"
         android:id="@+id/contact_number"/>

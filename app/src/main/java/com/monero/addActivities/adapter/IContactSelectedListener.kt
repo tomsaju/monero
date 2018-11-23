@@ -7,4 +7,5 @@ import com.monero.models.ContactMinimal
  */
 interface IContactSelectedListener {
     fun onContactSelected(contactList: ArrayList<ContactMinimal>)
+    fun onSingleContactSelected(contactMinimal: ContactMinimal)
 }
