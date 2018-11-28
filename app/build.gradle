@@ -119,6 +119,6 @@ dependencies {
     //QR code reader
     compile 'com.journeyapps:zxing-android-embedded:3.4.0'
 
-
+    implementation 'com.android.support:multidex:1.0.3'
 }
 com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true

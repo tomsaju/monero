@@ -12,20 +12,25 @@
         android:layout_alignParentTop="true"
         android:text="2 Hours ago"
         android:layout_margin="5dp"
+        android:layout_marginBottom="10dp"
         android:id="@+id/notifcation_time"/>
 
     <TextView
+        android:id="@+id/notification_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Harry Potter casted a new spell on dementors"
-        android:layout_centerVertical="true"
-        android:textSize="17sp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        android:paddingTop="10dp"
+        android:layout_below="@+id/notifcation_time"
+        android:layout_centerHorizontal="true"
         android:paddingBottom="10dp"
-        android:id="@+id/notification_text"
-        android:textColor="#000000"/>
+        android:paddingTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:text="Harry Potter casted a new spell on dementors"
+        android:textColor="#000000"
+        android:textSize="17sp" />
+
+    <View
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:background="@android:color/darker_gray"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

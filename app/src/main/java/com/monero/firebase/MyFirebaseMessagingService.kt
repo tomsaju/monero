@@ -11,6 +11,7 @@ import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.monero.Application.ApplicationController
@@ -101,6 +102,31 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
              AppDatabase.db = AppDatabase.getAppDatabase(baseContext)
              AppDatabase.db?.notificationItemDao()?.insertIntoNotiTable(nItem) // .database?.personDao()?.insert(person)
+
+             //check the subject of notification and save it to DB
+             if(eventType== DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_EXPENSE){
+                //download expense
+                 ApplicationController.instance?.downloadExpense(subjectId)
+
+             }else if(eventType==DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_ACTIVITY){
+                //download activity
+                 ApplicationController.instance?.downloadActivity(subjectId)
+
+             }else if(eventType==DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_COMMENT){
+                 action= "added a new comment"
+             }else if(eventType==DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_IMAGE){
+                 action= "added a new image"
+             }else if(eventType==DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_ADDED_NEW_USER){
+                 //download activity data
+                 ApplicationController.instance?.downloadActivity(subjectId)
+
+
+             }else if(eventType==DBContract.HISTORY_LOG_ITEM_TABLE.TYPE_EDITTED_EXPENSE){
+                 //download expense
+                 ApplicationController.instance?.downloadExpense(subjectId)
+
+             }
+
              AppDatabase.db?.historyDao()?.insertIntoHistoryTable(historyItem)
          }.subscribeOn(Schedulers.io())
                  .observeOn(AndroidSchedulers.mainThread()).subscribe({ notificationItem ->
@@ -113,7 +139,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onNewToken(p0)
 
         ApplicationController.preferenceManager?.fcmToken = p0!!
-        if(auth.currentUser!=null){
+        if(auth.currentUser!=null&&p0.isNotBlank()){
             var notificationKey = HashMap<String, Any>()
             notificationKey.put("Token",p0!!)
 
@@ -126,6 +152,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     ?.addOnFailureListener { e ->
 
                     }
+        }else if(p0.isBlank()){
+
         }
     }
 

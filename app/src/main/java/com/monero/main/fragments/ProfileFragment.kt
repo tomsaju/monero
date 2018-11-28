@@ -29,11 +29,15 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.monero.Application.ApplicationController
+import com.monero.helper.AppDatabase
 import com.monero.helper.ImageSaver
 import com.monero.helper.PreferenceManager
 import com.monero.models.User
 import com.mynameismidori.currencypicker.CurrencyPicker
 import com.mynameismidori.currencypicker.CurrencyPickerListener
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import net.glxn.qrgen.android.QRCode
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -188,16 +192,24 @@ class ProfileFragment:Fragment() {
             myImageReference?.getBytes(ONE_MEGABYTE)?.addOnSuccessListener {bytes ->
                 // Data for "images/island.jpg" is returned, use this as needed
 
-                var options =  BitmapFactory.Options()
-                options.inMutable = true
-                var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
+                Single.fromCallable {
+
+                    var options =  BitmapFactory.Options()
+                    options.inMutable = true
+                    var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
 
 
-                ImageSaver(requireContext())
-                        .setFileName(ApplicationController.preferenceManager!!.myUid+".jpg")
-                        .setExternal(false)//image save in external directory or app folder default value is false
-                        .setDirectory("profile")
-                        .save(bmp); //Bitmap from your code
+                    ImageSaver(requireContext())
+                            .setFileName(ApplicationController.preferenceManager!!.myUid+".jpg")
+                            .setExternal(false)//image save in external directory or app folder default value is false
+                            .setDirectory("profile")
+                            .save(bmp); //Bitmap from your code
+
+                }.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe()
+
+
 
 
             }?.addOnFailureListener {

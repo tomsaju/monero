@@ -31,7 +31,6 @@ class NotificationFragment:Fragment() {
         var rootView = inflater?.inflate(R.layout.notification_fragment,container,false)
         recyclerView = rootView.findViewById(R.id.noti_recyclerview)
         emptyView = rootView.findViewById(R.id.no_items_layout_parent)
-        mNotiFragmentListener.getAllNotificationFromDb()
         return rootView
     }
 
@@ -62,6 +61,12 @@ class NotificationFragment:Fragment() {
 
     interface NotificationFragmentListener{
         fun getAllNotificationFromDb()
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        mNotiFragmentListener.getAllNotificationFromDb()
     }
 }
 

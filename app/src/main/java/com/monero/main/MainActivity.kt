@@ -186,6 +186,7 @@ class MainActivity : AppCompatActivity(),
     private fun signout() {
         FirebaseAuth.getInstance().signOut();
         ApplicationController.instance?.deleteAllTables()
+        ApplicationController.instance?.clearAllSharedPreferences()
         startActivity(Intent(this@MainActivity,com.monero.signin.SignInActivity::class.java))
     }
 
@@ -373,7 +374,7 @@ class MainActivity : AppCompatActivity(),
 
 
     override fun getAllNotificationFromDb() {
-
+        mMainPresenter.getAllNotificationsFromDB()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -425,6 +426,9 @@ class MainActivity : AppCompatActivity(),
                 syncContacts()
             }
 
+            //check if something new is present to download
+            mMainPresenter.getAllActivitiesFromServer()
+
         }
     }
 
@@ -458,19 +462,19 @@ class MainActivity : AppCompatActivity(),
     }*/
 
     override fun showLoader() {
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        /*var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
         if(currentFragment is ActivityFragment&&currentFragment.isVisible){
 
             currentFragment.showProgressBar()
-        }
+        }*/
     }
 
     override fun hideLoader() {
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+       /* var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
         if(currentFragment is ActivityFragment&&currentFragment.isVisible){
 
             currentFragment.hideProgressBar()
-        }
+        }*/
     }
 
     fun clearSelectedActivitiesList(){

@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -19,7 +20,7 @@ import com.monero.utility.Utility
 import kotlinx.android.synthetic.main.activity_sign_in2.*
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
-
+import com.google.firebase.iid.FirebaseInstanceId
 
 
 class SignInActivity : AppCompatActivity() {
@@ -91,8 +92,10 @@ class SignInActivity : AppCompatActivity() {
                         Toast.makeText(this,"Sign in successfull", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this@SignInActivity,MainActivity::class.java))
                         //register for fcm notifications
-                        var notificationKey = HashMap<String, Any>()
-                        notificationKey.put("Token", ApplicationController.preferenceManager!!.fcmToken)
+
+                        registerFCM()
+
+
                         //save user id, phone number and email
                         if(firebaseAuth.currentUser?.uid!=null) {
                             ApplicationController.preferenceManager?.myUid = firebaseAuth.currentUser?.uid!!
@@ -119,15 +122,7 @@ class SignInActivity : AppCompatActivity() {
                             // Handle any errors
                         })
 
-                        ApplicationController.firestore?.collection("NotificationTokens")?.document(firebaseAuth.currentUser!!.uid)?.set(notificationKey)
 
-                                ?.addOnSuccessListener { DocumentReference ->
-                                    Log.d(TAG,"success")
-                                }
-
-                                ?.addOnFailureListener { e ->
-                                    Log.d(TAG,"failure")
-                                }
                     } else {
                         //display some message here
                         Log.d(TAG,"unsuccessfull"+task.exception?.message)
@@ -138,6 +133,39 @@ class SignInActivity : AppCompatActivity() {
 
 
     }
+
+    private fun registerFCM() {
+        // Get token
+        FirebaseInstanceId.getInstance().instanceId
+                .addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Log.w(TAG, "getInstanceId failed", task.exception)
+                        return@OnCompleteListener
+                    }
+
+                    // Get new Instance ID token
+                    val token = task.result?.token
+                    if(token!=null) {
+                        ApplicationController?.preferenceManager?.fcmToken = token
+                    }
+
+
+                })
+        if(!ApplicationController.preferenceManager!!.fcmToken.isNullOrEmpty()){
+            var notificationKey = HashMap<String, Any>()
+            notificationKey.put("Token", ApplicationController.preferenceManager!!.fcmToken)
+            ApplicationController.firestore?.collection("NotificationTokens")?.document(firebaseAuth.currentUser!!.uid)?.set(notificationKey)
+
+                    ?.addOnSuccessListener { DocumentReference ->
+                        Log.d(TAG,"success")
+                    }
+
+                    ?.addOnFailureListener { e ->
+                        Log.d(TAG,"failure")
+                    }
+        }
+    }
+
 
 
 }

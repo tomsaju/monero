@@ -56,4 +56,8 @@ class PreferenceManager(context: Context) {
         get() = prefs.getLong(CONTACT_SYNC_DATE,0)
         set(value) = prefs.edit().putLong(CONTACT_SYNC_DATE,value).apply()
 
+    fun clearAll(){
+        prefs.edit().clear().commit()
+    }
+
 }

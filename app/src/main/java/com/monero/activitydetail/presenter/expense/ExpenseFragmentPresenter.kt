@@ -103,17 +103,11 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                     //Log.d
                     Log.d("Tag","expense saved locally")
                     //push this expense id to activity db
-                    firestoreDb?.collection("expenses")?.add(newExpense)
+                    firestoreDb?.collection("expenses")?.document(expense.id)?.set(newExpense)
 
                             ?.addOnSuccessListener { DocumentReference ->
-                            Single.fromCallable({
-                                AppDatabase.db?.expenseDao()?.updateExpenseId(expense.id,DocumentReference.id)
-                            }).subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread()).subscribe()
-
 
                             }
-
                             ?.addOnFailureListener { e ->
                                 //failure
                             }

@@ -2,6 +2,7 @@ package com.monero.main.presenter.main
 
 import android.content.Context
 import android.database.Cursor
+import android.graphics.BitmapFactory
 import android.provider.ContactsContract
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -32,8 +33,13 @@ import io.reactivex.SingleObserver
 import org.json.JSONArray
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GetTokenResult
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.monero.R
+import com.monero.helper.ImageSaver
+import com.monero.utility.Utility
+import io.reactivex.functions.Consumer
 
 
 /**
@@ -46,11 +52,13 @@ class MainPresenter : IMainPresenter {
     var view: IMainView
     var firestoreDb: FirebaseFirestore? = null
     var auth = FirebaseAuth.getInstance()!!
+    private lateinit var storageReference: StorageReference
     constructor(context: Context, view: IMainView) {
         this.context = context
         this.view = view
         firestoreDb = FirebaseFirestore.getInstance()
-
+        var storage = FirebaseStorage.getInstance();
+        storageReference = storage?.getReference();
     }
 
     var PendingDownloadItems: ArrayList<String>? = null
@@ -107,38 +115,49 @@ class MainPresenter : IMainPresenter {
 
             var permittedUserArrayList = arrayListOf<String>()
             for (user in activity.members) {
-                if(user.user_email.isNotEmpty()){
-                    permittedUserArrayList.add(user.user_email)
-                }else if(user.user_phone.isNotEmpty()) {
-                    permittedUserArrayList.add(user.user_phone)
+
+                if(user.user_email.isNotEmpty()&&user.user_id==user.user_email||user.user_phone.isNotEmpty()&&user.user_id==user.user_phone){
+                    //not registered user
+                    if(user.user_email.isNotEmpty()){
+                        permittedUserArrayList.add(user.user_email)
+                    }else if(user.user_phone.isNotEmpty()) {
+                        permittedUserArrayList.add(user.user_phone)
+                    }
+                }else{
+                    if(user.user_id.isNotEmpty()){
+                        permittedUserArrayList.add(user.user_id)
+                    }
                 }
+
             }
 
 
-            var newActivity = HashMap<String, Any>()
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE, activity.title)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION, activity.description)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE, activity.mode)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS, tagsJson)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS, membersJson)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR, author)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_ALLOWED_READ_PERMISSION_USERS, permittedUserArrayList)
-            newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE, activity.createdDate)
+            if(Utility.isNetworkAvailable(context)) {
+                var newActivity = HashMap<String, Any>()
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TITLE, activity.title)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_DESCRIPTION, activity.description)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_MODE, activity.mode)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_TAGS, tagsJson)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_USERS, membersJson)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_AUTHOR, author)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_ALLOWED_READ_PERMISSION_USERS, permittedUserArrayList)
+                newActivity.put(DBContract.ACTIVITY_TABLE.ACTIVITY_CREATED_DATE, activity.createdDate)
 
 
-            firestoreDb?.collection("activities")?.document(activity.id)?.set(newActivity)
+                firestoreDb?.collection("activities")?.document(activity.id)?.set(newActivity)
 
-                    ?.addOnSuccessListener { DocumentReference ->
+                        ?.addOnSuccessListener { DocumentReference ->
 
-                        //success
-                        activity.syncStatus = true
+                            //success
+                            activity.syncStatus = true
 
-                    }
+                        }
 
-                    ?.addOnFailureListener { e ->
-                        //failure
-                    }
+                        ?.addOnFailureListener { e ->
+                            //failure
 
+                        }
+            }
             ///
         }, { error ->
             // handle exception if any
@@ -291,6 +310,11 @@ class MainPresenter : IMainPresenter {
         }
     }
 
+
+    fun getAllActivitiesForMe(){
+
+    }
+
     fun downloadActivity(activityId: String) {
         Log.d(TAG,"getAllActivity : "+activityId)
         var gson = Gson()
@@ -333,7 +357,7 @@ class MainPresenter : IMainPresenter {
                     timestampinSeconds = timestampWithoutNanoseconds.substringAfter("=")
                 }
                 var transactionIds = ""
-                var historyLogIds = ""
+                var historyLogIds = document.get(DBContract.ACTIVITY_TABLE.ACTIVITY_HISTORY).toString()
                 var expenseListId = document!!.get(DBContract.ACTIVITY_TABLE.ACTIVITY_EXPENSE_LIST).toString()
                 var downloadedActivity = Activities(id, title, description, tags, mode, members, author, syncStatus, createdDate, expenseListId, historyLogIds, transactionIds, timestampinSeconds)
 
@@ -342,9 +366,15 @@ class MainPresenter : IMainPresenter {
 
             } else {
                 Log.d("tasklist", "unsuccessfull")
+                view.hideLoader()
             }
 
         })
+                .addOnFailureListener({exception->
+
+                    Log.d("error",exception.message)
+                    view.hideLoader()
+                })
     }
 
     private fun saveActivityToLocal(downloadedActivity: Activities?) {
@@ -390,6 +420,39 @@ class MainPresenter : IMainPresenter {
                 }
             }
 
+            var historyListFromServer :ArrayList<String> = ArrayList()
+            if (downloadedActivity.historyLogIds != null) {
+                if (downloadedActivity.historyLogIds.contains(",")) {
+                    //more than one item
+                    historyListFromServer = ArrayList(downloadedActivity.historyLogIds.split(","))
+                } else {
+                    //single item
+                    historyListFromServer.add(downloadedActivity.historyLogIds)
+                }
+            }
+
+            if(historyListFromServer.isNotEmpty()){
+                Observable.fromCallable {
+                    db?.historyDao()?.getAllHistoryLogsIdsForActivity(downloadedActivity.id)
+                }.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe({ localList ->
+
+                    downloadHistoryFromServer(historyListFromServer, localList)
+
+                }, { error ->
+                    // handle exception if any
+                    Log.d("tag", "exception")
+                    view.hideLoader()
+                }, {
+                    // on complete
+                    Log.d("tag", "completed")
+                    view.hideLoader()
+
+
+                })
+            }
+
+
             if (expenseListFromServer != null && expenseListFromServer.isNotEmpty()) {
                 Observable.fromCallable {
                     db?.expenseDao()?.getAllExpenseIdListForActivity(downloadedActivity.id)
@@ -418,7 +481,68 @@ class MainPresenter : IMainPresenter {
 
     }
 
-    private fun downLoadExpensesFromServer(expenseListFromServer: ArrayList<String>, localList: List<String>) {
+    private fun downloadHistoryFromServer(historyListFromServer: ArrayList<String>, localList: List<String>) {
+        if (historyListFromServer != null && historyListFromServer.isNotEmpty()) {
+
+            if (localList != null && localList.isNotEmpty()) {
+
+                var temphistoryIdList = historyListFromServer
+
+                //check with each element
+                historyListFromServer.removeAll(localList)
+                //find deleted expenses
+                ArrayList(localList).removeAll(temphistoryIdList)
+                //now local list contains id's which are deleted from server --1
+                //expenseListFromServer contains new id's which are not present in local --2
+                //delete 1 and save 2
+            }
+            for (expenseId in historyListFromServer) {
+                downloadHistory(expenseId)
+            }
+        }
+    }
+
+    private fun downloadHistory(historyId: String) {
+        FirebaseFirestore.getInstance()
+                .collection("HistoryLog").document(historyId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+            if (task.isSuccessful) {
+                view.hideLoader()
+                val document = task.result
+                if(document!!.exists()){
+                    var activityId:String =  document.get(DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID).toString()
+                    var authorId:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.AUTHOR_ID).toString()
+                    var authorName:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.AUTHOR_NAME).toString()
+                    var eventType:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.EVENT_TYPE).toString()
+                    var logItemId:String = historyId
+                    var subjectId:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_ID).toString()
+                    var subjectName:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_NAME).toString()
+                    var subjectUrl:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_URL).toString()
+                    var syncstatus = true
+                    var timeStamp:String = document.get(DBContract.HISTORY_LOG_ITEM_TABLE.TIMESTAMP).toString()
+
+
+                    var historyItem = HistoryLogItem(logItemId,authorId,authorName,eventType,timeStamp,subjectName,subjectUrl,subjectId,activityId,syncstatus)
+
+
+                    Single.fromCallable {
+
+                        AppDatabase.db = AppDatabase.getAppDatabase(context)
+                        AppDatabase.db?.historyDao()?.insertIntoHistoryTable(historyItem)
+                    }.subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe()
+
+                }else{
+
+                }
+
+            }else{
+                view.hideLoader()
+            }
+        })
+    }
+
+    fun downLoadExpensesFromServer(expenseListFromServer: ArrayList<String>, localList: List<String>) {
         view.showLoader()
         Log.d(TAG,"downLoadExpensesFromServer")
         if (expenseListFromServer != null && expenseListFromServer.isNotEmpty()) {
@@ -548,11 +672,11 @@ class MainPresenter : IMainPresenter {
     fun getActivityIdList() {
 
         Log.d(TAG,"getActivityIdLIst")
-        var userId = ApplicationController.preferenceManager!!.myPhone
+        var userId = ApplicationController.preferenceManager!!.myUid
         var myActivityIds: ArrayList<String> = ArrayList()
         var stringlist: String = ""
         FirebaseFirestore.getInstance()
-                .collection("pending_reg_users").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
+                .collection("userData").document(userId).get().addOnCompleteListener(OnCompleteListener<DocumentSnapshot> { task ->
             if (task.isSuccessful) {
                 try {
                     view.hideLoader()
@@ -729,11 +853,13 @@ class MainPresenter : IMainPresenter {
 
                             }else{
 
+                                saveToDB("",contactList)
                             }
                         })
 
                     } else {
                         // Handle error -> task.getException();
+                        saveToDB("",contactList)
                     }
                 })
 
@@ -755,6 +881,41 @@ class MainPresenter : IMainPresenter {
                         phoneContact.Contact_email = registeredList.getJSONObject(i).getString("email")
                         phoneContact.Contact_name_public = registeredList.getJSONObject(i).getString("name")
                         phoneContact.Contact_phone = registeredList.getJSONObject(i).getString("phoneNumber")
+
+                        var profileImageUrl =  storageReference?.child("displayImages/"+phoneContact.Contact_uuid+".jpg")
+
+
+                        val ONE_MEGABYTE: Long = 1024 * 1024
+                        profileImageUrl.getBytes(ONE_MEGABYTE).addOnSuccessListener {bytes ->
+                            // Data for "images/island.jpg" is returned, use this as needed
+
+                            Single.fromCallable {
+
+                                var options =  BitmapFactory.Options()
+                                options.inMutable = true
+                                var bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, options);
+
+
+                                ImageSaver(context)
+                                        .setFileName(phoneContact.Contact_uuid+".jpg")
+                                        .setExternal(false)//image save in external directory or app folder default value is false
+                                        .setDirectory("profile")
+                                        .save(bmp); //Bitmap from your code
+
+                            }.subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(Consumer {
+
+                                    })
+
+
+
+
+                        }.addOnFailureListener {
+                            // Handle any errors
+                        }
+
+
                     }
                 }
             }
@@ -775,6 +936,46 @@ class MainPresenter : IMainPresenter {
                 }
                 .subscribe()
 
+    }
+
+
+    private fun normalisePhoneNumbers(numberLIst: ArrayList<Contact>){
+        var myphoneNumberUtil = PhoneNumberUtil.getInstance()
+        for(i in 0 until numberLIst.size){
+
+            var number = numberLIst[i]
+
+            try {
+                var phoneNumber = myphoneNumberUtil.parse(number.Contact_phone,null)
+
+                val isValid = myphoneNumberUtil.isValidNumber(phoneNumber)&&number.Contact_phone.length>=5 // returns true if valid
+                if (isValid) {
+                    // Actions to perform if the number is valid
+
+
+                } else {
+                    // Do necessary actions if its not valid
+
+                    numberLIst[i].Contact_phone=""
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                /* if(e.message?.trim()==="INVALID_COUNTRY_CODE. Missing or invalid default region.")
+                 {*/
+                var tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                var countryCode = tm.simCountryIso;
+                var daillingCodeForCountry = getCountryDiallingCode(countryCode)
+                number.Contact_phone=daillingCodeForCountry+number.Contact_phone
+                numberLIst[i] = number
+
+                //   }
+            }
+
+            if(!numberLIst[i].Contact_phone.startsWith("+")){
+                numberLIst[i].Contact_phone="+"+numberLIst[i].Contact_phone
+            }
+
+        }
     }
 
 
@@ -892,6 +1093,10 @@ class MainPresenter : IMainPresenter {
                 cursor!!.close()
             }
         }
+
+
+        normalisePhoneNumbers(contactsList)
+
         return contactsList
     }
 

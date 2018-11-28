@@ -91,7 +91,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
          if(expenseId.isEmpty()){
-             expenseId = System.currentTimeMillis().toString()
+             expenseId = UUID.randomUUID().toString()
          }
 
          val currentAct = currentlyWorkingActivity
@@ -207,10 +207,10 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
                 expenseId = arguments?.getString("expense_id").toString()
                 loadExpenseDetails(expenseId)
             }else{
-                expenseId = System.currentTimeMillis().toString()
+                expenseId = UUID.randomUUID().toString()
             }
         }else{
-            expenseId = System.currentTimeMillis().toString()
+            expenseId = UUID.randomUUID().toString()
         }
 
         if(expenseId!=null&&expenseId.isNotEmpty()) {

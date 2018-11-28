@@ -15,6 +15,9 @@ import com.monero.models.HistoryLogItem
     @Query("SELECT * FROM "+DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME+" WHERE "+DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID+" = :id")
     fun getAllHistoryLogsForActivity(id:String): LiveData<List<HistoryLogItem>>
 
+    @Query("SELECT "+DBContract.HISTORY_LOG_ITEM_TABLE.LOG_ITEM_ID+" FROM "+DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME+" WHERE "+DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID+" = :id")
+    fun getAllHistoryLogsIdsForActivity(id:String): List<String>
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoHistoryTable(log: HistoryLogItem)
