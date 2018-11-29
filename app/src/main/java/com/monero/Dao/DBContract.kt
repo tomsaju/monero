@@ -49,7 +49,7 @@ class DBContract {
             const val EXPENSE_AMOUNT = "amount"
             const val EXPENSE_CREATED_DATE = "created_date"
             const val EXPENSE_SPLIT_TYPE = "splitType"
-
+            const val EXPENSE_SYNC_STATUS = "sync_status"
 
         }
 

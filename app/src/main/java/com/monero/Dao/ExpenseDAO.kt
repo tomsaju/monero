@@ -34,6 +34,12 @@ import com.monero.models.Expense
     @Query("UPDATE "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" SET "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :newId ,"+DBContract.ACTIVITY_TABLE.ACTIVITY_SYNC_STATUS +" =1 WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" = :oldId")
     fun updateActivityId(oldId: String, newId: String)
 
+    @Query("UPDATE "+DBContract.EXPENSE_TABLE.TABLE_NAME+" SET "+DBContract.EXPENSE_TABLE.EXPENSE_SYNC_STATUS+" = :status WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ID+" = :expenseId")
+    fun updateSyncStatusForExpense(status:Boolean,expenseId: String)
+
+    @Query("SELECT * FROM "+DBContract.EXPENSE_TABLE.TABLE_NAME+" WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_SYNC_STATUS+" = 0")
+    fun getPendingSyncExpenses():List<Expense>
+
     @Query("UPDATE "+DBContract.EXPENSE_TABLE.TABLE_NAME+" SET "+DBContract.EXPENSE_TABLE.EXPENSE_ID+" = :newId WHERE "+DBContract.EXPENSE_TABLE.EXPENSE_ID+" = :oldId")
     fun updateExpenseId(oldId: String, newId: String)
 

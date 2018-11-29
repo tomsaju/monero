@@ -17,4 +17,5 @@ data class Expense(@ColumnInfo(name = "expense_id") @PrimaryKey var id: String,
                    val creditList:List<Credit>,
                    val debitList:List<Debit>,
                    val splitType:Int,
-                   var created_date:String)
+                   var created_date:String,
+                   var sync_status:Boolean)

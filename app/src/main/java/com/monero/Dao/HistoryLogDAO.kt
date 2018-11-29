@@ -2,6 +2,7 @@ package com.monero.Dao
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
+import com.monero.models.Activities
 import com.monero.models.HistoryLogItem
 
 /**
@@ -18,6 +19,11 @@ import com.monero.models.HistoryLogItem
     @Query("SELECT "+DBContract.HISTORY_LOG_ITEM_TABLE.LOG_ITEM_ID+" FROM "+DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME+" WHERE "+DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID+" = :id")
     fun getAllHistoryLogsIdsForActivity(id:String): List<String>
 
+    @Query("UPDATE "+DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME+" SET "+DBContract.HISTORY_LOG_ITEM_TABLE.SYNC_STATUS+" = :status WHERE "+DBContract.HISTORY_LOG_ITEM_TABLE.LOG_ITEM_ID+" = :logId")
+    fun updateSyncStatusForHistory(status:Boolean,logId: String)
+
+    @Query("SELECT * FROM "+DBContract.HISTORY_LOG_ITEM_TABLE.TABLE_NAME+" WHERE "+DBContract.HISTORY_LOG_ITEM_TABLE.SYNC_STATUS+" = 0")
+    fun getPendingSyncHistoryLogs():List<HistoryLogItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertIntoHistoryTable(log: HistoryLogItem)

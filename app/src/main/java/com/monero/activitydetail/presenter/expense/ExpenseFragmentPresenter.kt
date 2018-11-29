@@ -106,6 +106,13 @@ class ExpenseFragmentPresenter: IExpenseFragmentPresenter {
                     firestoreDb?.collection("expenses")?.document(expense.id)?.set(newExpense)
 
                             ?.addOnSuccessListener { DocumentReference ->
+                                expense.sync_status = true
+
+                                Observable.fromCallable {
+                                    AppDatabase.db = AppDatabase.getAppDatabase(context)
+                                    AppDatabase.db?.expenseDao()?.updateSyncStatusForExpense(true,expense.id) // .database?.personDao()?.insert(person)
+                                }.subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread()).subscribe()
 
                             }
                             ?.addOnFailureListener { e ->

@@ -29,6 +29,9 @@ import io.reactivex.Single
     @Query("SELECT "+ DBContract.ACTIVITY_TABLE.ACTIVITY_ID+" , "+DBContract.ACTIVITY_TABLE.ACTIVITY_MODIFIED_TIME +" FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME)
     fun getAllActivitiesModifiedDate():Single<List<ActivitiesMinimal>>
 
+    @Query("SELECT * FROM "+DBContract.ACTIVITY_TABLE.TABLE_NAME+" WHERE "+DBContract.ACTIVITY_TABLE.ACTIVITY_SYNC_STATUS+" = 0")
+    fun getPendingSyncActivities():List<Activities>
+
     @Insert(onConflict = REPLACE)
     fun insertIntoActivitiesTable(activity:Activities)
 

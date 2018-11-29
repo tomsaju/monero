@@ -517,7 +517,7 @@ class ApplicationController:MultiDexApplication(),SharedPreferences.OnSharedPref
                 }
 
 
-                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,splitType,createdDate)
+                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,splitType,createdDate,true)
 
                 Single.fromCallable {
 

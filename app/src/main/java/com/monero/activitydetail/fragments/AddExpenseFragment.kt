@@ -157,7 +157,7 @@ class AddExpenseFragment : Fragment(),IExpenseFragmentView {
 
 
 
-               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList,splitType,System.currentTimeMillis().toString())
+               var expense = Expense(expenseId,title.text.toString(),"Some comments",activityId,(amountEditText.text.toString().toDouble()*100).toInt(),tempCreditList,tempDebitList,splitType,System.currentTimeMillis().toString(),false)
                mExpenseFragmentPresenter.saveExpense(expense)
                mListener?.closeFragment()
            }

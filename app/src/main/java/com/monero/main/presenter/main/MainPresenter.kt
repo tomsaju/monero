@@ -269,7 +269,7 @@ class MainPresenter : IMainPresenter {
         historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_URL, historyItem.Subject_Url)
         historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SUBJECT_ID, historyItem.Subject_Id)
         historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.ACTIVITY_ID, historyItem.Activity_Id)
-        historylog.put(DBContract.HISTORY_LOG_ITEM_TABLE.SYNC_STATUS, historyItem.SyncStatus)
+
 
         firestoreDb?.collection("HistoryLog")?.document(historyItem.log_id)?.set(historylog)
 
@@ -636,7 +636,7 @@ class MainPresenter : IMainPresenter {
                 }
 
 
-                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,splitType,createdDate)
+                var expense = Expense(expenseId, title, Comments, activityId, amount, creditArrayList, debitArrayList,splitType,createdDate,true)
 
                 Single.fromCallable {
 
