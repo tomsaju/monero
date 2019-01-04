@@ -190,7 +190,7 @@ class DetailActivity : AppCompatActivity(),AddExpenseFragment.OnFragmentInteract
 
 
     override fun closeFragment() {
-        var currentFragment: Fragment =  supportFragmentManager.findFragmentById(android.R.id.content)
+        var currentFragment: Fragment =  supportFragmentManager.findFragmentById(android.R.id.content)!!
         if(currentFragment is AddExpenseFragment &&currentFragment.isVisible){
             supportFragmentManager.beginTransaction()
                     .setCustomAnimations(R.anim.design_bottom_sheet_slide_in,R.anim.design_bottom_sheet_slide_out)

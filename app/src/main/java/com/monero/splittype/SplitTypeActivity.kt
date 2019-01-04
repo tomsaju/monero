@@ -187,14 +187,18 @@ class SplitTypeActivity : AppCompatActivity(),ISplitTypeView,IContactSelectedLis
 
         val contactsAdapter: ContactListAdapter = ContactListAdapter(this,sortedList,object:IContactSelectedListener{
             override fun onContactSelected(contactList: ArrayList<ContactMinimal>) {
-            var contact = contactList[0]
-                mDialogView.user_name_autocomplete_tv.setText(contact.name)
-                selectedUserId = contact.contact_id
-                selectedUsersId.add(contact.contact_id)
+                if(contactList.isNotEmpty()) {
+                    var contact = contactList[0]
+                    mDialogView.user_name_autocomplete_tv.setText(contact.name)
+                    selectedUserId = contact.contact_id
+                    selectedUsersId.add(contact.contact_id)
+                }
             }
 
             override fun onSingleContactSelected(contactMinimal: ContactMinimal) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                mDialogView.user_name_autocomplete_tv.setText(contactMinimal.name)
+                selectedUserId = contactMinimal.contact_id
+                selectedUsersId.add(contactMinimal.contact_id)
             }
         })
 

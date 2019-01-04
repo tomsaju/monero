@@ -3,7 +3,6 @@ package com.monero.Application
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.graphics.Color
 import android.support.multidex.MultiDex
 import android.text.TextUtils
@@ -16,12 +15,12 @@ import com.monero.helper.PreferenceManager
 import com.monero.helper.AppDatabase
 import com.monero.helper.AppDatabase.Companion.db
 import android.app.PendingIntent
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.provider.Settings
 import android.support.multidex.MultiDexApplication
 import android.support.v4.app.NotificationCompat
 import android.util.Log
+import androidx.work.*
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +30,8 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.monero.Dao.DBContract
+import com.monero.SyncWorkManager
+import com.monero.helper.SyncService
 import com.monero.helper.converters.TagConverter
 import com.monero.main.MainActivity
 import com.monero.models.*
@@ -39,6 +40,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -59,6 +61,8 @@ class ApplicationController:MultiDexApplication(),SharedPreferences.OnSharedPref
     }
     //var db = Room.databaseBuilder(baseContext.applicationContext, AppDatabase::class.java, "fair-db").build()
 
+
+
     override fun onCreate() {
         super.onCreate()
         MultiDex.install(this)
@@ -75,6 +79,9 @@ class ApplicationController:MultiDexApplication(),SharedPreferences.OnSharedPref
         firestore = FirebaseFirestore.getInstance()
         firestore?.firestoreSettings = settings
         instance = this
+
+        val intentFilter =  IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+
     }
 
 
@@ -544,5 +551,21 @@ class ApplicationController:MultiDexApplication(),SharedPreferences.OnSharedPref
         })
 
     }
+
+    private lateinit var compressionWork: OneTimeWorkRequest
+
+    fun syncDataWithServer(){
+        Log.d("Listener","Syncing started")
+        Log.d(TAG,"synCdataCalled")
+         compressionWork =  OneTimeWorkRequest.Builder(SyncService::class.java)
+                 .addTag("syncTag")
+                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 15, TimeUnit.SECONDS)
+                 .build()
+         WorkManager.getInstance().enqueue(compressionWork)
+        Log.d(TAG,"enqueued")
+
+    }
+
 
 }

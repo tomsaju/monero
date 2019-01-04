@@ -57,6 +57,9 @@ class AccountBookPresenter :IAccountBookPresenter {
     }
 
 
+    override fun getAllExpensesForMonth(timeinMillis: String) {
+
+    }
 
     override fun getAllActivitiesList() {
         Single.fromCallable {

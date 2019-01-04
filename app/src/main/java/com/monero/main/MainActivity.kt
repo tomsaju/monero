@@ -20,6 +20,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.monero.R
 import com.monero.addActivities.AddActivityFragment
 import com.monero.addActivities.fragments.SelectContactsFragment
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun saveActivity(activity: Activities) {
         mMainPresenter.saveActivity(activity)
-        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("activity_add_fragment")).commit()
+        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("activity_add_fragment")!!).commit()
 
     }
 
@@ -193,7 +194,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onActivitiesFetched(activityList: LiveData<List<Activities>>?) {
       //  hideProgressBar()
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")!!
 
                 activityList?.observe(this, object : Observer<List<Activities>> {
                     override fun onChanged(allList: List<Activities>?) {
@@ -223,13 +224,13 @@ class MainActivity : AppCompatActivity(),
                 addFragment(activityFragment)
                 true
             }
-            R.id.action_account_book ->{
+            /*R.id.action_account_book ->{
                 if(accountBookFragment==null){
                     accountBookFragment = AccountBookFragment()
                 }
                 addFragment(accountBookFragment)
                 true
-            }
+            }*/
             R.id.action_notification ->{
                 if(notificationFragment==null){
                     notificationFragment = NotificationFragment()
@@ -302,7 +303,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun cancelAddActivityFragment(){
-        var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")
+        var currentFragment: Fragment = supportFragmentManager.findFragmentByTag("activity_add_fragment")!!
 
         if (currentFragment is AddActivityFragment && currentFragment.isVisible) {
             supportFragmentManager.beginTransaction()
@@ -336,7 +337,7 @@ class MainActivity : AppCompatActivity(),
         //show contacts in add page
         contactList?.let {
             for(contact in contactList){
-                var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")
+                var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")!!
                 if(currentFragment is AddActivityFragment&&currentFragment.isVisible){
 
                     currentFragment.setSelectedContacts(contactList)
@@ -355,7 +356,7 @@ class MainActivity : AppCompatActivity(),
            //permission not granted
             makeRequest()
         }else{
-            var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")
+            var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")!!
             if(currentFragment is AddActivityFragment&&currentFragment.isVisible){
 
                 currentFragment.onContactPermissionGranted()
@@ -386,7 +387,7 @@ class MainActivity : AppCompatActivity(),
                    // "Permission has been denied by user")
 
                 } else {
-                    var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")
+                    var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("activity_add_fragment")!!
                     if(currentFragment is AddActivityFragment&&currentFragment.isVisible){
 
                         currentFragment.onContactPermissionGranted()
@@ -404,7 +405,7 @@ class MainActivity : AppCompatActivity(),
 
 
     override fun closeContactSelectFragment() {
-        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("select_contacts")).commit()
+        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag("select_contacts")!!).commit()
     }
 
 
@@ -427,7 +428,12 @@ class MainActivity : AppCompatActivity(),
             }
 
             //check if something new is present to download
+            var displayPhoto = ApplicationController.preferenceManager!!.myDisplayPicture
+            if(displayPhoto!=null&&displayPhoto.isNotEmpty()) {
+                Glide.with(this).load(displayPhoto).preload()
+            }
             mMainPresenter.getAllActivitiesFromServer()
+
 
         }
     }
@@ -478,7 +484,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     fun clearSelectedActivitiesList(){
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")!!
         if(currentFragment is ActivityFragment&&currentFragment.isVisible){
 
             currentFragment.adapter?.selectedActivitieslist?.clear()
@@ -503,7 +509,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onNotificationsFetched(notifications: LiveData<List<NotificationItem>>?) {
         //  hideProgressBar()
-        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")
+        var currentFragment:Fragment =  supportFragmentManager.findFragmentByTag("currentFragment")!!
 
         notifications?.observe(this, object : Observer<List<NotificationItem>> {
             override fun onChanged(allList: List<NotificationItem>?) {

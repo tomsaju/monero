@@ -15,6 +15,7 @@ import com.monero.Application.ApplicationController
 import com.monero.R
 import com.monero.addActivities.fragments.SelectContactsFragment
 import com.monero.models.ContactMinimal
+import com.monero.splittype.SplitTypeActivity
 import com.pchmn.materialchips.R2
 import de.hdodenhof.circleimageview.CircleImageView
 import java.io.File
@@ -107,16 +108,28 @@ class ContactListAdapter:BaseAdapter, Filterable {
             check.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener {
                 compoundButton: CompoundButton?, isChecked: Boolean ->
                 //  if(isChecked){
-                      if(selectedContactList.contains(contactList[position])){
-                          selectedContactList.remove(contactList[position])
-                      }else{
-                          selectedContactList.add(contactList[position])
-                      }
+                    if(context is SplitTypeActivity) {
+
+                        this.parent.onSingleContactSelected(contactList[position])
+
+                    }else{
+                        if (selectedContactList.contains(contactList[position])) {
+                            selectedContactList.remove(contactList[position])
+                        } else {
+                            selectedContactList.add(contactList[position])
+                        }
+                    }
                //   }
                 this.parent.onContactSelected(selectedContactList)
                // this.parent.onSingleContactSelected(contactList[position])
             })
+            if(context is SplitTypeActivity){
+                check.visibility = View.GONE
+            }
+
         }
+
+
         return view
 
     }

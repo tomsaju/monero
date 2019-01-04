@@ -5,4 +5,7 @@
     <color name="colorAccent">#536DFE</color>
 
     <color name="colorListSelector">#7c8ca5</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="halfblack">#80000000</color>
 </resources>

@@ -853,13 +853,13 @@ class MainPresenter : IMainPresenter {
 
                             }else{
 
-                                saveToDB("",contactList)
+                                saveToDB("[]",contactList)
                             }
                         })
 
                     } else {
                         // Handle error -> task.getException();
-                        saveToDB("",contactList)
+                        saveToDB("[]",contactList)
                     }
                 })
 

@@ -1,10 +1,13 @@
 package com.monero.helper
 
+import android.app.IntentService
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import androidx.work.Worker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -27,57 +30,63 @@ import java.util.*
 /**
  * Created by tom.saju on 11/28/2018.
  */
-class SyncService : Service(){
+class SyncService : Worker() {
+
+
+    override fun doWork(): WorkerResult {
+        context = applicationContext
+        start()
+        return if(allOperationSuccess) {
+            WorkerResult.SUCCESS
+        }else{
+            WorkerResult.RETRY
+        }
+    }
+
+    var TAG = "SyncService"
     private lateinit var storageReference: StorageReference
     private lateinit var mHandler: Handler
     private lateinit var mRunnable: Runnable
     var firestoreDb: FirebaseFirestore? = null
     var auth = FirebaseAuth.getInstance()!!
+    lateinit var context:Context
+    var allOperationSuccess = true
 
 
-    override fun onBind(intent: Intent): IBinder? {
-        throw UnsupportedOperationException("Not yet implemented")
-    }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+     fun start() {
         // Send a notification that service is started
        // toast("Service started.")
-        Log.d("syncService","started")
+         Log.d(TAG,"Sync started")
         // Do a periodic task
-        mHandler = Handler()
-        mRunnable = Runnable { syncPendingItems() }
-        mHandler.postDelayed(mRunnable, 20000)
+
         firestoreDb = FirebaseFirestore.getInstance()
         var storage = FirebaseStorage.getInstance();
         storageReference = storage?.getReference();
 
+        syncPendingItems()
 
-        return Service.START_STICKY
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("syncService","stopped")
-        mHandler.removeCallbacks(mRunnable)
-    }
 
-    
+
+
 
 
     private fun syncPendingItems(){
         //check activities table,expenses table,history table for any pending items
         //if found , sync them
+        allOperationSuccess = true
         checkPendingSyncActivities()
         checkPendingSyncExpensesLogs()
         checkPendingSyncHistoryLogs()
-        mHandler.postDelayed(mRunnable, 20000)
     }
 
     private fun checkPendingSyncHistoryLogs() {
 
         Observable.fromCallable {
             if(db==null) {
-                db = AppDatabase.getAppDatabase(applicationContext)
+                db = AppDatabase.getAppDatabase(context)
             }
             db?.historyDao()?.getPendingSyncHistoryLogs() // .database?.personDao()?.insert(person)
         }.subscribeOn(Schedulers.io())
@@ -91,6 +100,7 @@ class SyncService : Service(){
 
             }
 
+            Log.d(TAG,"Sync ended")
         })
     }
 
@@ -114,7 +124,7 @@ class SyncService : Service(){
                     //success
                     Observable.fromCallable {
                         if(db==null) {
-                            db = getAppDatabase(baseContext)
+                            db = getAppDatabase(context)
                         }
                         db?.historyDao()?.updateSyncStatusForHistory(true,historyItem.log_id) // .database?.personDao()?.insert(person)
                     }.subscribeOn(Schedulers.io())
@@ -126,6 +136,7 @@ class SyncService : Service(){
 
                 ?.addOnFailureListener { e ->
                     //failure
+                    allOperationSuccess = false
 
                 }
     }
@@ -133,7 +144,7 @@ class SyncService : Service(){
     private fun checkPendingSyncExpensesLogs() {
         Observable.fromCallable {
             if(db==null) {
-                db = AppDatabase.getAppDatabase(applicationContext)
+                db = AppDatabase.getAppDatabase(context)
             }
             db?.expenseDao()?.getPendingSyncExpenses() // .database?.personDao()?.insert(person)
         }.subscribeOn(Schedulers.io())
@@ -172,7 +183,7 @@ class SyncService : Service(){
 
                     Observable.fromCallable {
                         if(db==null) {
-                            db = AppDatabase.getAppDatabase(baseContext)
+                            db = AppDatabase.getAppDatabase(context)
                         }
                         db?.expenseDao()?.updateSyncStatusForExpense(true,expense.id) // .database?.personDao()?.insert(person)
                     }.subscribeOn(Schedulers.io())
@@ -181,6 +192,7 @@ class SyncService : Service(){
                 }
                 ?.addOnFailureListener { e ->
                     //failure
+                    allOperationSuccess = false
                 }
     }
 
@@ -191,7 +203,7 @@ class SyncService : Service(){
 
 
         Observable.fromCallable {
-            db = AppDatabase.getAppDatabase(applicationContext)
+            db = AppDatabase.getAppDatabase(context)
             db?.activitesDao()?.getPendingSyncActivities() // .database?.personDao()?.insert(person)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ activities:List<Activities> ->
@@ -209,7 +221,7 @@ class SyncService : Service(){
 
     private fun uploadActivity(activity: Activities) {
 
-        if(Utility.isNetworkAvailable(baseContext)) {
+        if(Utility.isNetworkAvailable(context)) {
 
 
             var gson = Gson()
@@ -262,6 +274,7 @@ class SyncService : Service(){
 
                     ?.addOnFailureListener { e ->
                         //failure
+                        allOperationSuccess = false
 
                     }
         }
@@ -270,7 +283,7 @@ class SyncService : Service(){
     private fun updateSyncStatus(activityId: String, status: Boolean) {
         Observable.fromCallable {
             if(db==null) {
-                db = AppDatabase.getAppDatabase(applicationContext)
+                db = AppDatabase.getAppDatabase(context)
             }
             db?.activitesDao()?.updateActivitySyncStatus(activityId,status) // .database?.personDao()?.insert(person)
         }.subscribeOn(Schedulers.io())

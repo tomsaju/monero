@@ -19,7 +19,7 @@ import com.monero.models.User
 class SplitTypeRecyclerAdapter(var splitList:ArrayList<SplitItem>,var context: Context,var splitType:Int,var totalAmount:Int) :RecyclerView.Adapter<ViewHolder>() {
     var SPLIT_TYPE_PERCENTAGE = 1
     var SPLIT_TYPE_MONEY = 2
-    var SPLIT_TYPE_EQUALLY = 2
+    var SPLIT_TYPE_EQUALLY = 0
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

@@ -7,4 +7,5 @@ interface IAccountBookPresenter {
     fun getAllPendingTransactions()
     fun getAllActivitiesList()
     fun getPendingTransactionForActivity(id:String)
+    fun getAllExpensesForMonth(timeinMillis:String)
 }

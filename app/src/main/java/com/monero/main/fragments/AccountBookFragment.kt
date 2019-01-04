@@ -12,6 +12,7 @@ import com.monero.main.adapter.AccountBookListAdapter
 import com.monero.main.presenter.accountbook.AccountBookPresenter
 import com.monero.main.presenter.accountbook.IAccountBookPresenter
 import com.monero.main.presenter.accountbook.IAccountBookView
+import com.monero.models.Expense
 import com.monero.models.PendingTransaction
 import com.monero.models.User
 import kotlinx.android.synthetic.main.accountbook_fragment.*
@@ -48,6 +49,10 @@ class AccountBookFragment:Fragment(),IAccountBookView {
         recyclerview!!.adapter = adapter
     }
 
+
+    override fun onAllmonthlyExpensesFetched(expenseList: ArrayList<Expense>) {
+
+    }
 
     override fun onAllActivitiesFetched(activityIds: List<String>) {
 

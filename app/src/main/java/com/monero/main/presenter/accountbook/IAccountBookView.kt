@@ -1,5 +1,6 @@
 package com.monero.main.presenter.accountbook
 
+import com.monero.models.Expense
 import com.monero.models.PendingTransaction
 
 /**
@@ -8,4 +9,5 @@ import com.monero.models.PendingTransaction
 interface IAccountBookView {
     fun onTransactionsfetched(list:ArrayList<PendingTransaction>)
     fun onAllActivitiesFetched(activityIds:List<String>)
+    fun onAllmonthlyExpensesFetched(expenseList:ArrayList<Expense>)
 }

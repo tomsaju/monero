@@ -102,6 +102,11 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".signin.SignInActivity"
             android:screenOrientation="portrait"></activity>
+        <receiver android:name=".receiver.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
